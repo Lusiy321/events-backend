@@ -5,8 +5,11 @@ module.exports = {
     tsconfigRootDir: __dirname,
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint/eslint-plugin'],
+  plugins: ['@typescript-eslint', 'prettier'],
   extends: [
+    'airbnb-typescript/base',
+    'prettier',
+    'prettier/@typescript-eslint',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
   ],
