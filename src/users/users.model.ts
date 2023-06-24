@@ -32,14 +32,14 @@ export class User extends Model<User, UserCreateAttrs>{
     @Column({ type: DataType.STRING, })
     avatarURL: string;
     
-    @Column({ type: DataType.ENUM('user', 'admin', 'moderator'), defaultValue: 'user', unique: true, allowNull: false })
+    @Column({ type: DataType.STRING, defaultValue: 'user', unique: true, allowNull: false })
     role: string;
     
     @Column({ type: DataType.BOOLEAN, defaultValue:false, allowNull: false })
     isOnline: boolean;
 
-    @Column({ type: DataType.ARRAY, defaultValue: [] })
-    postsId: Array<string>;
+    @Column({ type: DataType.STRING, defaultValue: 'dj' })
+    postsId: string;
 
     @Column({ type: DataType.STRING, defaultValue: null })
     token: string;
