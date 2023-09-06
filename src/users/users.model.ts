@@ -1,47 +1,109 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+/* eslint-disable prettier/prettier */
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ApiProperty } from '@nestjs/swagger';
+import { Model } from 'mongoose';
 
-interface UserCreateAttrs{
-    email: string;
-    password: string;
+export type UserDocument = User & Document;
+
+@Schema({ versionKey: false, timestamps: true })
+export class User extends Model<User> {
+  @ApiProperty({ example: 'Volodymyr', description: 'User first name' })
+  @Prop({
+    type: String,
+    minlength: 2,
+    maxlength: 20,
+  })
+  firstName: string;
+
+  @ApiProperty({ example: 'Zelenskiy', description: 'User last name' })
+  @Prop({
+    type: String,
+    minlength: 2,
+    maxlength: 20,
+  })
+  lastName: string;
+
+  @ApiProperty({ example: 'zelenskiy@gmail.com', description: 'User email' })
+  @Prop({ type: String, required: [true, 'Email is required'] })
+  email: string;
+
+  @ApiProperty({ example: 'Vovan-123545', description: 'User password' })
+  @Prop({
+    type: String,
+    minlength: 8,
+    required: [true, 'Password is required'],
+  })
+  password: string;
+
+  @ApiProperty({
+    example: '+380987894556',
+    description: 'User phone number',
+  })
+  @Prop({
+    type: String,
+    minlength: 10,
+    maxlength: 13,
+    default: '+380000000000',
+  })
+  phone: string;
+
+  @ApiProperty({
+    example: 'Kyiv',
+    description: 'User location',
+  })
+  @Prop({
+    type: String,
+    minlength: 2,
+    maxlength: 20,
+    default: 'Kyiv',
+  })
+  location: string;
+
+  @ApiProperty({
+    example: 'https://',
+    description: 'User avatarURL',
+  })
+  @Prop({
+    type: String,
+    default: 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+  })
+  avatarURL: string;
+
+  @ApiProperty({ example: 'true', description: 'User status' })
+  @Prop({
+    type: Boolean,
+    default: false,
+  })
+  isOnline: boolean;
+
+  @ApiProperty({
+    example:
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0N2EzNzhiNGU4MTk3ODYzMzkwMTUyYSIsImlhdCI6MTY4NTczMTIxNCwiZXhwIjoxNjg1ODE3NjE0fQ.rxH3-wVl3VGGX675UCqOFrLx-1xNH-GObq9v7GbZj0s',
+    description: 'JWT token',
+  })
+  @Prop({ type: String, default: null })
+  token: string;
+
+  @ApiProperty({ example: 'true', description: 'User status' })
+  @Prop({
+    type: Boolean,
+    default: false,
+  })
+  verify: boolean;
+
+  @ApiProperty({
+    example: 'wVl3VGGX675UCqOFrLx-1xNH-GObq9v7GbZj0s',
+    description: 'Google ID',
+  })
+  @Prop({ type: String })
+  googleId: string;
+
+  @ApiProperty({ example: 'false', description: 'User ban status' })
+  @Prop({
+    type: Boolean,
+    default: false,
+  })
+  ban: boolean;
 }
 
-@Table({ tableName: 'users' })
-export class User extends Model<User, UserCreateAttrs>{
-    
-    @Column({type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true})
-    id: number;
-
-    @Column({type: DataType.TEXT})
-    firstName: string;
-
-    @Column({type: DataType.TEXT})
-    lastName: string;
-    
-    @Column({ type: DataType.STRING, unique: true, allowNull: false })
-    email: string;
-    
-    @Column({ type: DataType.STRING, unique: true, allowNull: false })
-    password: string;
-
-    @Column({ type: DataType.STRING, defaultValue: '+38000000000' })
-    phone: string;
-
-    @Column({ type: DataType.STRING, defaultValue: 'Kyiv' })
-    location: string;
-
-    @Column({ type: DataType.STRING, })
-    avatarURL: string;
-    
-    @Column({ type: DataType.STRING, defaultValue: 'user', unique: true, allowNull: false })
-    role: string;
-    
-    @Column({ type: DataType.BOOLEAN, defaultValue:false, allowNull: false })
-    isOnline: boolean;
-
-    @Column({ type: DataType.STRING, defaultValue: 'dj' })
-    postsId: string;
-
-    @Column({ type: DataType.STRING, defaultValue: null })
-    token: string;
-
-}
+export const UserSchema = SchemaFactory.createForClass(User);
