@@ -25,6 +25,7 @@ async function start() {
       'BearerAuthMethod',
     )
     .addServer(`http://localhost:${PORT}`)
+    .addServer(`https://events-95cc.onrender.com`)
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
