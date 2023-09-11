@@ -35,6 +35,22 @@ export class User extends Model<User> {
   })
   password: string;
 
+  @ApiProperty({ example: 'My music work', description: 'User post title' })
+  @Prop({
+    type: String,
+    minlength: 2,
+    maxlength: 30,
+  })
+  title: string;
+
+  @ApiProperty({ example: 'I sing song', description: 'User post description' })
+  @Prop({
+    type: String,
+    minlength: 2,
+    maxlength: 400,
+  })
+  description: string;
+
   @ApiProperty({
     example: '+380987894556',
     description: 'User phone number',
@@ -46,6 +62,39 @@ export class User extends Model<User> {
     default: '+380000000000',
   })
   phone: string;
+
+  @ApiProperty({
+    example: '@YourLogin',
+    description: 'User telegram login',
+  })
+  @Prop({
+    type: String,
+    minlength: 3,
+    maxlength: 15,
+  })
+  telegram: string;
+
+  @ApiProperty({
+    example: '+380987894556',
+    description: 'User viber phone number',
+  })
+  @Prop({
+    type: String,
+    minlength: 10,
+    maxlength: 13,
+  })
+  viber: string;
+
+  @ApiProperty({
+    example: '+380987894556',
+    description: 'User whatsapp phone number',
+  })
+  @Prop({
+    type: String,
+    minlength: 10,
+    maxlength: 13,
+  })
+  whatsapp: string;
 
   @ApiProperty({
     example: 'Kyiv',
@@ -67,7 +116,47 @@ export class User extends Model<User> {
     type: String,
     default: 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
   })
-  avatarURL: string;
+  master_photo: string;
+
+  @ApiProperty({
+    example: ['https://', 'https://'],
+    description: 'User photo',
+  })
+  @Prop({
+    type: Array<String>,
+    default: [],
+  })
+  photo: Array<string>;
+
+  @ApiProperty({
+    example: ['https://', 'https://'],
+    description: 'User video',
+  })
+  @Prop({
+    type: Array<String>,
+    default: [],
+  })
+  video: Array<string>;
+
+  @ApiProperty({
+    example: ['music', 'show'],
+    description: 'User categoty',
+  })
+  @Prop({
+    type: Array<String>,
+    default: [],
+  })
+  categoty: Array<string>;
+
+  @ApiProperty({
+    example: ['rock', 'pop'],
+    description: 'User category genre',
+  })
+  @Prop({
+    type: Array<String>,
+    default: [],
+  })
+  genre: Array<string>;
 
   @ApiProperty({ example: 'true', description: 'User status' })
   @Prop({
@@ -75,6 +164,27 @@ export class User extends Model<User> {
     default: false,
   })
   isOnline: boolean;
+
+  @ApiProperty({ example: 'true', description: 'User paid' })
+  @Prop({
+    type: Boolean,
+    default: false,
+  })
+  paid: boolean;
+
+  @ApiProperty({ example: 'true', description: 'User trial period' })
+  @Prop({
+    type: Boolean,
+    default: false,
+  })
+  trial: boolean;
+
+  @ApiProperty({
+    example: '100$',
+    description: 'User price',
+  })
+  @Prop({ type: String })
+  price: string;
 
   @ApiProperty({
     example:

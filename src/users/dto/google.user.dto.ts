@@ -15,19 +15,13 @@ export class GoogleUserDto {
   readonly password: string;
 
   @ApiProperty({ example: 'https://', description: 'User avatar' })
-  readonly avatarURL: string;
+  readonly master_photo: string;
 
   @ApiProperty({
     example: 'I1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0N2EzN',
     description: 'Google ID',
   })
   readonly googleId: string;
-
-  @ApiProperty({
-    example: 'iIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0N2Ez',
-    description: 'User verificationToken',
-  })
-  readonly verificationToken: string;
 
   @ApiProperty({ example: 'true', description: 'User email verify' })
   readonly verify: string;

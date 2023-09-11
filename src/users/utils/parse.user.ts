@@ -2,14 +2,14 @@
 import { User } from 'src/users/users.model';
 import { UpdateUserDto } from '../dto/update.user.dto';
 
-export async function parseUser(user: User): Promise<UpdateUserDto> {
+export async function parseUser(user: User): Promise<any> {
   try {
     const parseUser = {
       id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
       phone: user.phone,
-      avatarURL: user.avatarURL,
+      master_photo: user.avatarURL,
       location: user.location,
     };
     return parseUser;

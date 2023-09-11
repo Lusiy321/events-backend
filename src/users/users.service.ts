@@ -11,6 +11,7 @@ import { PasswordUserDto } from './dto/password.user.dto';
 import * as sgMail from '@sendgrid/mail';
 import { MailUserDto } from './dto/email.user.dto';
 import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
+import { GoogleUserDto } from './dto/google.user.dto';
 
 @Injectable()
 export class UsersService {
@@ -111,6 +112,32 @@ export class UsersService {
     }
   }
 
+  async validateUser(details: GoogleUserDto) {
+    const user = await this.userModel.findOne({ googleId: details.googleId });
+    try {
+      if (user === null) {
+        const newUser = await this.userModel.create(details);
+        newUser.save();
+        const userUpdateToken = await this.userModel.findOne({
+          email: details.email,
+        });
+
+        await this.userModel.createToken(userUpdateToken);
+        return await this.userModel.findById({
+          _id: userUpdateToken._id,
+        });
+      }
+
+      await this.userModel.createToken(user);
+
+      return await this.userModel.findOne({
+        _id: user.id,
+      });
+    } catch (e) {
+      throw new NotFound('User not found');
+    }
+  }
+
   async restorePassword(email: MailUserDto) {
     const restoreMail: User = await this.userModel.findOne(email);
     try {
@@ -190,16 +217,64 @@ export class UsersService {
   }
 
   async update(user: UpdateUserDto, req: any): Promise<User> {
-    const { firstName, lastName, phone, location, avatarURL } = user;
+    const {
+      firstName,
+      lastName,
+      title,
+      description,
+      phone,
+      telegram,
+      viber,
+      whatsapp,
+      location,
+      master_photo,
+      photo,
+      video,
+      category,
+      genre,
+      price,
+    } = user;
     const findId = await this.findToken(req);
     if (!findId) {
       throw new Unauthorized('jwt expired');
     }
 
-    if (firstName || lastName || phone || location || avatarURL) {
+    if (
+      firstName ||
+      lastName ||
+      title ||
+      description ||
+      phone ||
+      telegram ||
+      viber ||
+      whatsapp ||
+      location ||
+      master_photo ||
+      photo ||
+      video ||
+      category ||
+      genre ||
+      price
+    ) {
       await this.userModel.findByIdAndUpdate(
         { _id: findId.id },
-        { firstName, lastName, phone, location, avatarURL },
+        {
+          firstName,
+          lastName,
+          title,
+          description,
+          phone,
+          telegram,
+          viber,
+          whatsapp,
+          location,
+          master_photo,
+          photo,
+          video,
+          category,
+          genre,
+          price,
+        },
       );
       const userUpdate = this.userModel.findById({ _id: findId.id });
       return userUpdate;
