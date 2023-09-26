@@ -26,6 +26,7 @@ import { GoogleAuthGuard } from './utils/Guards';
 import { PasswordUserDto } from './dto/password.user.dto';
 import { MailUserDto } from './dto/email.user.dto';
 import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('User')
 @Controller('users')
@@ -76,7 +77,7 @@ export class UsersController {
   @ApiResponse({ status: 200, type: GoogleUserDto })
   @Get('google/login')
   @UseGuards(GoogleAuthGuard)
-  googleLogin() {
+  async googleLogin() {
     return;
   }
 
@@ -85,6 +86,22 @@ export class UsersController {
   @Get('google/redirect')
   @UseGuards(GoogleAuthGuard)
   async googleAuthRedirect(@Res() res: any, @Req() req: any) {
+    const userId = req.user.id;
+    const user = await this.usersService.findById(userId);
+    return res.redirect(
+      `https://show-git-main-smirnypavel.vercel.app/?token=${user.token}`,
+    );
+  }
+  @ApiOperation({ summary: 'Login Facebook User' })
+  @Get('facebook/login')
+  @UseGuards(AuthGuard('facebook'))
+  async facebookLogin() {
+    return;
+  }
+  @ApiOperation({ summary: 'Facebook Authentication' })
+  @Get('facebook/redirect')
+  @UseGuards(AuthGuard('facebook'))
+  async facebookLoginCallback(@Req() req: any, @Res() res: any) {
     const userId = req.user.id;
     const user = await this.usersService.findById(userId);
     return res.redirect(
