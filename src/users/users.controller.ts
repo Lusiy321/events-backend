@@ -96,17 +96,15 @@ export class UsersController {
   @Get('facebook/login')
   @UseGuards(AuthGuard('facebook'))
   async facebookLogin() {
-    return;
+    return console.log('object');
   }
   @ApiOperation({ summary: 'Facebook Authentication' })
   @Get('facebook/redirect')
   @UseGuards(AuthGuard('facebook'))
   async facebookLoginCallback(@Req() req: any, @Res() res: any) {
-    const userId = req.user.id;
-    const user = await this.usersService.findById(userId);
-    return res.redirect(
-      `https://show-git-main-smirnypavel.vercel.app/?token=${user.token}`,
-    );
+    // const userId = req.user.id;
+    // const user = await this.usersService.findById(userId);
+    return res.redirect(`https://show-git-main-smirnypavel.vercel.app/?token=`);
   }
 
   @ApiOperation({ summary: 'Refresh Access Token' })

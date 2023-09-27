@@ -25,6 +25,7 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
       verify: profile.emails[0].verified,
     });
     user.save();
+
     return user || null;
   }
 }
