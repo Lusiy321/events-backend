@@ -14,6 +14,8 @@ import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
 import { GoogleUserDto } from './dto/google.user.dto';
 import { Category } from './category.model';
 import { CreateCategoryDto } from './dto/create.category.dto';
+import { Subcategories } from './utils/subcategory.interface';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UsersService {
@@ -28,6 +30,15 @@ export class UsersService {
   async findById(id: string): Promise<User> {
     try {
       const find = await this.userModel.findById(id).exec();
+      return find;
+    } catch (e) {
+      throw new NotFound('User not found');
+    }
+  }
+
+  async findCategory(): Promise<Category[]> {
+    try {
+      const find = await this.categoryModel.find().exec();
       return find;
     } catch (e) {
       throw new NotFound('User not found');
@@ -81,11 +92,12 @@ export class UsersService {
 
   async addSubcategory(
     catId: string,
-    subCategory: CreateCategoryDto,
+    subCategory: Subcategories,
   ): Promise<Category> {
     try {
       const find = await this.categoryModel.findById(catId).exec();
       const arr = find.subcategories;
+      subCategory.id = uuidv4();
       arr.push(subCategory);
       await this.categoryModel.updateOne(
         { _id: catId },

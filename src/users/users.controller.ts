@@ -49,6 +49,14 @@ export class UsersController {
     return this.usersService.findById(id);
   }
 
+  @ApiOperation({ summary: 'Get user by ID' })
+  @ApiResponse({ status: 200, type: Category })
+  @ApiBearerAuth('BearerAuthMethod')
+  @Get('category')
+  async findCat(): Promise<Category[]> {
+    return this.usersService.findCategory();
+  }
+
   @ApiOperation({ summary: 'Login User' })
   @ApiResponse({ status: 200, type: User })
   @Post('login')

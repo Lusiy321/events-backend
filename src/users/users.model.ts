@@ -142,7 +142,10 @@ export class User extends Model<User> {
   video: Array<string>;
 
   @ApiProperty({
-    example: ['music', 'show'],
+    example: [
+      { id: 101, name: 'Rock' },
+      { id: 102, name: 'Jazz' },
+    ],
     description: 'User categoty',
   })
   @Prop({
