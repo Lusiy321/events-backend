@@ -119,11 +119,14 @@ export class User extends Model<User> {
   master_photo: string;
 
   @ApiProperty({
-    example: ['https://', 'https://'],
+    example: [
+      { id: '1', url: 'https://' },
+      { id: '2', url: 'https://' },
+    ],
     description: 'User photo',
   })
   @Prop({
-    type: Array<String>,
+    type: Array<Object>,
     default: [],
   })
   photo: Array<string>;

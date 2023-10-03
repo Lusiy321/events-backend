@@ -27,8 +27,11 @@ export class UpdateUserDto {
   readonly location: string;
   @ApiProperty({ example: 'https://', description: 'User photo' })
   readonly master_photo: string;
-  @ApiProperty({ example: ['https://'], description: 'User photo collection' })
-  readonly photo: Array<string>;
+  @ApiProperty({
+    example: [{ id: '1', url: 'https://' }],
+    description: 'User photo collection',
+  })
+  readonly photo: Array<object>;
   @ApiProperty({ example: ['https://'], description: 'User photo collection' })
   readonly video: Array<string>;
   @ApiProperty({ example: ['music', 'show'], description: 'User avatar' })
