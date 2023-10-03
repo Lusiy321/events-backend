@@ -12,12 +12,15 @@ import * as sgMail from '@sendgrid/mail';
 import { MailUserDto } from './dto/email.user.dto';
 import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
 import { GoogleUserDto } from './dto/google.user.dto';
+import { Category } from './category.model';
+import { CreateCategoryDto } from './dto/create.category.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name)
     private userModel: User,
+    @InjectModel(Category.name) private categoryModel: Category,
   ) {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   }
@@ -50,6 +53,27 @@ export class UsersService {
       const verificationLink = `http://localhost:5000//verify-email/${createdUser._id}`;
       await this.sendVerificationEmail(email, verificationLink);
       return await this.userModel.findById(createdUser._id);
+    } catch (e) {
+      throw new BadRequest(e.message);
+    }
+  }
+
+  async createCategory(category: CreateCategoryDto): Promise<Category> {
+    try {
+      const { name } = category;
+      const lowerCaseEmail = name.toLowerCase();
+
+      const registrationCategory = await this.categoryModel.findOne({
+        name: lowerCaseEmail,
+      });
+      if (registrationCategory) {
+        throw new Conflict(`Category ${name} exist`);
+      }
+
+      const createdCategory = await this.categoryModel.create(category);
+      createdCategory.save();
+
+      return await this.categoryModel.findById(createdCategory._id);
     } catch (e) {
       throw new BadRequest(e.message);
     }

@@ -8,6 +8,7 @@ import { GoogleStrategy } from './utils/GoogleStrategy';
 import { SessionSerializer } from './utils/Serializer';
 import { FacebookStrategy } from './utils/facebook.strategy';
 import { PassportModule } from '@nestjs/passport';
+import { Category, CategorySchema } from './category.model';
 
 @Module({
   imports: [
@@ -17,6 +18,9 @@ import { PassportModule } from '@nestjs/passport';
     }),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema, collection: 'users' },
+    ]),
+    MongooseModule.forFeature([
+      { name: Category.name, schema: CategorySchema, collection: 'categories' },
     ]),
     PassportModule.register({ defaultStrategy: 'facebook' }),
   ],

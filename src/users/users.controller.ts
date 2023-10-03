@@ -27,6 +27,8 @@ import { PasswordUserDto } from './dto/password.user.dto';
 import { MailUserDto } from './dto/email.user.dto';
 import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { Category } from './category.model';
+import { CreateCategoryDto } from './dto/create.category.dto';
 
 @ApiTags('User')
 @Controller('users')
@@ -92,19 +94,12 @@ export class UsersController {
       `https://show-git-main-smirnypavel.vercel.app/?token=${user.token}`,
     );
   }
-  @ApiOperation({ summary: 'Login Facebook User' })
-  @Get('facebook/login')
-  @UseGuards(AuthGuard('facebook'))
-  async facebookLogin() {
-    return console.log('object');
-  }
-  @ApiOperation({ summary: 'Facebook Authentication' })
-  @Get('facebook/redirect')
-  @UseGuards(AuthGuard('facebook'))
-  async facebookLoginCallback(@Req() req: any, @Res() res: any) {
-    // const userId = req.user.id;
-    // const user = await this.usersService.findById(userId);
-    return res.redirect(`https://show-git-main-smirnypavel.vercel.app/?token=`);
+
+  @ApiOperation({ summary: 'Create Category' })
+  @ApiResponse({ status: 200, type: Category })
+  @Post('/category/add')
+  async createCat(@Body() category: CreateCategoryDto): Promise<Category> {
+    return this.usersService.createCategory(category);
   }
 
   @ApiOperation({ summary: 'Refresh Access Token' })
@@ -146,3 +141,18 @@ export class UsersController {
     return res.redirect(`https://show-git-main-smirnypavel.vercel.app`);
   }
 }
+
+// @ApiOperation({ summary: 'Login Facebook User' })
+// @Get('facebook/login')
+// @UseGuards(AuthGuard('facebook'))
+// async facebookLogin() {
+//   return console.log('object');
+// }
+// @ApiOperation({ summary: 'Facebook Authentication' })
+// @Get('facebook/redirect')
+// @UseGuards(AuthGuard('facebook'))
+// async facebookLoginCallback(@Req() req: any, @Res() res: any) {
+//   // const userId = req.user.id;
+//   // const user = await this.usersService.findById(userId);
+//   return res.redirect(`https://show-git-main-smirnypavel.vercel.app/?token=`);
+// }
