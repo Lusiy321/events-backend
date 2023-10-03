@@ -79,6 +79,24 @@ export class UsersService {
     }
   }
 
+  async addSubcategory(
+    catId: string,
+    subCategory: CreateCategoryDto,
+  ): Promise<Category> {
+    try {
+      const find = await this.categoryModel.findById(catId).exec();
+      const arr = find.subcategories;
+      arr.push(subCategory);
+      await this.categoryModel.updateOne(
+        { _id: catId },
+        { $set: { subcategories: arr } },
+      );
+      return await this.categoryModel.findById(catId);
+    } catch (e) {
+      throw new NotFound('Category not found');
+    }
+  }
+
   async sendVerificationEmail(
     email: string,
     verificationLink: string,

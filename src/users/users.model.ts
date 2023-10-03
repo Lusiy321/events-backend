@@ -146,10 +146,10 @@ export class User extends Model<User> {
     description: 'User categoty',
   })
   @Prop({
-    type: Array<String>,
+    type: Array<Object>,
     default: [],
   })
-  categoty: Array<string>;
+  categoty: Array<object>;
 
   @ApiProperty({
     example: ['rock', 'pop'],

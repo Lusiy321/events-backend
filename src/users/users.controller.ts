@@ -102,6 +102,16 @@ export class UsersController {
     return this.usersService.createCategory(category);
   }
 
+  @ApiOperation({ summary: 'Add subcategories' })
+  @ApiResponse({ status: 200, type: Category })
+  @Post('/subcategories/:id')
+  async addSubcategory(
+    @Param('id') id: string,
+    @Body() subCategory: CreateCategoryDto,
+  ): Promise<Category> {
+    return this.usersService.addSubcategory(id, subCategory);
+  }
+
   @ApiOperation({ summary: 'Refresh Access Token' })
   @ApiBearerAuth('BearerAuthMethod')
   @Patch('refresh')
