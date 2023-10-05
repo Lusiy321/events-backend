@@ -29,11 +29,16 @@ import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Category } from './category.model';
 import { CreateCategoryDto } from './dto/create.category.dto';
+import { TelegramService } from './telegram.servica';
 
 @ApiTags('User')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly telegramService: TelegramService,
+  ) {}
+
   @ApiOperation({ summary: 'Create User' })
   @ApiResponse({ status: 200, type: User })
   @Post('/')
@@ -158,6 +163,14 @@ export class UsersController {
     await this.usersService.verifyUserEmail(id);
     return res.redirect(`https://show-git-main-smirnypavel.vercel.app`);
   }
+
+  // @ApiOperation({ summary: 'Send telegram message' })
+  // @Post('send')
+  // async sendNotification(@Body() data: { chatId: number; message: string }) {
+  //   const { chatId, message } = data;
+  //   await this.telegramService.sendMessage(chatId, message);
+  //   return { success: true, message: 'Уведомление успешно отправлено' };
+  // }
 }
 
 // @ApiOperation({ summary: 'Login Facebook User' })

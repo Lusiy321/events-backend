@@ -9,6 +9,7 @@ import { SessionSerializer } from './utils/Serializer';
 import { FacebookStrategy } from './utils/facebook.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { Category, CategorySchema } from './category.model';
+import { TelegramService } from './telegram.servica';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { Category, CategorySchema } from './category.model';
     SessionSerializer,
     { provide: 'USER_SERVICE', useClass: UsersService },
     UsersService,
+    TelegramService,
   ],
   controllers: [UsersController],
 })
