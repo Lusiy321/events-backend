@@ -288,12 +288,11 @@ export class UsersService {
       genre,
       price,
     } = user;
+    const findId = await this.findToken(req);
+    if (!findId) {
+      throw new Unauthorized('jwt expired');
+    }
     try {
-      const findId = await this.findToken(req);
-      if (!findId) {
-        throw new Unauthorized('jwt expired');
-      }
-
       if (
         firstName ||
         lastName ||
