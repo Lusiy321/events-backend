@@ -30,13 +30,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { Category } from './category.model';
 import { CreateCategoryDto } from './dto/create.category.dto';
 
-
 @ApiTags('User')
 @Controller('users')
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService,
-  ) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @ApiOperation({ summary: 'Create User' })
   @ApiResponse({ status: 200, type: User })
@@ -53,9 +50,8 @@ export class UsersController {
     return this.usersService.findById(id);
   }
 
-  @ApiOperation({ summary: 'Get user by ID' })
+  @ApiOperation({ summary: 'Get category' })
   @ApiResponse({ status: 200, type: Category })
-  @ApiBearerAuth('BearerAuthMethod')
   @Get('category')
   async findCat(): Promise<Category[]> {
     return this.usersService.findCategory();
