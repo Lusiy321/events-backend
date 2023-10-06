@@ -6,11 +6,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UsersController } from './users/users.controller';
 import { UsersService } from './users/users.service';
 import { Category, CategorySchema } from './users/category.model';
-import { TelegramService } from './users/telegram.servica';
+import { TelegramService } from './telegram/telegram.service';
+import { TelegramModule } from './telegram/telegram.module';
 
 @Module({
   controllers: [UsersController],
-  providers: [UsersService, TelegramService],
+  providers: [UsersService, TelegramService,],
   imports: [
     ConfigModule.forRoot({
       envFilePath: `.env`,
@@ -23,6 +24,7 @@ import { TelegramService } from './users/telegram.servica';
       { name: Category.name, schema: CategorySchema, collection: 'categories' },
     ]),
     UsersModule,
+    TelegramModule,
   ],
 })
 export class AppModule {}

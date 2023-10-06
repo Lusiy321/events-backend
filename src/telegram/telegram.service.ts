@@ -13,11 +13,11 @@ export class TelegramService {
       { command: '/set', description: 'Настройки' },
     ]);
     this.bot.onText(/\/start/, async (msg) => {
-      const chatId = msg.chat.id;
+      const chatId = msg.chat.id;      
       console.log(`New user ${msg.from.first_name} connected`);
       this.bot.sendMessage(
         chatId,
-        `Привет ${msg.from.first_name} теперь тебе будут приходить уведомления`,
+        `Привет ${msg.from.first_name} теперь тебе будут приходить уведомления ваш ID ${chatId} `,
       );
     });
   }

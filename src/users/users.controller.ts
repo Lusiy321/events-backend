@@ -29,14 +29,13 @@ import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Category } from './category.model';
 import { CreateCategoryDto } from './dto/create.category.dto';
-import { TelegramService } from './telegram.servica';
+
 
 @ApiTags('User')
 @Controller('users')
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly telegramService: TelegramService,
   ) {}
 
   @ApiOperation({ summary: 'Create User' })
