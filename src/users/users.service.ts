@@ -293,6 +293,7 @@ export class UsersService {
     if (!findId) {
       throw new Unauthorized('jwt expired');
     }
+    console.log(user);
     try {
       if (
         firstName ||
@@ -385,7 +386,7 @@ export class UsersService {
       id: authUser._id,
     };
     const SECRET_KEY = process.env.SECRET_KEY;
-    const token = sign(payload, SECRET_KEY, { expiresIn: '1m' });
+    const token = sign(payload, SECRET_KEY, { expiresIn: '10m' });
     await this.userModel.findByIdAndUpdate(authUser._id, { token });
     const authentificationUser = await this.userModel.findById({
       _id: authUser._id,
