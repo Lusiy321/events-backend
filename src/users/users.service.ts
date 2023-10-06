@@ -288,9 +288,8 @@ export class UsersService {
       genre,
       price,
     } = user;
-    console.log(req);
     const findId = await this.findToken(req);
-    console.log(findId);
+
     if (!findId) {
       throw new Unauthorized('jwt expired');
     }
@@ -365,7 +364,8 @@ export class UsersService {
     try {
       const { authorization = '' } = req.headers;
       const [bearer, token] = authorization.split(' ');
-
+      console.log(bearer);
+      console.log(token);
       if (bearer !== 'Bearer') {
         throw new Unauthorized('Not authorized');
       }
