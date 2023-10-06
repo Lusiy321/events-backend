@@ -288,50 +288,54 @@ export class UsersService {
       genre,
       price,
     } = user;
-    const findId = await this.findToken(req);
-    if (!findId) {
-      throw new Unauthorized('jwt expired');
-    }
+    try {
+      const findId = await this.findToken(req);
+      if (!findId) {
+        throw new Unauthorized('jwt expired');
+      }
 
-    if (
-      firstName ||
-      lastName ||
-      title ||
-      description ||
-      phone ||
-      telegram ||
-      viber ||
-      whatsapp ||
-      location ||
-      master_photo ||
-      photo ||
-      video ||
-      category ||
-      genre ||
-      price
-    ) {
-      await this.userModel.findByIdAndUpdate(
-        { _id: findId.id },
-        {
-          firstName,
-          lastName,
-          title,
-          description,
-          phone,
-          telegram,
-          viber,
-          whatsapp,
-          location,
-          master_photo,
-          photo,
-          video,
-          category,
-          genre,
-          price,
-        },
-      );
-      const userUpdate = this.userModel.findById({ _id: findId.id });
-      return userUpdate;
+      if (
+        firstName ||
+        lastName ||
+        title ||
+        description ||
+        phone ||
+        telegram ||
+        viber ||
+        whatsapp ||
+        location ||
+        master_photo ||
+        photo ||
+        video ||
+        category ||
+        genre ||
+        price
+      ) {
+        await this.userModel.findByIdAndUpdate(
+          { _id: findId.id },
+          {
+            firstName,
+            lastName,
+            title,
+            description,
+            phone,
+            telegram,
+            viber,
+            whatsapp,
+            location,
+            master_photo,
+            photo,
+            video,
+            category,
+            genre,
+            price,
+          },
+        );
+        const userUpdate = this.userModel.findById({ _id: findId.id });
+        return userUpdate;
+      }
+    } catch (e) {
+      throw new BadRequest(e.message);
     }
   }
 
