@@ -26,7 +26,6 @@ import { GoogleAuthGuard } from './utils/Guards';
 import { PasswordUserDto } from './dto/password.user.dto';
 import { MailUserDto } from './dto/email.user.dto';
 import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { Category } from './category.model';
 import { CreateCategoryDto } from './dto/create.category.dto';
 
