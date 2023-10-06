@@ -288,7 +288,9 @@ export class UsersService {
       genre,
       price,
     } = user;
+    console.log(req);
     const findId = await this.findToken(req);
+    console.log(findId);
     if (!findId) {
       throw new Unauthorized('jwt expired');
     }
