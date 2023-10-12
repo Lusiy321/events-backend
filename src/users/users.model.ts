@@ -146,13 +146,13 @@ export class User extends Model<User> {
       { id: 101, name: 'Rock' },
       { id: 102, name: 'Jazz' },
     ],
-    description: 'User categoty',
+    description: 'User category',
   })
   @Prop({
     type: Array<Object>,
     default: [],
   })
-  categoty: Array<object>;
+  category: Array<object>;
 
   @ApiProperty({
     example: ['rock', 'pop'],
