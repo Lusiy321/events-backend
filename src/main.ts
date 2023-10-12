@@ -9,6 +9,7 @@ async function start() {
   const app = await NestFactory.create(AppModule, new ExpressAdapter(express), {
     cors: true,
   });
+
   app.enableCors();
   const config = new DocumentBuilder()
     .setTitle('Event server')

@@ -11,7 +11,7 @@ import { TelegramModule } from './telegram/telegram.module';
 
 @Module({
   controllers: [UsersController],
-  providers: [UsersService, TelegramService,],
+  providers: [UsersService, TelegramService],
   imports: [
     ConfigModule.forRoot({
       envFilePath: `.env`,
