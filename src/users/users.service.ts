@@ -245,7 +245,6 @@ export class UsersService {
     if (!findId) {
       throw new Unauthorized('jwt expired');
     }
-    console.log(user);
     try {
       if (
         firstName ||
@@ -317,8 +316,7 @@ export class UsersService {
     try {
       const { authorization = '' } = req.headers;
       const [bearer, token] = authorization.split(' ');
-      console.log(bearer);
-      console.log(token);
+
       if (bearer !== 'Bearer') {
         throw new Unauthorized('Not authorized');
       }
