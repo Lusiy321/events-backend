@@ -2,6 +2,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Model } from 'mongoose';
+import { Categories } from './dto/caterory.interface';
 
 export type UserDocument = User & Document;
 
@@ -152,7 +153,7 @@ export class User extends Model<User> {
     type: Array<Object>,
     default: [],
   })
-  category: Array<object>;
+  category: Array<Categories>;
 
   @ApiProperty({
     example: ['rock', 'pop'],

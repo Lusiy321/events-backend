@@ -16,6 +16,7 @@ import { Category } from './category.model';
 import { CreateCategoryDto } from './dto/create.category.dto';
 import { Subcategories } from './utils/subcategory.interface';
 import { v4 as uuidv4 } from 'uuid';
+import { Categories } from './dto/caterory.interface';
 
 @Injectable()
 export class UsersService {
@@ -392,7 +393,39 @@ export class UsersService {
       throw new BadRequest(e.message);
     }
   }
+  async addUsercategory(
+    userID: string,
+    categoryID: string,
+    subcategoryID: string,
+  ): Promise<User> {
+    try {
+      const findUser = await this.userModel.findById(userID).exec();
+      const arrCategory = findUser.category;
+      const findCategory = await this.categoryModel.findById(categoryID).exec();
+      const arrSubcategory = findCategory.subcategories;
 
+      function searchById(arr: Array<any>, id: string) {
+        for (let i = 0; i < arr.length; i++) {
+          if (arr[i].id === id) {
+            return arr[i];
+          }
+        }
+        return null;
+      }
+      const result = searchById(arrSubcategory, subcategoryID);
+      findCategory.subcategories = [];
+      findCategory.subcategories.push(result);
+      arrCategory.push(findCategory);
+
+      await this.userModel.updateOne(
+        { _id: userID },
+        { $set: { category: arrCategory } },
+      );
+      return await this.userModel.findById(userID);
+    } catch (e) {
+      throw new NotFound('Category not found');
+    }
+  }
   async addSubcategory(
     catId: string,
     subCategory: Subcategories,
