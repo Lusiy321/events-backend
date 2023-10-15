@@ -263,6 +263,18 @@ export class UsersService {
         genre ||
         price
       ) {
+        if (category) {
+          const findUser = await this.userModel.findById(findId.id).exec();
+          const arrCategory = findUser.category;
+          arrCategory.push(...category);
+          await this.userModel.findByIdAndUpdate(
+            { _id: findId.id },
+            {
+              $set: { category: arrCategory },
+            },
+          );
+        }
+
         await this.userModel.findByIdAndUpdate(
           { _id: findId.id },
           {
@@ -278,7 +290,6 @@ export class UsersService {
             master_photo,
             photo,
             video,
-            category,
             genre,
             price,
           },
