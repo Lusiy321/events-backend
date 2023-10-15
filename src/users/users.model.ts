@@ -75,6 +75,11 @@ export class User extends Model<User> {
   })
   telegram: string;
 
+  @Prop({
+    type: Number,
+  })
+  tg_chat: number;
+
   @ApiProperty({
     example: '+380987894556',
     description: 'User viber phone number',
