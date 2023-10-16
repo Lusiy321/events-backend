@@ -20,50 +20,50 @@ export class OrdersService {
       throw new NotFound('User not found');
     }
   }
-
+  async generateSixDigitNumber() {
+    const min = 100000;
+    const max = 999999;
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
   async create(order: CreateOrderDto): Promise<Orders> {
     try {
       const { phone } = order;
 
-      const registrationUser = await this.ordersModel.findOne({
+      const existingOrder = await this.ordersModel.findOne({
         phone: phone,
+        active: true,
       });
-      if (registrationUser.active === true) {
-        throw new Conflict(`User with ${phone} in use`);
+
+      if (existingOrder) {
+        throw new Conflict(
+          `Пользователь с номером телефона ${phone} уже существует`,
+        );
+      } else {
+        const verificationCode = await this.generateSixDigitNumber();
+        const createdOrder = await this.ordersModel.create(order);
+
+        await this.ordersModel.findByIdAndUpdate(
+          { _id: createdOrder._id },
+          { sms: verificationCode },
+        );
+
+        return await this.ordersModel.findById(createdOrder._id);
       }
-
-      const createOrder = await this.ordersModel.create(order);
-      createOrder.save();
-
-      return await this.ordersModel.findById(createOrder._id);
     } catch (e) {
       throw new BadRequest(e.message);
     }
   }
 
-  async sendVerificationCode(phoneNumber: CreateOrderDto) {
-    // const user = await this.ordersModel.findOne(phoneNumber);
-    const { phone } = phoneNumber;
-    function generateSixDigitNumber() {
-      const min = 100000;
-      const max = 999999;
-      return Math.floor(Math.random() * (max - min + 1)) + min;
+  async verifyOrder(code: string) {
+    try {
+      const user = await this.ordersModel.findOne({ sms: code });
+      if (user) {
+        user.verify = true;
+        user.save();
+        return await this.ordersModel.findOne({ id: user.id });
+      }
+    } catch (e) {
+      throw new BadRequest(e.message);
     }
-    const verificationCode = generateSixDigitNumber();
-    console.log(phone);
-    // try {
-    await this.twilioService.sendSMS(
-      phone,
-      `Your verification code: ${verificationCode}`,
-    );
-
-    // await this.ordersModel.findByIdAndUpdate(
-    //   { _id: user._id },
-    //   { sms: verificationCode },
-    // );
-    // } catch (e) {
-    //   throw new BadRequest(e.message);
-    // }
-    return await this.ordersModel.findOne(phoneNumber);
   }
 }
