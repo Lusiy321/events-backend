@@ -10,8 +10,8 @@ export class Orders extends Model<Orders> {
   @ApiProperty({ example: '380987894556', description: 'User phone number' })
   @Prop({
     type: String,
-    minlength: 12,
-    maxlength: 12,
+    minlength: 13,
+    maxlength: 13,
     required: [true, 'User phone number'],
   })
   phone: string;
@@ -76,6 +76,11 @@ export class Orders extends Model<Orders> {
   })
   active: boolean;
 
+  @ApiProperty({ example: '123564', description: 'SMS code' })
+  @Prop({
+    type: Number,
+  })
+  sms: number;
   @ApiProperty({ example: 'true', description: 'Order verify' })
   @Prop({
     type: Boolean,

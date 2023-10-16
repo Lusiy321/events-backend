@@ -3,6 +3,7 @@ import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { OrderSchema, Orders } from './order.model';
+import { TwilioService } from './twilio.service';
 
 @Module({
   imports: [
@@ -11,6 +12,6 @@ import { OrderSchema, Orders } from './order.model';
     ]),
   ],
   controllers: [OrdersController],
-  providers: [OrdersService],
+  providers: [OrdersService, TwilioService],
 })
 export class OrdersModule {}
