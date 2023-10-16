@@ -8,6 +8,7 @@ import { UsersService } from './users/users.service';
 import { Category, CategorySchema } from './users/category.model';
 import { TelegramService } from './telegram/telegram.service';
 import { TelegramModule } from './telegram/telegram.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   controllers: [UsersController],
@@ -25,6 +26,7 @@ import { TelegramModule } from './telegram/telegram.module';
     ]),
     UsersModule,
     TelegramModule,
+    OrdersModule,
   ],
 })
 export class AppModule {}
