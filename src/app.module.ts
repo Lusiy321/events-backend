@@ -9,6 +9,7 @@ import { Category, CategorySchema } from './users/category.model';
 import { TelegramService } from './telegram/telegram.service';
 import { TelegramModule } from './telegram/telegram.module';
 import { OrdersModule } from './orders/orders.module';
+import { OrderSchema, Orders } from './orders/order.model';
 
 @Module({
   controllers: [UsersController],
@@ -23,6 +24,9 @@ import { OrdersModule } from './orders/orders.module';
     ]),
     MongooseModule.forFeature([
       { name: Category.name, schema: CategorySchema, collection: 'categories' },
+    ]),
+    MongooseModule.forFeature([
+      { name: Orders.name, schema: OrderSchema, collection: 'orders' },
     ]),
     UsersModule,
     TelegramModule,

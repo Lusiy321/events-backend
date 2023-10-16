@@ -12,7 +12,7 @@ async function start() {
 
   app.enableCors();
   const config = new DocumentBuilder()
-    .setTitle('Event server')
+    .setTitle('Event and Show server')
     .setDescription('REAST API Documentation')
     .setVersion('1.0.0')
     .addBearerAuth(

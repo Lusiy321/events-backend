@@ -126,8 +126,8 @@ export class User extends Model<User> {
 
   @ApiProperty({
     example: [
-      { id: '1', url: 'https://' },
-      { id: '2', url: 'https://' },
+      { publicId: '1', url: 'https://' },
+      { publicId: '2', url: 'https://' },
     ],
     description: 'User photo',
   })
@@ -149,8 +149,28 @@ export class User extends Model<User> {
 
   @ApiProperty({
     example: [
-      { id: 101, name: 'Rock' },
-      { id: 102, name: 'Jazz' },
+      {
+        _id: '65258a576f9a7d99e555c7bd',
+        name: 'Музичні послуги',
+        subcategories: [
+          {
+            name: 'Жива музика',
+            id: '872c7525-ef5b-4dc3-9082-bdb98426fb1a',
+          },
+          {
+            name: 'Ді-джеї та звукорежисери',
+            id: '4bb29caa-f936-45df-baeb-6ca488404f55',
+          },
+          {
+            name: 'Кавер-групи',
+            id: '5843bd7-1d85-48e1-b225-56ff78e34514',
+          },
+          {
+            name: 'Сольні виконавці',
+            id: '5f24f679-54a1-4449-b03c-95fe36afb56c',
+          },
+        ],
+      },
     ],
     description: 'User category',
   })
@@ -159,16 +179,6 @@ export class User extends Model<User> {
     default: [],
   })
   category: Array<Categories>;
-
-  @ApiProperty({
-    example: ['rock', 'pop'],
-    description: 'User category genre',
-  })
-  @Prop({
-    type: Array<String>,
-    default: [],
-  })
-  genre: Array<string>;
 
   @ApiProperty({ example: 'true', description: 'User status' })
   @Prop({

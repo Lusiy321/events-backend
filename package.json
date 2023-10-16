@@ -49,6 +49,7 @@
     "rxjs": "^7.2.0",
     "sendgrid": "^5.2.3",
     "swagger-ui-express": "^4.6.3",
+    "twilio": "^4.18.1",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

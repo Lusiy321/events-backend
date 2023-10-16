@@ -132,16 +132,7 @@ export class UsersController {
   async findSubcategoryId(@Param('id') id: string): Promise<User[]> {
     return this.usersService.findUserSubcategory(id);
   }
-  @ApiOperation({ summary: 'Добавление категории и подкатегории пользователю' })
-  @ApiResponse({ status: 200, type: Category })
-  @Post('/cat-add-user/:userId/:categoryId/:subcategoryId')
-  async addUserCategories(
-    @Param('userId') userID: string,
-    @Param('categoryId') categoryID: string,
-    @Param('subcategoryId') subcategoryID: string,
-  ): Promise<User> {
-    return this.usersService.addUsercategory(userID, categoryID, subcategoryID);
-  }
+
   @ApiOperation({ summary: 'Refresh Access Token' })
   @ApiBearerAuth('BearerAuthMethod')
   @Patch('refresh')
