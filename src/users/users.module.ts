@@ -6,7 +6,6 @@ import { User, UserSchema } from './users.model';
 import { JwtModule } from '@nestjs/jwt';
 import { GoogleStrategy } from './utils/GoogleStrategy';
 import { SessionSerializer } from './utils/Serializer';
-import { FacebookStrategy } from './utils/facebook.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { Category, CategorySchema } from './category.model';
 
@@ -26,7 +25,6 @@ import { Category, CategorySchema } from './category.model';
   ],
   providers: [
     GoogleStrategy,
-    FacebookStrategy,
     SessionSerializer,
     { provide: 'USER_SERVICE', useClass: UsersService },
     UsersService,
