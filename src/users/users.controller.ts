@@ -41,6 +41,13 @@ export class UsersController {
     return this.usersService.create(user);
   }
 
+  @ApiOperation({ summary: 'Get all users' })
+  @ApiResponse({ status: 200, type: User })
+  @Get('/find')
+  async findUsers(): Promise<User[]> {
+    return this.usersService.findAllUsers();
+  }
+
   @ApiOperation({ summary: 'Get user by ID' })
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')

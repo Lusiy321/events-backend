@@ -28,6 +28,16 @@ export class UsersService {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   }
   // USER
+
+  async findAllUsers(): Promise<User[]> {
+    try {
+      const find = await this.userModel.find().exec();
+      return find;
+    } catch (e) {
+      throw new NotFound('User not found');
+    }
+  }
+
   async findById(id: string): Promise<User> {
     try {
       const find = await this.userModel.findById(id).exec();

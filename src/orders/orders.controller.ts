@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Injectable, Param, Post } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { TwilioService } from './twilio.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -17,6 +17,13 @@ export class OrdersController {
     private ordersModel: Orders,
   ) {}
 
+  @ApiOperation({ summary: 'Get all orders' })
+  @ApiResponse({ status: 200, type: Orders })
+  @Get('/find')
+  async findOrders(): Promise<Orders[]> {
+    return this.ordersService.findAllOrders();
+  }
+
   @ApiOperation({ summary: 'Create Order' })
   @ApiResponse({ status: 200, type: Orders })
   @Post('/')
@@ -26,20 +33,18 @@ export class OrdersController {
 
   @ApiOperation({ summary: 'Send sms code' })
   @ApiResponse({ status: 200, type: Orders })
-  @Post('/send-code')
-  async sendVerificationCode(@Body() phoneNumber: CreateOrderDto) {
-    const { phone } = phoneNumber;
-    const user = await this.ordersModel.findOne({ phone: phone });
-
+  @Post('/send-code/:phone')
+  async sendVerificationCode(@Param('phone') phoneNumber: string) {
+    const user = await this.ordersModel.findOne({ phone: phoneNumber });
     try {
       await this.twilioService.sendSMS(
-        phone,
+        phoneNumber,
         `Your verification code: ${user.sms}`,
       );
     } catch (e) {
       throw new BadRequest(e.message);
     }
-    return await this.ordersModel.findOne({ phone: phone });
+    return await this.ordersModel.findOne({ phone: phoneNumber });
   }
 
   @ApiOperation({ summary: 'Verivy sms order' })

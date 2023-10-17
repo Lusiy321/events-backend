@@ -17,6 +17,15 @@ export class Orders extends Model<Orders> {
   phone: string;
 
   @ApiProperty({
+    example: 'Ivan Petrov',
+    description: 'Your name',
+  })
+  @Prop({
+    type: String,
+  })
+  name: string;
+
+  @ApiProperty({
     example: 'I whand music band on 20:00 today',
     description: 'Order description',
   })
