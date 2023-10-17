@@ -44,18 +44,6 @@ export class Orders extends Model<Orders> {
             name: 'Жива музика',
             id: '872c7525-ef5b-4dc3-9082-bdb98426fb1a',
           },
-          {
-            name: 'Ді-джеї та звукорежисери',
-            id: '4bb29caa-f936-45df-baeb-6ca488404f55',
-          },
-          {
-            name: 'Кавер-групи',
-            id: '5843bd7-1d85-48e1-b225-56ff78e34514',
-          },
-          {
-            name: 'Сольні виконавці',
-            id: '5f24f679-54a1-4449-b03c-95fe36afb56c',
-          },
         ],
       },
     ],
