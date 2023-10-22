@@ -66,6 +66,32 @@ export class Orders extends Model<Orders> {
   })
   telegram: string;
 
+  @ApiProperty({
+    example: 'Kyiv',
+    description: 'User location',
+  })
+  @Prop({
+    type: String,
+    minlength: 2,
+    maxlength: 20,
+    default: 'Kyiv',
+  })
+  location: string;
+
+  @ApiProperty({
+    example: '100$',
+    description: 'User price',
+  })
+  @Prop({ type: String })
+  price: string;
+
+  @ApiProperty({
+    example: '10.11.2024',
+    description: 'Order data',
+  })
+  @Prop({ type: String })
+  data: string;
+
   @ApiProperty({ example: 'true', description: 'Order status' })
   @Prop({
     type: Boolean,
