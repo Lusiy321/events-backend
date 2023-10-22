@@ -4,16 +4,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Conflict, NotFound, BadRequest, Unauthorized } from 'http-errors';
 import { CreateOrderDto } from './dto/create.order.dto';
 import { TwilioService } from './twilio.service';
-import { User } from 'src/users/users.model';
+
+import { TelegramService } from 'src/telegram/telegram.service';
 
 @Injectable()
 export class OrdersService {
   constructor(
     private readonly twilioService: TwilioService,
+    private readonly telegramService: TelegramService,
     @InjectModel(Orders.name)
     private ordersModel: Orders,
-    @InjectModel(Orders.name)
-    private userModel: User,
   ) {}
 
   async findAllOrders(): Promise<Orders[]> {
@@ -27,7 +27,7 @@ export class OrdersService {
 
   async findOrderByPhone(phone: string): Promise<Orders> {
     try {
-      const find = await this.ordersModel.findOne(phone).exec();
+      const find = await this.ordersModel.findOne({ phone: phone }).exec();
       return find;
     } catch (e) {
       throw new NotFound('User not found');
@@ -63,6 +63,8 @@ export class OrdersService {
         );
         const user = await this.ordersModel.findById(createdOrder._id);
 
+        const chatId = '609689270';
+        await this.telegramService.sendNewOrder(chatId, user);
         await this.twilioService.sendSMS(
           user.phone,
           `Your verification code: ${user.sms}`,

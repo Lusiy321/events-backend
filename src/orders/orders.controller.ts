@@ -62,4 +62,11 @@ export class OrdersController {
     await this.ordersService.verifyOrder(code);
     return await this.ordersModel.findOne({ sms: code });
   }
+
+  @ApiOperation({ summary: 'Get all orders' })
+  @ApiResponse({ status: 200, type: Orders })
+  @Get('/find/:phone')
+  async findPhoneUser(@Param('phone') phone: string): Promise<Orders> {
+    return this.ordersService.findOrderByPhone(phone);
+  }
 }

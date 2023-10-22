@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as TelegramBot from 'node-telegram-bot-api';
+import { Orders } from 'src/orders/order.model';
 import { User } from 'src/users/users.model';
 
 @Injectable()
@@ -26,11 +27,11 @@ export class TelegramService {
             [
               {
                 text: 'Запросить номер телефона',
-                request_contact: true, // Устанавливаем опцию для запроса контакта
+                request_contact: true,
               },
             ],
           ],
-          one_time_keyboard: true, // Клавиатура исчезнет после нажатия кнопки
+          one_time_keyboard: true,
         },
       };
       this.bot.sendMessage(
@@ -57,5 +58,21 @@ export class TelegramService {
 
       this.bot.sendMessage(chatId, `Вы включили уведомление`);
     });
+  }
+
+  async sendNewOrder(chatId: string, order: Orders) {
+    try {
+      const msg = `Доброго дня, з'явилось нове повідомлення по Вашому профілю. 
+      Замовник: ${order.name}.
+      Дата події: ${order.date}.
+      Категорія: ${order.category[0].name}.
+      Вимоги замовника: ${order.description}.
+      Локація: ${order.location}.
+      Гонорар: ${order.price}`;
+      const result = await this.bot.sendMessage(chatId, msg);
+      return result;
+    } catch (error) {
+      throw new Error(`Ошибка отправки сообщения: ${error}`);
+    }
   }
 }
