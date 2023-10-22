@@ -90,7 +90,7 @@ export class Orders extends Model<Orders> {
     description: 'Order data',
   })
   @Prop({ type: String })
-  data: string;
+  date: string;
 
   @ApiProperty({ example: 'true', description: 'Order status' })
   @Prop({
