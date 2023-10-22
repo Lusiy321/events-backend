@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Conflict, NotFound, BadRequest, Unauthorized } from 'http-errors';
 import { CreateOrderDto } from './dto/create.order.dto';
 import { TwilioService } from './twilio.service';
+import { User } from 'src/users/users.model';
 
 @Injectable()
 export class OrdersService {
@@ -11,6 +12,8 @@ export class OrdersService {
     private readonly twilioService: TwilioService,
     @InjectModel(Orders.name)
     private ordersModel: Orders,
+    @InjectModel(Orders.name)
+    private userModel: User,
   ) {}
 
   async findAllOrders(): Promise<Orders[]> {

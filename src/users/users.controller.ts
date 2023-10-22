@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -39,6 +40,13 @@ export class UsersController {
   @Post('/')
   async create(@Body() user: CreateUserDto): Promise<User> {
     return this.usersService.create(user);
+  }
+
+  @ApiOperation({ summary: 'Search posts from query ( ?req= )' })
+  @ApiResponse({ status: 200, type: [User] })
+  @Get('/')
+  async searchUser(@Query() query: any): Promise<User[]> {
+    return this.usersService.searchUsers(query);
   }
 
   @ApiOperation({ summary: 'Get all users' })

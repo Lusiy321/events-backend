@@ -29,6 +29,59 @@ export class UsersService {
   }
   // USER
 
+  async searchUsers(query: any): Promise<User[]> {
+    const { req } = query;
+    try {
+      const searchItem = req;
+      if (searchItem === '') {
+        return this.userModel.find().exec();
+      }
+      const regex = new RegExp(searchItem, 'i');
+      const find = await this.userModel
+        .find({ title: { $regex: regex } })
+        .exec();
+      if (Array.isArray(find) && find.length === 0) {
+        const descr = await this.userModel
+          .find({ description: { $regex: regex } })
+          .exec();
+        if (Array.isArray(descr) && descr.length === 0) {
+          const category = await this.userModel
+            .find({
+              category: {
+                $elemMatch: {
+                  _id: req,
+                },
+              },
+            })
+            .exec();
+          if (Array.isArray(category) && category.length === 0) {
+            const subcategory = await this.userModel
+              .find({
+                'category.subcategories': {
+                  $elemMatch: {
+                    id: req,
+                  },
+                },
+              })
+              .exec();
+            if (Array.isArray(subcategory) && subcategory.length === 0) {
+              throw new NotFound('Post not found');
+            } else {
+              return subcategory;
+            }
+          } else {
+            return category;
+          }
+        }
+        return descr;
+      } else {
+        return find;
+      }
+    } catch (e) {
+      throw new NotFound('Post not found');
+    }
+  }
+
   async findAllUsers(): Promise<User[]> {
     try {
       const find = await this.userModel.find().exec();
