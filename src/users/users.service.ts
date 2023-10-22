@@ -33,7 +33,7 @@ export class UsersService {
     const { req } = query;
     try {
       const searchItem = req;
-      if (searchItem === '') {
+      if (searchItem === '' || !searchItem) {
         return this.userModel.find().exec();
       }
       const regex = new RegExp(searchItem, 'i');
