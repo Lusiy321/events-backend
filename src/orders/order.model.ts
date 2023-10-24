@@ -88,6 +88,7 @@ export class Orders extends Model<Orders> {
   @ApiProperty({
     example: '10.11.2024',
     description: 'Order data',
+    default: 'Не визначено',
   })
   @Prop({ type: String })
   date: string;

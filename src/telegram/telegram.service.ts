@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as TelegramBot from 'node-telegram-bot-api';
+import { InlineKeyboardMarkup } from 'node-telegram-bot-api';
 import { Orders } from 'src/orders/order.model';
 import { User } from 'src/users/users.model';
 
@@ -69,7 +70,17 @@ export class TelegramService {
       Вимоги замовника: ${order.description}.
       Локація: ${order.location}.
       Гонорар: ${order.price}`;
-      const result = await this.bot.sendMessage(chatId, msg);
+      const keyboard: InlineKeyboardMarkup = {
+        inline_keyboard: [
+          [
+            { text: 'Згоден', callback_data: '/agree' },
+            { text: 'Не цікаво', callback_data: '/disagree' },
+          ],
+        ],
+      };
+      const result = await this.bot.sendMessage(chatId, msg, {
+        reply_markup: keyboard,
+      });
       return result;
     } catch (error) {
       throw new Error(`Ошибка отправки сообщения: ${error}`);

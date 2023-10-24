@@ -6,6 +6,8 @@ import { CreateOrderDto } from './dto/create.order.dto';
 import { TwilioService } from './twilio.service';
 
 import { TelegramService } from 'src/telegram/telegram.service';
+import { User } from 'src/users/users.model';
+import { Categories } from 'src/users/dto/caterory.interface';
 
 @Injectable()
 export class OrdersService {
@@ -14,6 +16,8 @@ export class OrdersService {
     private readonly telegramService: TelegramService,
     @InjectModel(Orders.name)
     private ordersModel: Orders,
+    @InjectModel(User.name)
+    private userModel: User,
   ) {}
 
   async findAllOrders(): Promise<Orders[]> {
@@ -61,13 +65,18 @@ export class OrdersService {
           { _id: createdOrder._id },
           { sms: verificationCode },
         );
-        const user = await this.ordersModel.findById(createdOrder._id);
+        const order = await this.ordersModel.findById(createdOrder._id);
+        const usersArr = await this.findUserByCategory(order);
 
-        const chatId = '609689270';
-        await this.telegramService.sendNewOrder(chatId, user);
+        for (const user of usersArr) {
+          if (user.tg_chat !== null) {
+            await this.telegramService.sendNewOrder(user.tg_chat, order);
+          }
+        }
+
         await this.twilioService.sendSMS(
-          user.phone,
-          `Your verification code: ${user.sms}`,
+          order.phone,
+          `Your verification code: ${order.sms}`,
         );
         return await this.ordersModel.findById(createdOrder._id);
       }
@@ -87,5 +96,39 @@ export class OrdersService {
     } catch (e) {
       throw new BadRequest(e.message);
     }
+  }
+
+  async findUserByCategory(order: Orders) {
+    const arr = order.category;
+
+    function extractIds(data: Categories[]) {
+      const ids = [];
+
+      function recursiveExtract(obj: Object) {
+        for (const key in obj) {
+          if (key === 'id') {
+            ids.push(obj[key]);
+          } else if (typeof obj[key] === 'object') {
+            recursiveExtract(obj[key]);
+          }
+        }
+      }
+
+      recursiveExtract(data);
+      return ids;
+    }
+    const subcategoriesId = extractIds(arr);
+    const findId = subcategoriesId[0];
+    const subcategory = await this.userModel
+      .find({
+        'category.subcategories': {
+          $elemMatch: {
+            id: findId,
+          },
+        },
+      })
+      .exec();
+
+    return subcategory;
   }
 }

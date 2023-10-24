@@ -34,4 +34,22 @@ export class CreateOrderDto {
     description: 'Order description',
   })
   readonly description: string;
+
+  @ApiProperty({
+    example: 'Kyiv',
+    description: 'User location',
+  })
+  readonly location: string;
+
+  @ApiProperty({
+    example: '100$',
+    description: 'User price',
+  })
+  readonly price: string;
+
+  @ApiProperty({
+    example: '10.11.2024',
+    description: 'Order data',
+  })
+  readonly date: string;
 }

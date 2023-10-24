@@ -6,11 +6,15 @@ import { OrderSchema, Orders } from './order.model';
 import { TwilioService } from './twilio.service';
 import { TelegramService } from 'src/telegram/telegram.service';
 import { TelegramModule } from 'src/telegram/telegram.module';
+import { User, UserSchema } from 'src/users/users.model';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Orders.name, schema: OrderSchema, collection: 'orders' },
+    ]),
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema, collection: 'users' },
     ]),
     TelegramModule,
   ],
