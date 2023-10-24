@@ -47,7 +47,7 @@ export class Orders extends Model<Orders> {
         ],
       },
     ],
-    description: 'Order category',
+    description: 'Order description',
   })
   @Prop({
     type: Array<Object>,
@@ -65,6 +65,11 @@ export class Orders extends Model<Orders> {
     maxlength: 15,
   })
   telegram: string;
+
+  @Prop({
+    type: Number,
+  })
+  tg_chat: number;
 
   @ApiProperty({
     example: 'Kyiv',

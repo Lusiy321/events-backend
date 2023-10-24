@@ -10,6 +10,8 @@ export class TelegramService {
   private bot: TelegramBot;
 
   constructor(
+    @InjectModel(Orders.name)
+    private ordersModel: Orders,
     @InjectModel(User.name)
     private userModel: User,
   ) {
@@ -44,8 +46,15 @@ export class TelegramService {
     this.bot.on('contact', async (msg) => {
       const chatId = msg.chat.id;
       const phoneNumber = msg.contact.phone_number;
-      const user = await this.userModel.findOne({ phone: phoneNumber }).exec();
+      const user = await this.ordersModel
+        .findOne({ phone: phoneNumber })
+        .exec();
       await this.userModel.findByIdAndUpdate(user._id, { tg_chat: chatId });
+      const order = await this.ordersModel
+        .findOne({ phone: phoneNumber })
+        .exec();
+
+      await this.ordersModel.findByIdAndUpdate(user._id, { tg_chat: chatId });
       this.bot.sendMessage(
         chatId,
         `Спасибо, ${msg.from.first_name} теперь тебе будут приходить уведомления о новых предложенияех в твоей категории.`,
@@ -61,6 +70,15 @@ export class TelegramService {
     });
   }
 
+  async sendMessage(chatId: string, msg: string) {
+    try {
+      const message = await this.bot.sendMessage(chatId, msg);
+      return message;
+    } catch (error) {
+      throw new Error(`Ошибка отправки сообщения: ${error}`);
+    }
+  }
+
   async sendNewOrder(chatId: string, order: Orders) {
     try {
       const msg = `Доброго дня, з'явилось нове повідомлення по Вашому профілю. 
@@ -73,7 +91,10 @@ export class TelegramService {
       const keyboard: InlineKeyboardMarkup = {
         inline_keyboard: [
           [
-            { text: 'Згоден', callback_data: '/agree' },
+            {
+              text: 'Згоден',
+              callback_data: `https://events-show.cyclic.app/telegram/send/${order.phone}/${chatId}`,
+            },
             { text: 'Не цікаво', callback_data: '/disagree' },
           ],
         ],
