@@ -73,15 +73,19 @@ export class TelegramService {
     this.bot.on('callback_query', async (query) => {
       const { data } = query;
       const [action, phone, chatId] = data.split(':');
-      console.log(`${process.env.BACK_LINK}telegram/send/${phone}/${chatId}`);
+
       if (action === 'accept') {
-        this.httpService.get(
-          `${process.env.BACK_LINK}telegram/send/${phone}/${chatId}`,
-          {},
-        );
-        return;
+        console.log('worck');
+        fetch(`${process.env.BACK_LINK}telegram/send/${phone}/${chatId}`, {
+          method: 'GET',
+        });
+        // this.httpService.get(
+        //   `${process.env.BACK_LINK}telegram/send/${phone}/${chatId}`,
+        //   {},
+        // );
       }
     });
+
     this.bot.onText(/\/stop/, async (msg) => {
       const chatId = msg.chat.id;
       const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
