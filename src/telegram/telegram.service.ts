@@ -74,7 +74,7 @@ export class TelegramService {
       const { data } = query;
       const [action, phone, chatId] = data.split(':');
       console.log(action, phone, chatId);
-      console.log(`${process.env.BACK_LINK}${phone}/${chatId}`);
+      console.log(`${process.env.BACK_LINK}telegram/send/${phone}/${chatId}`);
       if (action === 'accept') {
         this.httpService.post(
           `${process.env.BACK_LINK}telegram/send/${phone}/${chatId}`,
