@@ -70,7 +70,19 @@ export class TelegramService {
         );
       }
     });
-
+    this.bot.on('callback_query', async (query) => {
+      const { data } = query;
+      const [action, phone, chatId] = data.split(':');
+      console.log(action, phone, chatId);
+      console.log(`${process.env.BACK_LINK}${phone}/${chatId}`);
+      if (action === 'accept') {
+        this.httpService.post(
+          `${process.env.BACK_LINK}telegram/send/${phone}/${chatId}`,
+          {},
+        );
+        return;
+      }
+    });
     this.bot.onText(/\/stop/, async (msg) => {
       const chatId = msg.chat.id;
       const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
@@ -124,19 +136,6 @@ export class TelegramService {
       const result = await this.bot.sendMessage(chatId, msg, {
         reply_markup: keyboard,
       });
-
-      await this.bot.on('callback_query', async (query) => {
-        const { data } = query;
-        console.log(data);
-        if (data.startsWith('accept:')) {
-          this.httpService.post(
-            `${process.env.BACK_LINK}${order.phone}/${chatId}`,
-            {},
-          );
-          return;
-        }
-      });
-
       return result;
     } catch (error) {
       throw new Error(`Ошибка отправки сообщения: ${error}`);
