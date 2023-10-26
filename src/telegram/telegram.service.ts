@@ -79,10 +79,6 @@ export class TelegramService {
         fetch(`${process.env.BACK_LINK}telegram/send/${phone}/${chatId}`, {
           method: 'GET',
         });
-        // this.httpService.get(
-        //   `${process.env.BACK_LINK}telegram/send/${phone}/${chatId}`,
-        //   {},
-        // );
       }
     });
 
