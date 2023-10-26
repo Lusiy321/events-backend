@@ -1,0 +1,512 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UsersService = void 0;
+const common_1 = require("@nestjs/common");
+const mongoose_1 = require("@nestjs/mongoose");
+const users_model_1 = require("./users.model");
+const bcrypt_1 = require("bcrypt");
+const http_errors_1 = require("http-errors");
+const jsonwebtoken_1 = require("jsonwebtoken");
+const sgMail = require("@sendgrid/mail");
+const category_model_1 = require("./category.model");
+const uuid_1 = require("uuid");
+let UsersService = class UsersService {
+    constructor(userModel, categoryModel) {
+        this.userModel = userModel;
+        this.categoryModel = categoryModel;
+        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    }
+    async searchUsers(query) {
+        const { req } = query;
+        try {
+            const searchItem = req;
+            if (searchItem === '' || !searchItem) {
+                return this.userModel.find().exec();
+            }
+            const regex = new RegExp(searchItem, 'i');
+            const find = await this.userModel
+                .find({ title: { $regex: regex } })
+                .exec();
+            if (Array.isArray(find) && find.length === 0) {
+                const descr = await this.userModel
+                    .find({ description: { $regex: regex } })
+                    .exec();
+                if (Array.isArray(descr) && descr.length === 0) {
+                    const category = await this.userModel
+                        .find({
+                        category: {
+                            $elemMatch: {
+                                _id: req,
+                            },
+                        },
+                    })
+                        .exec();
+                    if (Array.isArray(category) && category.length === 0) {
+                        const subcategory = await this.userModel
+                            .find({
+                            'category.subcategories': {
+                                $elemMatch: {
+                                    id: req,
+                                },
+                            },
+                        })
+                            .exec();
+                        if (Array.isArray(subcategory) && subcategory.length === 0) {
+                            throw new http_errors_1.NotFound('Post not found');
+                        }
+                        else {
+                            return subcategory;
+                        }
+                    }
+                    else {
+                        return category;
+                    }
+                }
+                return descr;
+            }
+            else {
+                return find;
+            }
+        }
+        catch (e) {
+            throw new http_errors_1.NotFound('Post not found');
+        }
+    }
+    async findAllUsers() {
+        try {
+            const find = await this.userModel.find().exec();
+            return find;
+        }
+        catch (e) {
+            throw new http_errors_1.NotFound('User not found');
+        }
+    }
+    async findById(id) {
+        try {
+            const find = await this.userModel.findById(id).exec();
+            return find;
+        }
+        catch (e) {
+            throw new http_errors_1.NotFound('User not found');
+        }
+    }
+    async create(user) {
+        try {
+            const { email } = user;
+            const lowerCaseEmail = email.toLowerCase();
+            const registrationUser = await this.userModel.findOne({
+                email: lowerCaseEmail,
+            });
+            if (registrationUser) {
+                throw new http_errors_1.Conflict(`User with ${email} in use`);
+            }
+            const createdUser = await this.userModel.create(user);
+            createdUser.setName(lowerCaseEmail);
+            createdUser.setPassword(user.password);
+            createdUser.save();
+            const verificationLink = `http://localhost:5000//verify-email/${createdUser._id}`;
+            await this.sendVerificationEmail(email, verificationLink);
+            return await this.userModel.findById(createdUser._id);
+        }
+        catch (e) {
+            throw new http_errors_1.BadRequest(e.message);
+        }
+    }
+    async sendVerificationEmail(email, verificationLink) {
+        const msg = {
+            to: email,
+            from: 'lusiy321@gmail.com',
+            subject: 'Email Verification from Swep',
+            html: `<p>Click the link below to verify your email:</p><p><a href="${verificationLink}">Click</a></p>`,
+        };
+        try {
+            await sgMail.send(msg);
+        }
+        catch (error) {
+            throw new Error('Failed to send verification email');
+        }
+    }
+    async verifyUserEmail(id) {
+        try {
+            const user = await this.userModel.findById(id);
+            user.verify = true;
+            user.save();
+        }
+        catch (e) {
+            throw new http_errors_1.BadRequest(e.message);
+        }
+    }
+    async changePassword(req, newPass) {
+        const user = await this.findToken(req);
+        if (!user) {
+            throw new http_errors_1.Unauthorized('jwt expired');
+        }
+        try {
+            const { oldPassword, password } = newPass;
+            if (user.comparePassword(oldPassword) === true) {
+                user.setPassword(password);
+                user.save();
+                const msg = {
+                    to: user.email,
+                    from: 'lusiy321@gmail.com',
+                    subject: 'Your password has been changed on swep.com',
+                    html: `<div class="container">
+          <h1>Your Password Has Been Changed</h1>
+          <p>Click on the link below to go to your personal account:</p>
+          <p><a href="https://my-app-hazel-nine.vercel.app/ru/account/profile">Go to your account</a></p>
+      </div>`,
+                };
+                await sgMail.send(msg);
+                return await this.userModel.findById(user._id);
+            }
+            throw new http_errors_1.BadRequest('Password is not avaible');
+        }
+        catch (e) {
+            throw new http_errors_1.BadRequest(e.message);
+        }
+    }
+    async validateUser(details) {
+        const user = await this.userModel.findOne({ googleId: details.googleId });
+        try {
+            if (user === null) {
+                const newUser = await this.userModel.create(details);
+                newUser.save();
+                const userUpdateToken = await this.userModel.findOne({
+                    email: details.email,
+                });
+                await this.userModel.createToken(userUpdateToken);
+                return await this.userModel.findById({
+                    _id: userUpdateToken._id,
+                });
+            }
+            await this.userModel.createToken(user);
+            return await this.userModel.findOne({
+                _id: user.id,
+            });
+        }
+        catch (e) {
+            throw new http_errors_1.NotFound('User not found');
+        }
+    }
+    async restorePassword(email) {
+        const restoreMail = await this.userModel.findOne(email);
+        try {
+            if (restoreMail) {
+                const msg = {
+                    to: restoreMail.email,
+                    from: 'lusiy321@gmail.com',
+                    subject: 'Change your password on swep.com',
+                    html: `<div class="container">
+          <h1>Your Password Has Been Changed</h1>
+          <p>Click on the link below to go to your personal account:</p>
+          <p><a href="https://my-app-hazel-nine.vercel.app/ru/account/profile">Go to your account</a></p>
+      </div>`,
+                };
+                return await sgMail.send(msg);
+            }
+        }
+        catch (e) {
+            throw new http_errors_1.BadRequest('User not found');
+        }
+    }
+    async updateRestorePassword(id, newPass) {
+        const user = await this.userModel.findById(id);
+        const { password } = newPass;
+        try {
+            if (user) {
+                user.setPassword(password);
+                user.save();
+                const msg = {
+                    to: user.email,
+                    from: 'lusiy321@gmail.com',
+                    subject: 'Your password has been changed on swep.com',
+                    html: `<div class="container">
+          <h1>Your Password Has Been Changed</h1>
+          <p>Click on the link below to go to your personal account:</p>
+          <p><a href="https://my-app-hazel-nine.vercel.app/ru/account/profile">Go to your account</a></p>
+      </div>`,
+                };
+                await sgMail.send(msg);
+                return await this.userModel.findById(user._id);
+            }
+            throw new http_errors_1.BadRequest('User not found');
+        }
+        catch (e) {
+            throw new http_errors_1.BadRequest(e.message);
+        }
+    }
+    async login(user) {
+        try {
+            const { email, password } = user;
+            const lowerCaseEmail = email.toLowerCase();
+            const authUser = await this.userModel.findOne({ email: lowerCaseEmail });
+            if (!authUser || !authUser.comparePassword(password)) {
+                throw new http_errors_1.Unauthorized(`Email or password is wrong`);
+            }
+            return this.createToken(authUser);
+        }
+        catch (e) {
+            throw new http_errors_1.BadRequest(e.message);
+        }
+    }
+    async logout(req) {
+        const user = await this.findToken(req);
+        if (!user) {
+            throw new http_errors_1.Unauthorized('jwt expired');
+        }
+        try {
+            await this.userModel.findByIdAndUpdate({ _id: user.id }, { token: null });
+            return await this.userModel.findById({ _id: user.id });
+        }
+        catch (e) {
+            throw new http_errors_1.BadRequest(e.message);
+        }
+    }
+    async update(user, req) {
+        const { firstName, lastName, title, description, phone, telegram, viber, whatsapp, location, master_photo, photo, video, category, genre, price, } = user;
+        const findId = await this.findToken(req);
+        if (!findId) {
+            throw new http_errors_1.Unauthorized('jwt expired');
+        }
+        try {
+            if (firstName ||
+                lastName ||
+                title ||
+                description ||
+                phone ||
+                telegram ||
+                viber ||
+                whatsapp ||
+                location ||
+                master_photo ||
+                photo ||
+                video ||
+                category ||
+                genre ||
+                price) {
+                if (category) {
+                    const findUser = await this.userModel.findById(findId.id).exec();
+                    const arrCategory = findUser.category;
+                    arrCategory.push(...category);
+                    await this.userModel.findByIdAndUpdate({ _id: findId.id }, {
+                        $set: { category: arrCategory },
+                    });
+                }
+                await this.userModel.findByIdAndUpdate({ _id: findId.id }, {
+                    firstName,
+                    lastName,
+                    title,
+                    description,
+                    phone,
+                    telegram,
+                    viber,
+                    whatsapp,
+                    location,
+                    master_photo,
+                    photo,
+                    video,
+                    genre,
+                    price,
+                });
+                const userUpdate = this.userModel.findById({ _id: findId.id });
+                return userUpdate;
+            }
+        }
+        catch (e) {
+            throw new http_errors_1.BadRequest(e.message);
+        }
+    }
+    async findOrCreateUser(googleId, firstName, email) {
+        try {
+            let user = await this.userModel.findOne({ googleId });
+            if (!user) {
+                user = await this.userModel.create({
+                    googleId,
+                    firstName,
+                    email,
+                });
+                user.setPassword(googleId);
+                return user.save();
+            }
+        }
+        catch (e) {
+            throw new http_errors_1.NotFound('User not found');
+        }
+    }
+    async findToken(req) {
+        try {
+            const { authorization = '' } = req.headers;
+            const [bearer, token] = authorization.split(' ');
+            if (bearer !== 'Bearer') {
+                throw new http_errors_1.Unauthorized('Not authorized');
+            }
+            const SECRET_KEY = process.env.SECRET_KEY;
+            const findId = (0, jsonwebtoken_1.verify)(token, SECRET_KEY);
+            const user = await this.userModel.findById({ _id: findId.id });
+            return user;
+        }
+        catch (e) {
+            throw new http_errors_1.Unauthorized('jwt expired');
+        }
+    }
+    async createToken(authUser) {
+        const payload = {
+            id: authUser._id,
+        };
+        const SECRET_KEY = process.env.SECRET_KEY;
+        const token = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY, { expiresIn: '10m' });
+        await this.userModel.findByIdAndUpdate(authUser._id, { token });
+        const authentificationUser = await this.userModel.findById({
+            _id: authUser._id,
+        });
+        return authentificationUser;
+    }
+    async refreshAccessToken(req) {
+        try {
+            const { authorization = '' } = req.headers;
+            const [bearer, token] = authorization.split(' ');
+            if (bearer !== 'Bearer') {
+                throw new http_errors_1.Unauthorized('Not authorized');
+            }
+            const SECRET_KEY = process.env.SECRET_KEY;
+            const user = await this.userModel.findOne({ token: token });
+            if (!user) {
+                throw new http_errors_1.NotFound('User not found');
+            }
+            const payload = {
+                id: user._id,
+            };
+            const tokenRef = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY, { expiresIn: '24h' });
+            await this.userModel.findByIdAndUpdate(user._id, { token: tokenRef });
+            const authentificationUser = await this.userModel.findById({
+                _id: user.id,
+            });
+            return authentificationUser;
+        }
+        catch (error) {
+            throw new http_errors_1.BadRequest('Invalid refresh token');
+        }
+    }
+    async createCategory(category) {
+        try {
+            const { name } = category;
+            const lowerCaseEmail = name.toLowerCase();
+            const registrationCategory = await this.categoryModel.findOne({
+                name: lowerCaseEmail,
+            });
+            if (registrationCategory) {
+                throw new http_errors_1.Conflict(`Category ${name} exist`);
+            }
+            const createdCategory = await this.categoryModel.create(category);
+            createdCategory.save();
+            return await this.categoryModel.findById(createdCategory._id);
+        }
+        catch (e) {
+            throw new http_errors_1.BadRequest(e.message);
+        }
+    }
+    async addUsercategory(userID, categoryID, subcategoryID) {
+        try {
+            const findUser = await this.userModel.findById(userID).exec();
+            const arrCategory = findUser.category;
+            const findCategory = await this.categoryModel.findById(categoryID).exec();
+            const arrSubcategory = findCategory.subcategories;
+            function searchById(arr, id) {
+                for (let i = 0; i < arr.length; i++) {
+                    if (arr[i].id === id) {
+                        return arr[i];
+                    }
+                }
+                return null;
+            }
+            const result = searchById(arrSubcategory, subcategoryID);
+            findCategory.subcategories = [];
+            findCategory.subcategories.push(result);
+            arrCategory.push(findCategory);
+            await this.userModel.updateOne({ _id: userID }, { $set: { category: arrCategory } });
+            return await this.userModel.findById(userID);
+        }
+        catch (e) {
+            throw new http_errors_1.NotFound('Category not found');
+        }
+    }
+    async addSubcategory(catId, subCategory) {
+        try {
+            const find = await this.categoryModel.findById(catId).exec();
+            const arr = find.subcategories;
+            subCategory.id = (0, uuid_1.v4)();
+            arr.push(subCategory);
+            await this.categoryModel.updateOne({ _id: catId }, { $set: { subcategories: arr } });
+            return await this.categoryModel.findById(catId);
+        }
+        catch (e) {
+            throw new http_errors_1.NotFound('Category not found');
+        }
+    }
+    async findCategory() {
+        try {
+            const find = await this.categoryModel.find().exec();
+            return find;
+        }
+        catch (e) {
+            throw new http_errors_1.NotFound('User not found');
+        }
+    }
+    async findUserCategory(id) {
+        try {
+            const find = await this.userModel.find({ 'category._id': id }).exec();
+            if (Array.isArray(find) && find.length === 0) {
+                return new http_errors_1.NotFound('User not found');
+            }
+            return find;
+        }
+        catch (e) {
+            throw new http_errors_1.NotFound('User not found');
+        }
+    }
+    async findUserSubcategory(id) {
+        try {
+            const find = await this.userModel
+                .find({ 'category.subcategories.id': id })
+                .exec();
+            if (Array.isArray(find) && find.length === 0) {
+                return new http_errors_1.NotFound('User not found');
+            }
+            return find;
+        }
+        catch (e) {
+            throw new http_errors_1.NotFound('User not found');
+        }
+    }
+};
+exports.UsersService = UsersService;
+exports.UsersService = UsersService = __decorate([
+    (0, common_1.Injectable)(),
+    __param(0, (0, mongoose_1.InjectModel)(users_model_1.User.name)),
+    __param(1, (0, mongoose_1.InjectModel)(category_model_1.Category.name)),
+    __metadata("design:paramtypes", [users_model_1.User,
+        category_model_1.Category])
+], UsersService);
+users_model_1.UserSchema.methods.setPassword = async function (password) {
+    return (this.password = (0, bcrypt_1.hashSync)(password, 10));
+};
+users_model_1.UserSchema.methods.setName = function (email) {
+    const parts = email.split('@');
+    this.firstName = parts[0];
+};
+users_model_1.UserSchema.methods.comparePassword = function (password) {
+    return (0, bcrypt_1.compareSync)(password, this.password);
+};
+//# sourceMappingURL=users.service.js.map

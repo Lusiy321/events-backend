@@ -1,0 +1,41 @@
+import { User } from './users.model';
+import { CreateUserDto } from './dto/create.user.dto';
+import { UpdateUserDto } from './dto/update.user.dto';
+import { PasswordUserDto } from './dto/password.user.dto';
+import * as sgMail from '@sendgrid/mail';
+import { MailUserDto } from './dto/email.user.dto';
+import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
+import { GoogleUserDto } from './dto/google.user.dto';
+import { Category } from './category.model';
+import { CreateCategoryDto } from './dto/create.category.dto';
+import { Subcategories } from './utils/subcategory.interface';
+export declare class UsersService {
+    private userModel;
+    private categoryModel;
+    constructor(userModel: User, categoryModel: Category);
+    searchUsers(query: any): Promise<User[]>;
+    findAllUsers(): Promise<User[]>;
+    findById(id: string): Promise<User>;
+    create(user: CreateUserDto): Promise<User>;
+    sendVerificationEmail(email: string, verificationLink: string): Promise<void>;
+    verifyUserEmail(id: any): Promise<void>;
+    changePassword(req: any, newPass: PasswordUserDto): Promise<User>;
+    validateUser(details: GoogleUserDto): Promise<any>;
+    restorePassword(email: MailUserDto): Promise<[sgMail.ClientResponse, {}]>;
+    updateRestorePassword(id: string, newPass: UpdatePasswordUserDto): Promise<User>;
+    login(user: CreateUserDto): Promise<User>;
+    logout(req: any): Promise<User>;
+    update(user: UpdateUserDto, req: any): Promise<User>;
+    findOrCreateUser(googleId: string, firstName: string, email: string): Promise<any>;
+    findToken(req: any): Promise<User>;
+    createToken(authUser: {
+        _id: string;
+    }): Promise<any>;
+    refreshAccessToken(req: any): Promise<User>;
+    createCategory(category: CreateCategoryDto): Promise<Category>;
+    addUsercategory(userID: string, categoryID: string, subcategoryID: string): Promise<User>;
+    addSubcategory(catId: string, subCategory: Subcategories): Promise<Category>;
+    findCategory(): Promise<Category[]>;
+    findUserCategory(id: string): Promise<any>;
+    findUserSubcategory(id: string): Promise<any>;
+}
