@@ -43,13 +43,14 @@ export class TelegramService {
         opts,
       );
     });
+
     this.bot.on('contact', async (msg) => {
       const chatId = msg.chat.id;
       const phoneNumber = msg.contact.phone_number;
       const user = await this.userModel.findOne({ phone: phoneNumber }).exec();
       if (user) {
         await this.userModel.findByIdAndUpdate(user.id, { tg_chat: chatId });
-        return this.bot.sendMessage(
+        this.bot.sendMessage(
           chatId,
           `Спасибо, ${msg.from.first_name} теперь тебе будут приходить уведомления о новых предложенияех в твоей категории.`,
         );
@@ -62,7 +63,7 @@ export class TelegramService {
             tg_chat: chatId,
           });
         }
-        return this.bot.sendMessage(
+        this.bot.sendMessage(
           chatId,
           `Спасибо, ${msg.from.first_name} теперь тебе будут приходить уведомления о новых предложенияех в твоей категории.`,
         );
@@ -78,7 +79,6 @@ export class TelegramService {
         fetch(`${process.env.BACK_LINK}telegram/send/${phone}/${chatId}`, {
           method: 'GET',
         });
-        return;
       }
     });
 
@@ -87,7 +87,6 @@ export class TelegramService {
       const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
       if (user) {
         await this.userModel.findByIdAndUpdate(user.id, { tg_chat: null });
-        return;
       } else {
         const order = await this.ordersModel
           .findOne({ tg_chat: chatId })
@@ -96,7 +95,7 @@ export class TelegramService {
           await this.ordersModel.findByIdAndUpdate(order.id, { tg_chat: null });
         }
       }
-      return this.bot.sendMessage(chatId, `Вы включили уведомление`);
+      this.bot.sendMessage(chatId, `Вы включили уведомление`);
     });
   }
 
