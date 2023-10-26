@@ -74,10 +74,10 @@ export class OrdersService {
           }
         }
 
-        await this.twilioService.sendSMS(
-          order.phone,
-          `Your verification code: ${order.sms}`,
-        );
+        // await this.twilioService.sendSMS(
+        //   order.phone,
+        //   `Your verification code: ${order.sms}`,
+        // );
         return await this.ordersModel.findById(createdOrder._id);
       }
     } catch (e) {

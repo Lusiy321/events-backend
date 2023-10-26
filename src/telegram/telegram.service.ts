@@ -4,6 +4,7 @@ import * as TelegramBot from 'node-telegram-bot-api';
 import { InlineKeyboardMarkup } from 'node-telegram-bot-api';
 import { Orders } from 'src/orders/order.model';
 import { User } from 'src/users/users.model';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class TelegramService {
@@ -14,6 +15,7 @@ export class TelegramService {
     private ordersModel: Orders,
     @InjectModel(User.name)
     private userModel: User,
+    private httpService: HttpService,
   ) {
     const token = process.env.BOT_TELEGRAM;
     this.bot = new TelegramBot(token, { polling: true });
@@ -46,6 +48,7 @@ export class TelegramService {
     this.bot.on('contact', async (msg) => {
       const chatId = msg.chat.id;
       const phoneNumber = msg.contact.phone_number;
+      console.log(phoneNumber);
       const user = await this.ordersModel
         .findOne({ phone: phoneNumber })
         .exec();
@@ -54,7 +57,7 @@ export class TelegramService {
         .findOne({ phone: phoneNumber })
         .exec();
 
-      await this.ordersModel.findByIdAndUpdate(user._id, { tg_chat: chatId });
+      await this.ordersModel.findByIdAndUpdate(order._id, { tg_chat: chatId });
       this.bot.sendMessage(
         chatId,
         `Спасибо, ${msg.from.first_name} теперь тебе будут приходить уведомления о новых предложенияех в твоей категории.`,
@@ -93,15 +96,31 @@ export class TelegramService {
           [
             {
               text: 'Згоден',
-              callback_data: `https://events-show.cyclic.app/telegram/send/${order.phone}/${chatId}`,
+              callback_data: `accept:${order.phone}:${chatId}`,
             },
-            { text: 'Не цікаво', callback_data: '/disagree' },
+            {
+              text: 'Не цікаво',
+              callback_data: 'not',
+            },
           ],
         ],
       };
       const result = await this.bot.sendMessage(chatId, msg, {
         reply_markup: keyboard,
       });
+
+      this.bot.on('callback_query', async (query) => {
+        const { data } = query;
+
+        if (data.startsWith('accept:')) {
+          const response = this.httpService.post(
+            `${process.env.BACK_LINK}${order.phone}/${chatId}`,
+            {},
+          );
+          return console.log(response);
+        }
+      });
+
       return result;
     } catch (error) {
       throw new Error(`Ошибка отправки сообщения: ${error}`);

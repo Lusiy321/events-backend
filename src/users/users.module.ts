@@ -6,8 +6,8 @@ import { User, UserSchema } from './users.model';
 import { JwtModule } from '@nestjs/jwt';
 import { GoogleStrategy } from './utils/GoogleStrategy';
 import { SessionSerializer } from './utils/Serializer';
-import { PassportModule } from '@nestjs/passport';
 import { Category, CategorySchema } from './category.model';
+import { TelegramModule } from 'src/telegram/telegram.module';
 
 @Module({
   imports: [
@@ -21,7 +21,7 @@ import { Category, CategorySchema } from './category.model';
     MongooseModule.forFeature([
       { name: Category.name, schema: CategorySchema, collection: 'categories' },
     ]),
-    PassportModule.register({ defaultStrategy: 'facebook' }),
+    TelegramModule,
   ],
   providers: [
     GoogleStrategy,

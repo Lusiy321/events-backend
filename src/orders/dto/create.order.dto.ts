@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Categories } from 'src/users/dto/caterory.interface';
 
 export class CreateOrderDto {
-  @ApiProperty({ example: '+380985633225', description: 'User phone' })
+  @ApiProperty({ example: '380985633225', description: 'User phone' })
   readonly phone: string;
 
   @ApiProperty({

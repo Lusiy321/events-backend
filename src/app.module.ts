@@ -10,7 +10,7 @@ import { TelegramService } from './telegram/telegram.service';
 import { TelegramModule } from './telegram/telegram.module';
 import { OrdersModule } from './orders/orders.module';
 import { OrderSchema, Orders } from './orders/order.model';
-import { OrdersController } from './orders/orders.controller';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   controllers: [UsersController],
@@ -32,6 +32,7 @@ import { OrdersController } from './orders/orders.controller';
     UsersModule,
     TelegramModule,
     OrdersModule,
+    HttpModule,
   ],
 })
 export class AppModule {}

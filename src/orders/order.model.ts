@@ -10,8 +10,8 @@ export class Orders extends Model<Orders> {
   @ApiProperty({ example: '380987894556', description: 'User phone number' })
   @Prop({
     type: String,
-    minlength: 13,
-    maxlength: 13,
+    minlength: 12,
+    maxlength: 12,
     required: [true, 'User phone number'],
   })
   phone: string;

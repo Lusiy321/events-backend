@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/users/users.model';
 import { TelegramController } from './telegram.controller';
 import { OrderSchema, Orders } from 'src/orders/order.model';
+import { HttpModule, HttpService } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { OrderSchema, Orders } from 'src/orders/order.model';
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema, collection: 'users' },
     ]),
+    HttpModule,
   ],
   providers: [TelegramService],
   exports: [TelegramService],
