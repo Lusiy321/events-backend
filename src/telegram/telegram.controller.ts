@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { TelegramService } from './telegram.service';
 import { InjectModel } from '@nestjs/mongoose';
@@ -18,12 +18,13 @@ export class TelegramController {
 
   @ApiOperation({ summary: 'Send Agreement message' })
   @ApiResponse({ status: 200, type: Object })
-  @Post('/send/:phone/:chat')
+  @Get('/send/:phone/:chat')
   async sendAgreement(
     @Param('phone') phone: string,
     @Param('chat') chatId: string,
   ) {
     const order = await this.ordersModel.findOne({ phone: phone });
+    console.log(order);
     const user = await this.userModel.findOne({ tg_chat: chatId });
     if (order.tg_chat !== null) {
       const msgTrue = `Доброго дня, замовник отримав Вашу відповідь`;
