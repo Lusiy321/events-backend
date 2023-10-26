@@ -4,7 +4,6 @@ import * as TelegramBot from 'node-telegram-bot-api';
 import { InlineKeyboardMarkup } from 'node-telegram-bot-api';
 import { Orders } from 'src/orders/order.model';
 import { User } from 'src/users/users.model';
-import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class TelegramService {
@@ -15,10 +14,9 @@ export class TelegramService {
     private ordersModel: Orders,
     @InjectModel(User.name)
     private userModel: User,
-    private httpService: HttpService,
   ) {
-    const token = process.env.BOT_TELEGRAM;
-    this.bot = new TelegramBot(token, { polling: true });
+    // const token = process.env.BOT_TELEGRAM;
+    // this.bot = new TelegramBot(token, { polling: true });
     this.bot.setMyCommands([
       { command: '/start', description: 'Старт' },
       { command: '/stop', description: 'Зупинити' },

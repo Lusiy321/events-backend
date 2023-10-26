@@ -32,7 +32,6 @@ import { HttpModule } from '@nestjs/axios';
     UsersModule,
     TelegramModule,
     OrdersModule,
-    HttpModule,
   ],
 })
 export class AppModule {}
