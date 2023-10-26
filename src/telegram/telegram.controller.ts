@@ -18,10 +18,12 @@ export class TelegramController {
 
   @ApiOperation({ summary: 'Send Agreement message' })
   @ApiResponse({ status: 200, type: Object })
-  @Post('/send/:data')
-  async sendAgreement(@Param('data') data: string, @Body() requestData: any) {
-    const [action, phone, chatId] = data.split(':');
-    if (action === 'accept') {
+  @Post('/send/:phone/:chat')
+  async sendAgreement(
+    @Param('phone') phone: string,
+    @Param('chat') chatId: string,
+  ) {
+    if (phone) {
       const order = await this.ordersModel.findOne({ phone: phone });
       const user = await this.userModel.findOne({ tg_chat: chatId });
       if (order.tg_chat !== null) {

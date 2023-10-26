@@ -48,27 +48,43 @@ export class TelegramService {
     this.bot.on('contact', async (msg) => {
       const chatId = msg.chat.id;
       const phoneNumber = msg.contact.phone_number;
-      console.log(phoneNumber);
-      const user = await this.ordersModel
-        .findOne({ phone: phoneNumber })
-        .exec();
-      await this.userModel.findByIdAndUpdate(user._id, { tg_chat: chatId });
-      const order = await this.ordersModel
-        .findOne({ phone: phoneNumber })
-        .exec();
-
-      await this.ordersModel.findByIdAndUpdate(order._id, { tg_chat: chatId });
-      this.bot.sendMessage(
-        chatId,
-        `Спасибо, ${msg.from.first_name} теперь тебе будут приходить уведомления о новых предложенияех в твоей категории.`,
-      );
+      const user = await this.userModel.findOne({ phone: phoneNumber }).exec();
+      if (user) {
+        await this.userModel.findByIdAndUpdate(user.id, { tg_chat: chatId });
+        return this.bot.sendMessage(
+          chatId,
+          `Спасибо, ${msg.from.first_name} теперь тебе будут приходить уведомления о новых предложенияех в твоей категории.`,
+        );
+      } else {
+        const order = await this.ordersModel
+          .findOne({ phone: phoneNumber })
+          .exec();
+        if (order) {
+          await this.ordersModel.findByIdAndUpdate(order.id, {
+            tg_chat: chatId,
+          });
+        }
+        return this.bot.sendMessage(
+          chatId,
+          `Спасибо, ${msg.from.first_name} теперь тебе будут приходить уведомления о новых предложенияех в твоей категории.`,
+        );
+      }
     });
 
     this.bot.onText(/\/stop/, async (msg) => {
       const chatId = msg.chat.id;
       const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
-      await this.userModel.findByIdAndUpdate(user._id, { tg_chat: null });
-
+      if (user) {
+        await this.userModel.findByIdAndUpdate(user.id, { tg_chat: null });
+        return;
+      } else {
+        const order = await this.ordersModel
+          .findOne({ tg_chat: chatId })
+          .exec();
+        if (order) {
+          await this.ordersModel.findByIdAndUpdate(order.id, { tg_chat: null });
+        }
+      }
       this.bot.sendMessage(chatId, `Вы включили уведомление`);
     });
   }
@@ -109,15 +125,15 @@ export class TelegramService {
         reply_markup: keyboard,
       });
 
-      this.bot.on('callback_query', async (query) => {
+      await this.bot.on('callback_query', async (query) => {
         const { data } = query;
-
+        console.log(data);
         if (data.startsWith('accept:')) {
-          const response = this.httpService.post(
+          this.httpService.post(
             `${process.env.BACK_LINK}${order.phone}/${chatId}`,
             {},
           );
-          return console.log(response);
+          return;
         }
       });
 
