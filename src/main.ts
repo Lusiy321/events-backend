@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import TelegramBot from 'node-telegram-bot-api';
 
 async function start() {
   const PORT = process.env.PORT || 5000;
@@ -32,8 +31,7 @@ async function start() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
-  const token = process.env.BOT_TELEGRAM;
-  const bot = new TelegramBot(token, { polling: true });
+
   await app.listen(PORT, () =>
     console.log(`Server started on port = http://localhost:${PORT}`),
   );

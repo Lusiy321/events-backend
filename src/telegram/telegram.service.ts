@@ -15,8 +15,8 @@ export class TelegramService {
     @InjectModel(User.name)
     private userModel: User,
   ) {
-    // const token = process.env.BOT_TELEGRAM;
-    // this.bot = new TelegramBot(token, { polling: true });
+    const token = process.env.BOT_TELEGRAM;
+    this.bot = new TelegramBot(token, { polling: true });
     this.bot.setMyCommands([
       { command: '/start', description: 'Старт' },
       { command: '/stop', description: 'Зупинити' },
@@ -68,6 +68,7 @@ export class TelegramService {
         );
       }
     });
+
     this.bot.on('callback_query', async (query) => {
       const { data } = query;
       const [action, phone, chatId] = data.split(':');
@@ -77,6 +78,7 @@ export class TelegramService {
         fetch(`${process.env.BACK_LINK}telegram/send/${phone}/${chatId}`, {
           method: 'GET',
         });
+        return;
       }
     });
 
@@ -94,7 +96,7 @@ export class TelegramService {
           await this.ordersModel.findByIdAndUpdate(order.id, { tg_chat: null });
         }
       }
-      this.bot.sendMessage(chatId, `Вы включили уведомление`);
+      return this.bot.sendMessage(chatId, `Вы включили уведомление`);
     });
   }
 
