@@ -7,5 +7,6 @@ export declare class TelegramService {
     private bot;
     constructor(ordersModel: Orders, userModel: User);
     sendMessage(chatId: string, msg: string): Promise<TelegramBot.Message>;
+    sendAgreement(phone: string, chatId: string): Promise<void>;
     sendNewOrder(chatId: string, order: Orders): Promise<TelegramBot.Message>;
 }

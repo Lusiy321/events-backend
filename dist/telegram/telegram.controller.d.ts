@@ -6,5 +6,4 @@ export declare class TelegramController {
     private ordersModel;
     private userModel;
     constructor(telegramService: TelegramService, ordersModel: Orders, userModel: User);
-    sendAgreement(phone: string, chatId: string): Promise<void>;
 }

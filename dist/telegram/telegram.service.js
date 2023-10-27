@@ -69,10 +69,7 @@ let TelegramService = class TelegramService {
             const { data } = query;
             const [action, phone, chatId] = data.split(':');
             if (action === 'accept') {
-                console.log(`${process.env.BACK_LINK}telegram/send/${phone}/${chatId}`);
-                fetch(`${process.env.BACK_LINK}telegram/send/${phone}/${chatId}`, {
-                    method: 'GET',
-                });
+                await this.sendAgreement(phone, chatId);
             }
         });
         this.bot.onText(/\/stop/, async (msg) => {
@@ -99,6 +96,34 @@ let TelegramService = class TelegramService {
         }
         catch (error) {
             throw new Error(`Ошибка отправки сообщения: ${error}`);
+        }
+    }
+    async sendAgreement(phone, chatId) {
+        try {
+            const order = await this.ordersModel.findOne({ phone: phone });
+            const user = await this.userModel.findOne({ tg_chat: chatId });
+            if (!order.tg_chat || (order.tg_chat !== null && order.active === true)) {
+                const msgTrue = `Доброго дня, замовник отримав Вашу відповідь`;
+                await this.sendMessage(chatId, msgTrue);
+                const msgOrder = `Користувач ${user.firstName} ${user.lastName} готовий виконати ваше замовлення "${order.description}".
+      Ви можете написати йому в телеграм @${user.telegram}, або зателефонувати по номеру ${user.phone}.
+      Посылання на профіль виконавця ${process.env.FRONT_LINK}${user._id}. ${user.video[0]}`;
+                await this.sendMessage(order.tg_chat, msgOrder);
+                return;
+            }
+            else if (order.tg_chat === null) {
+                const msg = `Замовник ще не активував чат-бот, спробуйте пізніше`;
+                await this.sendMessage(chatId, msg);
+                return;
+            }
+            else {
+                const msg = `Замовник призупинив пошук`;
+                await this.sendMessage(chatId, msg);
+                return;
+            }
+        }
+        catch (e) {
+            throw new Error(`Ошибка отправки сообщения: ${e}`);
         }
     }
     async sendNewOrder(chatId, order) {

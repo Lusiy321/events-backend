@@ -109,19 +109,23 @@ export class TelegramService {
     try {
       const order = await this.ordersModel.findOne({ phone: phone });
       const user = await this.userModel.findOne({ tg_chat: chatId });
-      console.log(order.tg_chat);
-      if (!order.tg_chat || order.tg_chat !== null) {
+      if (!order.tg_chat || (order.tg_chat !== null && order.active === true)) {
         const msgTrue = `Доброго дня, замовник отримав Вашу відповідь`;
         await this.sendMessage(chatId, msgTrue);
         const msgOrder = `Користувач ${user.firstName} ${user.lastName} готовий виконати ваше замовлення "${order.description}".
       Ви можете написати йому в телеграм @${user.telegram}, або зателефонувати по номеру ${user.phone}.
-      Посылання на профіль виконавця ${process.env.FRONT_LINK}${user._id}`;
+      Посылання на профіль виконавця ${process.env.FRONT_LINK}${user._id}. ${user.video[0]}`;
         await this.sendMessage(order.tg_chat, msgOrder);
         return;
+      } else if (order.tg_chat === null) {
+        const msg = `Замовник ще не активував чат-бот, спробуйте пізніше`;
+        await this.sendMessage(chatId, msg);
+        return;
+      } else {
+        const msg = `Замовник призупинив пошук`;
+        await this.sendMessage(chatId, msg);
+        return;
       }
-      const msg = `Замовник ще не активував чат-бот, спробуйте пізніше`;
-      await this.sendMessage(chatId, msg);
-      return;
     } catch (e) {
       throw new Error(`Ошибка отправки сообщения: ${e}`);
     }
