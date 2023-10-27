@@ -69,7 +69,7 @@ let TelegramService = class TelegramService {
             const { data } = query;
             const [action, phone, chatId] = data.split(':');
             if (action === 'accept') {
-                console.log('worck');
+                console.log(`${process.env.BACK_LINK}telegram/send/${phone}/${chatId}`);
                 fetch(`${process.env.BACK_LINK}telegram/send/${phone}/${chatId}`, {
                     method: 'GET',
                 });
