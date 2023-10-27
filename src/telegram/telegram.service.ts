@@ -109,7 +109,8 @@ export class TelegramService {
     try {
       const order = await this.ordersModel.findOne({ phone: phone });
       const user = await this.userModel.findOne({ tg_chat: chatId });
-      if (!order.tg_chat || (order.tg_chat !== null && order.active === true)) {
+      const check = !order.tg_chat || order.tg_chat !== null;
+      if (check && order.active === true) {
         const msgTrue = `Доброго дня, замовник отримав Вашу відповідь`;
         await this.sendMessage(chatId, msgTrue);
         const msgOrder = `Користувач ${user.firstName} ${user.lastName} готовий виконати ваше замовлення "${order.description}".
