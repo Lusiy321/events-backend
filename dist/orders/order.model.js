@@ -83,6 +83,7 @@ __decorate([
 __decorate([
     (0, mongoose_1.Prop)({
         type: Number,
+        default: null,
     }),
     __metadata("design:type", Number)
 ], Orders.prototype, "tg_chat", void 0);

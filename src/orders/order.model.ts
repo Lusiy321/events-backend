@@ -68,6 +68,7 @@ export class Orders extends Model<Orders> {
 
   @Prop({
     type: Number,
+    default: null,
   })
   tg_chat: number;
 

@@ -75,7 +75,15 @@ export class TelegramService {
       const [action, phone, chatId] = data.split(':');
 
       if (action === 'accept') {
-        await this.sendAgreement(phone, chatId);
+        const order = await this.sendAgreement(phone, chatId);
+        console.log(order);
+        if (order === true) {
+          const msg = `${query.message.text} Ви погодились на це замовлення \n`;
+          this.bot.editMessageText(msg, {
+            chat_id: chatId,
+            message_id: query.message.message_id,
+          });
+        }
       }
     });
 
@@ -109,23 +117,23 @@ export class TelegramService {
     try {
       const order = await this.ordersModel.findOne({ phone: phone });
       const user = await this.userModel.findOne({ tg_chat: chatId });
-      const check = !order.tg_chat || order.tg_chat !== null;
-      if (check && order.active === true) {
+
+      if (order.tg_chat !== null && order.active === true) {
         const msgTrue = `Доброго дня, замовник отримав Вашу відповідь`;
         await this.sendMessage(chatId, msgTrue);
         const msgOrder = `Користувач ${user.firstName} ${user.lastName} готовий виконати ваше замовлення "${order.description}".
       Ви можете написати йому в телеграм @${user.telegram}, або зателефонувати по номеру ${user.phone}.
       Посылання на профіль виконавця ${process.env.FRONT_LINK}${user._id}. ${user.video[0]}`;
         await this.sendMessage(order.tg_chat, msgOrder);
-        return;
+        return true;
       } else if (order.tg_chat === null) {
         const msg = `Замовник ще не активував чат-бот, спробуйте пізніше`;
         await this.sendMessage(chatId, msg);
-        return;
+        return false;
       } else {
         const msg = `Замовник призупинив пошук`;
         await this.sendMessage(chatId, msg);
-        return;
+        return true;
       }
     } catch (e) {
       throw new Error(`Ошибка отправки сообщения: ${e}`);
