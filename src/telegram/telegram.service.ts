@@ -75,12 +75,7 @@ export class TelegramService {
       const [action, phone, chatId] = data.split(':');
 
       if (action === 'accept') {
-        await fetch(
-          `${process.env.BACK_LINK}telegram/send/${phone}/${chatId}`,
-          {
-            method: 'GET',
-          },
-        );
+        await this.sendAgreement(phone, chatId);
       }
     });
 
@@ -108,6 +103,25 @@ export class TelegramService {
     } catch (error) {
       throw new Error(`Ошибка отправки сообщения: ${error}`);
     }
+  }
+
+  async sendAgreement(phone: string, chatId: string) {
+    const order = await this.ordersModel.findOne({ phone: phone });
+
+    const user = await this.userModel.findOne({ tg_chat: chatId });
+    console.log(order.tg_chat);
+    if (!order.tg_chat || order.tg_chat !== null) {
+      const msgTrue = `Доброго дня, замовник отримав Вашу відповідь`;
+      await this.sendMessage(chatId, msgTrue);
+      const msgOrder = `Користувач ${user.firstName} ${user.lastName} готовий виконати ваше замовлення "${order.description}".
+      Ви можете написати йому в телеграм @${user.telegram}, або зателефонувати по номеру ${user.phone}.
+      Посылання на профіль виконавця ${process.env.FRONT_LINK}${user._id}`;
+      await this.sendMessage(order.tg_chat, msgOrder);
+      return;
+    }
+    const msg = `Замовник ще не активував чат-бот, спробуйте пізніше`;
+    await this.sendMessage(chatId, msg);
+    return;
   }
 
   async sendNewOrder(chatId: string, order: Orders) {
