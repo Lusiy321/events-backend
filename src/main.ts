@@ -25,6 +25,7 @@ async function start() {
       },
       'BearerAuthMethod',
     )
+    .addServer(`https://events-4qv2.onrender.com`)
     .addServer(`https://events-show.cyclic.app`)
     .addServer(`http://localhost:${PORT}`)
 

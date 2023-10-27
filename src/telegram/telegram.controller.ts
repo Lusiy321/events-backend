@@ -15,9 +15,4 @@ export class TelegramController {
     @InjectModel(User.name)
     private userModel: User,
   ) {}
-
-  // @ApiOperation({ summary: 'Send Agreement message' })
-  // @ApiResponse({ status: 200, type: Object })
-  // @Get('/send/:phone/:chat')
-  //
 }
