@@ -13,7 +13,6 @@ const mongoose_1 = require("@nestjs/mongoose");
 const users_model_1 = require("../users/users.model");
 const telegram_controller_1 = require("./telegram.controller");
 const order_model_1 = require("../orders/order.model");
-const axios_1 = require("@nestjs/axios");
 let TelegramModule = class TelegramModule {
 };
 exports.TelegramModule = TelegramModule;
@@ -29,7 +28,6 @@ exports.TelegramModule = TelegramModule = __decorate([
             mongoose_1.MongooseModule.forFeature([
                 { name: users_model_1.User.name, schema: users_model_1.UserSchema, collection: 'users' },
             ]),
-            axios_1.HttpModule,
         ],
         providers: [telegram_service_1.TelegramService],
         exports: [telegram_service_1.TelegramService],

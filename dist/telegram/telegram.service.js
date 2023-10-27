@@ -18,12 +18,10 @@ const mongoose_1 = require("@nestjs/mongoose");
 const TelegramBot = require("node-telegram-bot-api");
 const order_model_1 = require("../orders/order.model");
 const users_model_1 = require("../users/users.model");
-const axios_1 = require("@nestjs/axios");
 let TelegramService = class TelegramService {
-    constructor(ordersModel, userModel, httpService) {
+    constructor(ordersModel, userModel) {
         this.ordersModel = ordersModel;
         this.userModel = userModel;
-        this.httpService = httpService;
         const token = process.env.BOT_TELEGRAM;
         this.bot = new TelegramBot(token, { polling: true });
         this.bot.setMyCommands([
@@ -53,7 +51,7 @@ let TelegramService = class TelegramService {
             const user = await this.userModel.findOne({ phone: phoneNumber }).exec();
             if (user) {
                 await this.userModel.findByIdAndUpdate(user.id, { tg_chat: chatId });
-                return this.bot.sendMessage(chatId, `Спасибо, ${msg.from.first_name} теперь тебе будут приходить уведомления о новых предложенияех в твоей категории.`);
+                this.bot.sendMessage(chatId, `Спасибо, ${msg.from.first_name} теперь тебе будут приходить уведомления о новых предложенияех в твоей категории.`);
             }
             else {
                 const order = await this.ordersModel
@@ -64,7 +62,7 @@ let TelegramService = class TelegramService {
                         tg_chat: chatId,
                     });
                 }
-                return this.bot.sendMessage(chatId, `Спасибо, ${msg.from.first_name} теперь тебе будут приходить уведомления о новых предложенияех в твоей категории.`);
+                this.bot.sendMessage(chatId, `Спасибо, ${msg.from.first_name} теперь тебе будут приходить уведомления о новых предложенияех в твоей категории.`);
             }
         });
         this.bot.on('callback_query', async (query) => {
@@ -82,7 +80,6 @@ let TelegramService = class TelegramService {
             const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
             if (user) {
                 await this.userModel.findByIdAndUpdate(user.id, { tg_chat: null });
-                return;
             }
             else {
                 const order = await this.ordersModel
@@ -143,7 +140,6 @@ exports.TelegramService = TelegramService = __decorate([
     __param(0, (0, mongoose_1.InjectModel)(order_model_1.Orders.name)),
     __param(1, (0, mongoose_1.InjectModel)(users_model_1.User.name)),
     __metadata("design:paramtypes", [order_model_1.Orders,
-        users_model_1.User,
-        axios_1.HttpService])
+        users_model_1.User])
 ], TelegramService);
 //# sourceMappingURL=telegram.service.js.map

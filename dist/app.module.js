@@ -19,7 +19,6 @@ const telegram_service_1 = require("./telegram/telegram.service");
 const telegram_module_1 = require("./telegram/telegram.module");
 const orders_module_1 = require("./orders/orders.module");
 const order_model_1 = require("./orders/order.model");
-const axios_1 = require("@nestjs/axios");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -44,7 +43,6 @@ exports.AppModule = AppModule = __decorate([
             users_module_1.UsersModule,
             telegram_module_1.TelegramModule,
             orders_module_1.OrdersModule,
-            axios_1.HttpModule,
         ],
     })
 ], AppModule);
