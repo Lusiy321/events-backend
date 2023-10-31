@@ -255,7 +255,8 @@ let UsersService = class UsersService {
             if (!authUser || !authUser.comparePassword(password)) {
                 throw new http_errors_1.Unauthorized(`Email or password is wrong`);
             }
-            return this.createToken(authUser);
+            await this.setToken(authUser);
+            return await this.userModel.findOne({ email: lowerCaseEmail });
         }
         catch (e) {
             throw new http_errors_1.BadRequest(e.message);
@@ -361,7 +362,7 @@ let UsersService = class UsersService {
             throw new http_errors_1.Unauthorized('jwt expired');
         }
     }
-    async createToken(authUser) {
+    async setToken(authUser) {
         const payload = {
             id: authUser._id,
         };

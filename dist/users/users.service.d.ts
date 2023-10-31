@@ -28,7 +28,7 @@ export declare class UsersService {
     update(user: UpdateUserDto, req: any): Promise<User>;
     findOrCreateUser(googleId: string, firstName: string, email: string): Promise<any>;
     findToken(req: any): Promise<User>;
-    createToken(authUser: {
+    setToken(authUser: {
         _id: string;
     }): Promise<any>;
     refreshAccessToken(req: any): Promise<User>;

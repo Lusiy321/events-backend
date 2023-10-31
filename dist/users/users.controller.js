@@ -46,7 +46,7 @@ let UsersController = class UsersController {
         return this.usersService.findCategory();
     }
     async login(user) {
-        return this.usersService.login(user);
+        return await this.usersService.login(user);
     }
     async logout(request) {
         return this.usersService.logout(request);
@@ -94,7 +94,7 @@ let UsersController = class UsersController {
 exports.UsersController = UsersController;
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Create User' }),
-    (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
+    (0, swagger_1.ApiResponse)({ status: 201, type: users_model_1.User }),
     (0, common_1.Post)('/'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -138,6 +138,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Login User' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
+    (0, common_1.HttpCode)(200),
     (0, common_1.Post)('login'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -148,7 +149,7 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Logout User' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
-    (0, common_1.Post)('logout'),
+    (0, common_1.Patch)('logout'),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),

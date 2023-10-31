@@ -266,7 +266,8 @@ export class UsersService {
       if (!authUser || !authUser.comparePassword(password)) {
         throw new Unauthorized(`Email or password is wrong`);
       }
-      return this.createToken(authUser);
+      await this.setToken(authUser);
+      return await this.userModel.findOne({ email: lowerCaseEmail });
     } catch (e) {
       throw new BadRequest(e.message);
     }
@@ -329,7 +330,7 @@ export class UsersService {
         if (category) {
           const findUser = await this.userModel.findById(findId.id).exec();
           const arrCategory = findUser.category;
-          arrCategory.push(...category);
+          arrCategory.push(...category); // сделать проверку на существующие категории
           await this.userModel.findByIdAndUpdate(
             { _id: findId.id },
             {
@@ -405,7 +406,7 @@ export class UsersService {
     }
   }
 
-  async createToken(authUser: { _id: string }) {
+  async setToken(authUser: { _id: string }) {
     const payload = {
       id: authUser._id,
     };

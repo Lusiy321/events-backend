@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   Param,
   Patch,
   Post,
@@ -29,6 +30,7 @@ import { MailUserDto } from './dto/email.user.dto';
 import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
 import { Category } from './category.model';
 import { CreateCategoryDto } from './dto/create.category.dto';
+import { STATUS_CODES } from 'http';
 
 @ApiTags('User')
 @Controller('users')
@@ -36,7 +38,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @ApiOperation({ summary: 'Create User' })
-  @ApiResponse({ status: 200, type: User })
+  @ApiResponse({ status: 201, type: User })
   @Post('/')
   async create(@Body() user: CreateUserDto): Promise<User> {
     return this.usersService.create(user);
@@ -72,14 +74,16 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Login User' })
   @ApiResponse({ status: 200, type: User })
+  @HttpCode(200)
   @Post('login')
   async login(@Body() user: CreateUserDto): Promise<User> {
-    return this.usersService.login(user);
+    return await this.usersService.login(user);
   }
 
   @ApiOperation({ summary: 'Logout User' })
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')
+  @HttpCode(200)
   @Post('logout')
   async logout(@Req() request: any): Promise<User> {
     return this.usersService.logout(request);
@@ -118,6 +122,7 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Создание категории в БД с категориями' })
   @ApiResponse({ status: 200, type: Category })
+  @HttpCode(200)
   @Post('/category/add')
   async createCat(@Body() category: CreateCategoryDto): Promise<Category> {
     return this.usersService.createCategory(category);
@@ -125,6 +130,7 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Добавление подкатегории в БД с категориями' })
   @ApiResponse({ status: 200, type: Category })
+  @HttpCode(200)
   @Post('/subcategories/:id')
   async addSubcategory(
     @Param('id') id: string,
@@ -162,6 +168,7 @@ export class UsersController {
   }
 
   @ApiOperation({ summary: 'Forgot password email send' })
+  @HttpCode(200)
   @Post('forgot-password')
   async forgotPwd(@Body() email: MailUserDto) {
     return await this.usersService.restorePassword(email);
@@ -171,6 +178,7 @@ export class UsersController {
     summary: 'Update password for forgot password',
   })
   @ApiResponse({ status: 200, type: User })
+  @HttpCode(200)
   @Post('/update-password/:Id')
   async setUpdatePsw(
     @Param('Id') id: string,
@@ -185,27 +193,4 @@ export class UsersController {
     await this.usersService.verifyUserEmail(id);
     return res.redirect(`https://show-git-main-smirnypavel.vercel.app`);
   }
-
-  // @ApiOperation({ summary: 'Send telegram message' })
-  // @Post('send')
-  // async sendNotification(@Body() data: { chatId: number; message: string }) {
-  //   const { chatId, message } = data;
-  //   await this.telegramService.sendMessage(chatId, message);
-  //   return { success: true, message: 'Уведомление успешно отправлено' };
-  // }
 }
-
-// @ApiOperation({ summary: 'Login Facebook User' })
-// @Get('facebook/login')
-// @UseGuards(AuthGuard('facebook'))
-// async facebookLogin() {
-//   return console.log('object');
-// }
-// @ApiOperation({ summary: 'Facebook Authentication' })
-// @Get('facebook/redirect')
-// @UseGuards(AuthGuard('facebook'))
-// async facebookLoginCallback(@Req() req: any, @Res() res: any) {
-//   // const userId = req.user.id;
-//   // const user = await this.usersService.findById(userId);
-//   return res.redirect(`https://show-git-main-smirnypavel.vercel.app/?token=`);
-// }
