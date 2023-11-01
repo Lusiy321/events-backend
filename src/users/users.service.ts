@@ -266,7 +266,7 @@ export class UsersService {
       if (!authUser || !authUser.comparePassword(password)) {
         throw new Unauthorized(`Email or password is wrong`);
       }
-      await this.setToken(authUser);
+      await this.createToken(authUser);
       return await this.userModel.findOne({ email: lowerCaseEmail });
     } catch (e) {
       throw new BadRequest(e.message);
@@ -406,7 +406,7 @@ export class UsersService {
     }
   }
 
-  async setToken(authUser: { _id: string }) {
+  async createToken(authUser: { _id: string }) {
     const payload = {
       id: authUser._id,
     };

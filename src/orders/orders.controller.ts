@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   Injectable,
   Param,
   Post,
@@ -41,6 +42,7 @@ export class OrdersController {
 
   @ApiOperation({ summary: 'Send sms code' })
   @ApiResponse({ status: 200, type: Orders })
+  @HttpCode(200)
   @Post('/send-code/:phone')
   async sendVerificationCode(@Param('phone') phoneNumber: string) {
     const user = await this.ordersModel.findOne({ phone: phoneNumber });
@@ -57,6 +59,7 @@ export class OrdersController {
 
   @ApiOperation({ summary: 'Verivy sms order' })
   @ApiResponse({ status: 200, type: Orders })
+  @HttpCode(200)
   @Post('/verify/:code')
   async verifyBySms(@Param('code') code: string): Promise<Orders> {
     await this.ordersService.verifyOrder(code);
