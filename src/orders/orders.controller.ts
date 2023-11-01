@@ -33,6 +33,13 @@ export class OrdersController {
     return this.ordersService.findAllOrders();
   }
 
+  @ApiOperation({ summary: 'Get orders by id' })
+  @ApiResponse({ status: 200, type: Orders })
+  @Get('/find/:id')
+  async findIdOrders(@Param('id') id: string): Promise<Orders> {
+    return this.ordersService.findOrderById(id);
+  }
+
   @ApiOperation({ summary: 'Create Order' })
   @ApiResponse({ status: 200, type: Orders })
   @Post('/')

@@ -29,6 +29,15 @@ export class OrdersService {
     }
   }
 
+  async findOrderById(id: string): Promise<Orders> {
+    try {
+      const find = await this.ordersModel.findById({ _id: id }).exec();
+      return find;
+    } catch (e) {
+      throw new NotFound('User not found');
+    }
+  }
+
   async findOrderByPhone(phone: string): Promise<Orders> {
     try {
       const find = await this.ordersModel.findOne({ phone: phone }).exec();
