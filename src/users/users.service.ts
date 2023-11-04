@@ -286,6 +286,25 @@ export class UsersService {
     }
   }
 
+  async findByIdUpdate(id: string, user: UpdateUserDto): Promise<User> {
+    const { ...params } = user;
+
+    try {
+      if (params) {
+        await this.userModel.findByIdAndUpdate(
+          { _id: id },
+          {
+            ...params,
+          },
+        );
+        const userUpdate = this.userModel.findById({ _id: id });
+        return userUpdate;
+      }
+    } catch (e) {
+      throw new BadRequest(e.message);
+    }
+  }
+
   async update(user: UpdateUserDto, req: any): Promise<User> {
     const {
       firstName,
