@@ -3,6 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Model } from 'mongoose';
 import { Categories } from './dto/caterory.interface';
+import { verify } from './dto/verify.user.dto';
 
 export type UserDocument = User & Document;
 
@@ -216,12 +217,12 @@ export class User extends Model<User> {
   @Prop({ type: String, default: null })
   token: string;
 
-  @ApiProperty({ example: 'true', description: 'User status' })
+  @ApiProperty({ example: 'new', description: 'User moderate status' })
   @Prop({
-    type: Boolean,
-    default: false,
+    enum: ['new', 'approve', 'rejected'],
+    default: 'new',
   })
-  verify: boolean;
+  verify: verify;
 
   @ApiProperty({
     example: 'wVl3VGGX675UCqOFrLx-1xNH-GObq9v7GbZj0s',

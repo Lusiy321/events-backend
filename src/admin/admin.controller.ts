@@ -21,13 +21,15 @@ import { User } from 'src/users/users.model';
 import { Admin } from './admin.model';
 import { CreateAdminDto } from './dto/create.admin.dto';
 import { UpdateUserDto } from 'src/users/dto/update.user.dto';
+import { Orders } from 'src/orders/order.model';
+import { VerifyUserDto } from 'src/users/dto/verify.user.dto';
 
 @ApiTags('Admin')
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
   [x: string]: any;
-
+  //ADMIN
   @ApiOperation({ summary: 'Create Admin (only "superadmin" role)' })
   @ApiResponse({ status: 201, type: Admin })
   @ApiBearerAuth('BearerAuthMethod')
@@ -69,9 +71,11 @@ export class AdminController {
   async refresh(@Req() req: any) {
     return await this.adminService.refreshAccessToken(req);
   }
+
+  //USERS
   @ApiOperation({
     summary:
-      'Find by id and update all rows in User (only "admin" or "moderator" role)',
+      'Find by ID and update all rows in User (only "admin" or "moderator" role)',
   })
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')
@@ -83,5 +87,54 @@ export class AdminController {
     @Req() req: any,
   ): Promise<User> {
     return this.adminService.findByIdUpdate(id, user, req);
+  }
+
+  @ApiOperation({
+    summary: 'Verify User enum: [new, aprove, rejected]',
+  })
+  @ApiResponse({ status: 200, type: User })
+  @ApiBearerAuth('BearerAuthMethod')
+  @Patch('/verify/:Id')
+  async setVerify(
+    @Body() usr: VerifyUserDto,
+    @Param('Id') id: string,
+    @Req() request: any,
+  ): Promise<User> {
+    return this.adminService.verifyUser(id, request, usr);
+  }
+
+  @ApiOperation({ summary: 'Delet user' })
+  @ApiResponse({ status: 200, type: User })
+  @ApiBearerAuth('BearerAuthMethod')
+  @Delete('/user/:id')
+  async deleteUrs(@Param('id') id: string, @Req() request: any): Promise<User> {
+    return this.adminService.deleteUser(id, request);
+  }
+
+  @ApiOperation({ summary: 'Delet Order' })
+  @ApiResponse({ status: 200, type: Orders })
+  @ApiBearerAuth('BearerAuthMethod')
+  @Delete('/user/:id')
+  async deleteOrd(
+    @Param('id') id: string,
+    @Req() request: any,
+  ): Promise<Orders> {
+    return this.adminService.deleteOrder(id, request);
+  }
+
+  @ApiOperation({ summary: 'Set moderator' })
+  @ApiResponse({ status: 200, type: User })
+  @ApiBearerAuth('BearerAuthMethod')
+  @Patch('/role/:Id')
+  async setRole(@Param('Id') id: string, @Req() request: any): Promise<User> {
+    return this.adminService.setModerator(id, request);
+  }
+
+  @ApiOperation({ summary: 'Set ban user' })
+  @ApiResponse({ status: 200, type: User })
+  @ApiBearerAuth('BearerAuthMethod')
+  @Patch('/ban/:Id')
+  async setBan(@Param('Id') id: string, @Req() request: any): Promise<User> {
+    return this.adminService.banUser(id, request);
   }
 }

@@ -8,6 +8,8 @@ import { CreateAdminDto } from './dto/create.admin.dto';
 import { Admin, AdminSchema } from './admin.model';
 import { UpdateUserDto } from 'src/users/dto/update.user.dto';
 import { User } from 'src/users/users.model';
+import { Orders } from 'src/orders/order.model';
+import { VerifyUserDto } from 'src/users/dto/verify.user.dto';
 
 @Injectable()
 export class AdminService {
@@ -16,8 +18,11 @@ export class AdminService {
     private adminModel: Admin,
     @InjectModel(User.name)
     private userModel: User,
+    @InjectModel(Orders.name)
+    private ordersModel: Orders,
   ) {}
 
+  // ADMINS
   async createAdmin(admin: CreateAdminDto, req: any): Promise<Admin> {
     try {
       const findSuper = await this.findToken(req);
@@ -98,6 +103,35 @@ export class AdminService {
     }
   }
 
+  async setModerator(id: string, req: any): Promise<User> {
+    const admin = await this.adminModel.findToken(req);
+    const newSub = await this.adminModel.findById(id).exec();
+    if (!admin) {
+      throw new Unauthorized('jwt expired');
+    }
+    try {
+      if (!admin || !newSub) {
+        throw new Conflict('User not found');
+      }
+
+      if (admin.role === 'admin' && newSub.role === 'moderator') {
+        newSub.role = 'admin';
+        return newSub.save();
+      } else if (admin.role === 'admin' && newSub.role === 'admin') {
+        newSub.role = 'moderator';
+        return newSub.save();
+      } else {
+        throw new Conflict(
+          'Only moderator and their subordinates can change user moderator',
+        );
+      }
+    } catch (e) {
+      throw new NotFound('User not found');
+    }
+  }
+
+  // USERS
+
   async findByIdUpdate(
     id: string,
     user: UpdateUserDto,
@@ -125,6 +159,94 @@ export class AdminService {
       }
     } catch (e) {
       throw new BadRequest(e.message);
+    }
+  }
+
+  async banUser(id: string, req: any): Promise<User> {
+    const admin = await this.adminModel.findToken(req);
+    const newSub = await this.userModel.findById(id);
+    if (!admin) {
+      throw new Unauthorized('jwt expired');
+    }
+
+    if (!admin || !newSub) {
+      throw new Conflict('User not found');
+    }
+    try {
+      const adm = admin.role === 'admin' || admin.role === 'moderator';
+
+      if (adm && newSub.ban === false) {
+        newSub.ban = true;
+        newSub.save();
+        return this.userModel.findById(id);
+      } else if (adm && newSub.ban === true) {
+        newSub.ban = false;
+        newSub.save();
+        return this.userModel.findById(id);
+      } else {
+        return this.userModel.findById(id);
+      }
+    } catch (e) {
+      throw new NotFound('User not found');
+    }
+  }
+
+  async deleteUser(id: string, req: any): Promise<User> {
+    const admin = await this.adminModel.findToken(req);
+    if (!admin) {
+      throw new Unauthorized('jwt expired');
+    }
+    try {
+      if (admin.role === 'admin' || admin.role === 'moderator') {
+        const find = await this.userModel.findByIdAndRemove(id).exec();
+        return find;
+      } else {
+        throw new Conflict('Only admin can delete user');
+      }
+    } catch (e) {
+      throw new NotFound('User not found');
+    }
+  }
+
+  async deleteOrder(id: string, req: any): Promise<Orders> {
+    const admin = await this.adminModel.findToken(req);
+    if (!admin) {
+      throw new Unauthorized('jwt expired');
+    }
+    try {
+      if (admin.role === 'admin' || admin.role === 'moderator') {
+        const find = await this.ordersModel.findByIdAndRemove(id).exec();
+        return find;
+      } else {
+        throw new Conflict('Only admin can delete user');
+      }
+    } catch (e) {
+      throw new NotFound('User not found');
+    }
+  }
+
+  async verifyUser(id: string, req: any, userUp: VerifyUserDto): Promise<User> {
+    const admin = await this.adminModel.findToken(req);
+    const user = await this.userModel.findById(id);
+    if (!admin) {
+      throw new Unauthorized('jwt expired');
+    }
+
+    if (!admin || !user) {
+      throw new Conflict('Not found');
+    }
+    try {
+      const adm = admin.role === 'admin' || admin.role === 'moderator';
+      if (adm && user.verify === 'new') {
+        const { ...params } = userUp;
+        await this.userModel.findByIdAndUpdate({ _id: id }, { ...params });
+        user.save();
+        return await this.userModel.findById(id);
+      } else {
+        return user;
+      }
+    } catch (e) {
+      throw new NotFound('User not found');
     }
   }
 

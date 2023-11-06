@@ -24,6 +24,7 @@
 /// <reference types="mongoose/types/inferschematype" />
 import { Model } from 'mongoose';
 import { Categories } from './dto/caterory.interface';
+import { verify } from './dto/verify.user.dto';
 export type UserDocument = User & Document;
 export declare class User extends Model<User> {
     firstName: string;
@@ -47,7 +48,7 @@ export declare class User extends Model<User> {
     trial: boolean;
     price: string;
     token: string;
-    verify: boolean;
+    verify: verify;
     googleId: string;
     ban: boolean;
 }
