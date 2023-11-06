@@ -13,9 +13,6 @@ import { OrderSchema, Orders } from 'src/orders/order.model';
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema, collection: 'users' },
     ]),
-    MongooseModule.forFeature([
-      { name: User.name, schema: UserSchema, collection: 'users' },
-    ]),
   ],
   providers: [TelegramService],
   exports: [TelegramService],

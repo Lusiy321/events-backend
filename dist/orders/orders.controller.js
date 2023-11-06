@@ -30,6 +30,9 @@ let OrdersController = class OrdersController {
     async findOrders() {
         return this.ordersService.findAllOrders();
     }
+    async findIdOrders(id) {
+        return this.ordersService.findOrderById(id);
+    }
     async create(user) {
         return this.ordersService.create(user);
     }
@@ -61,6 +64,15 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "findOrders", null);
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Get orders by id' }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: order_model_1.Orders }),
+    (0, common_1.Get)('/find/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], OrdersController.prototype, "findIdOrders", null);
+__decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Create Order' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: order_model_1.Orders }),
     (0, common_1.Post)('/'),
@@ -72,6 +84,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Send sms code' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: order_model_1.Orders }),
+    (0, common_1.HttpCode)(200),
     (0, common_1.Post)('/send-code/:phone'),
     __param(0, (0, common_1.Param)('phone')),
     __metadata("design:type", Function),
@@ -81,6 +94,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Verivy sms order' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: order_model_1.Orders }),
+    (0, common_1.HttpCode)(200),
     (0, common_1.Post)('/verify/:code'),
     __param(0, (0, common_1.Param)('code')),
     __metadata("design:type", Function),

@@ -11,6 +11,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
@@ -255,7 +266,7 @@ let UsersService = class UsersService {
             if (!authUser || !authUser.comparePassword(password)) {
                 throw new http_errors_1.Unauthorized(`Email or password is wrong`);
             }
-            await this.setToken(authUser);
+            await this.createToken(authUser);
             return await this.userModel.findOne({ email: lowerCaseEmail });
         }
         catch (e) {
@@ -270,6 +281,19 @@ let UsersService = class UsersService {
         try {
             await this.userModel.findByIdAndUpdate({ _id: user.id }, { token: null });
             return await this.userModel.findById({ _id: user.id });
+        }
+        catch (e) {
+            throw new http_errors_1.BadRequest(e.message);
+        }
+    }
+    async findByIdUpdate(id, user) {
+        const params = __rest(user, []);
+        try {
+            if (params) {
+                await this.userModel.findByIdAndUpdate({ _id: id }, Object.assign({}, params));
+                const userUpdate = this.userModel.findById({ _id: id });
+                return userUpdate;
+            }
         }
         catch (e) {
             throw new http_errors_1.BadRequest(e.message);
@@ -362,7 +386,7 @@ let UsersService = class UsersService {
             throw new http_errors_1.Unauthorized('jwt expired');
         }
     }
-    async setToken(authUser) {
+    async createToken(authUser) {
         const payload = {
             id: authUser._id,
         };

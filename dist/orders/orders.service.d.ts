@@ -10,6 +10,7 @@ export declare class OrdersService {
     private userModel;
     constructor(twilioService: TwilioService, telegramService: TelegramService, ordersModel: Orders, userModel: User);
     findAllOrders(): Promise<Orders[]>;
+    findOrderById(id: string): Promise<Orders>;
     findOrderByPhone(phone: string): Promise<Orders>;
     generateSixDigitNumber(): Promise<number>;
     create(order: CreateOrderDto): Promise<Orders>;

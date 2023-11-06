@@ -68,6 +68,9 @@ let UsersController = class UsersController {
     async addSubcategory(id, subCategory) {
         return this.usersService.addSubcategory(id, subCategory);
     }
+    async find(id, user) {
+        return this.usersService.findByIdUpdate(id, user);
+    }
     async findCategoryId(id) {
         return this.usersService.findUserCategory(id);
     }
@@ -149,7 +152,8 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Logout User' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
-    (0, common_1.Patch)('logout'),
+    (0, common_1.HttpCode)(200),
+    (0, common_1.Post)('logout'),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -189,6 +193,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Создание категории в БД с категориями' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: category_model_1.Category }),
+    (0, common_1.HttpCode)(200),
     (0, common_1.Post)('/category/add'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -198,6 +203,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Добавление подкатегории в БД с категориями' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: category_model_1.Category }),
+    (0, common_1.HttpCode)(200),
     (0, common_1.Post)('/subcategories/:id'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
@@ -205,6 +211,17 @@ __decorate([
     __metadata("design:paramtypes", [String, create_category_dto_1.CreateCategoryDto]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "addSubcategory", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Find by id and update' }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: category_model_1.Category }),
+    (0, common_1.HttpCode)(200),
+    (0, common_1.Put)('/find-by-id/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_user_dto_1.UpdateUserDto]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "find", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Сортировка по категориям пользователей' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
@@ -233,7 +250,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "refresh", null);
 __decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Refresh Access Token' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Change password' }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
     (0, common_1.Patch)('change-password'),
     __param(0, (0, common_1.Req)()),
@@ -244,6 +261,7 @@ __decorate([
 ], UsersController.prototype, "cangePwd", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Forgot password email send' }),
+    (0, common_1.HttpCode)(200),
     (0, common_1.Post)('forgot-password'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -255,6 +273,7 @@ __decorate([
         summary: 'Update password for forgot password',
     }),
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
+    (0, common_1.HttpCode)(200),
     (0, common_1.Post)('/update-password/:Id'),
     __param(0, (0, common_1.Param)('Id')),
     __param(1, (0, common_1.Body)()),

@@ -11,15 +11,22 @@ import { TelegramModule } from './telegram/telegram.module';
 import { OrdersModule } from './orders/orders.module';
 import { OrderSchema, Orders } from './orders/order.model';
 import { HttpModule } from '@nestjs/axios';
+import { AdminService } from './admin/admin.service';
+import { AdminController } from './admin/admin.controller';
+import { AdminModule } from './admin/admin.module';
+import { Admin, AdminSchema } from './admin/admin.model';
 
 @Module({
-  controllers: [UsersController],
-  providers: [UsersService, TelegramService],
+  controllers: [UsersController, AdminController],
+  providers: [UsersService, TelegramService, AdminService],
   imports: [
     ConfigModule.forRoot({
       envFilePath: `.env`,
     }),
     MongooseModule.forRoot(process.env.DB_HOST),
+    MongooseModule.forFeature([
+      { name: Admin.name, schema: AdminSchema, collection: 'admins' },
+    ]),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema, collection: 'users' },
     ]),
@@ -32,6 +39,7 @@ import { HttpModule } from '@nestjs/axios';
     UsersModule,
     TelegramModule,
     OrdersModule,
+    AdminModule,
   ],
 })
 export class AppModule {}

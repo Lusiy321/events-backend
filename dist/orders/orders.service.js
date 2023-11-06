@@ -47,6 +47,15 @@ let OrdersService = class OrdersService {
             throw new http_errors_1.NotFound('User not found');
         }
     }
+    async findOrderById(id) {
+        try {
+            const find = await this.ordersModel.findById({ _id: id }).exec();
+            return find;
+        }
+        catch (e) {
+            throw new http_errors_1.NotFound('User not found');
+        }
+    }
     async findOrderByPhone(phone) {
         try {
             const find = await this.ordersModel.findOne({ phone: phone }).exec();

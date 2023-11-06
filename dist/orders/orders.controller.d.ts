@@ -8,6 +8,7 @@ export declare class OrdersController {
     private ordersModel;
     constructor(ordersService: OrdersService, twilioService: TwilioService, ordersModel: Orders);
     findOrders(): Promise<Orders[]>;
+    findIdOrders(id: string): Promise<Orders>;
     create(user: CreateOrderDto): Promise<Orders>;
     sendVerificationCode(phoneNumber: string): Promise<any>;
     verifyBySms(code: string): Promise<Orders>;

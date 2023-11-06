@@ -171,7 +171,7 @@ export class UsersController {
     return await this.usersService.refreshAccessToken(request);
   }
 
-  @ApiOperation({ summary: 'Refresh Access Token' })
+  @ApiOperation({ summary: 'Change password' })
   @ApiBearerAuth('BearerAuthMethod')
   @Patch('change-password')
   async cangePwd(@Req() request: any, @Body() password: PasswordUserDto) {

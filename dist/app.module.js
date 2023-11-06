@@ -19,18 +19,25 @@ const telegram_service_1 = require("./telegram/telegram.service");
 const telegram_module_1 = require("./telegram/telegram.module");
 const orders_module_1 = require("./orders/orders.module");
 const order_model_1 = require("./orders/order.model");
+const admin_service_1 = require("./admin/admin.service");
+const admin_controller_1 = require("./admin/admin.controller");
+const admin_module_1 = require("./admin/admin.module");
+const admin_model_1 = require("./admin/admin.model");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        controllers: [users_controller_1.UsersController],
-        providers: [users_service_1.UsersService, telegram_service_1.TelegramService],
+        controllers: [users_controller_1.UsersController, admin_controller_1.AdminController],
+        providers: [users_service_1.UsersService, telegram_service_1.TelegramService, admin_service_1.AdminService],
         imports: [
             config_1.ConfigModule.forRoot({
                 envFilePath: `.env`,
             }),
             mongoose_1.MongooseModule.forRoot(process.env.DB_HOST),
+            mongoose_1.MongooseModule.forFeature([
+                { name: admin_model_1.Admin.name, schema: admin_model_1.AdminSchema, collection: 'admins' },
+            ]),
             mongoose_1.MongooseModule.forFeature([
                 { name: users_model_1.User.name, schema: users_model_1.UserSchema, collection: 'users' },
             ]),
@@ -43,6 +50,7 @@ exports.AppModule = AppModule = __decorate([
             users_module_1.UsersModule,
             telegram_module_1.TelegramModule,
             orders_module_1.OrdersModule,
+            admin_module_1.AdminModule,
         ],
     })
 ], AppModule);

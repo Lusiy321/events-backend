@@ -25,9 +25,6 @@ exports.TelegramModule = TelegramModule = __decorate([
             mongoose_1.MongooseModule.forFeature([
                 { name: users_model_1.User.name, schema: users_model_1.UserSchema, collection: 'users' },
             ]),
-            mongoose_1.MongooseModule.forFeature([
-                { name: users_model_1.User.name, schema: users_model_1.UserSchema, collection: 'users' },
-            ]),
         ],
         providers: [telegram_service_1.TelegramService],
         exports: [telegram_service_1.TelegramService],
