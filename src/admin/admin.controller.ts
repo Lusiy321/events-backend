@@ -114,7 +114,7 @@ export class AdminController {
   @ApiOperation({ summary: 'Delet Order' })
   @ApiResponse({ status: 200, type: Orders })
   @ApiBearerAuth('BearerAuthMethod')
-  @Delete('/user/:id')
+  @Delete('/order/:id')
   async deleteOrd(
     @Param('id') id: string,
     @Req() request: any,
