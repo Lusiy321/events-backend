@@ -103,6 +103,23 @@ export class AdminService {
     }
   }
 
+  async findAdminById(id: string, req: any): Promise<Admin> {
+    try {
+      const findSuper = await this.findToken(req);
+      if (!findSuper) {
+        throw new Unauthorized('jwt expired');
+      }
+      if (findSuper.role === 'superadmin' || findSuper.role === 'admin') {
+        const find = await this.adminModel.findById(id).exec();
+        return find;
+      } else {
+        throw new BadRequest('You are not admin');
+      }
+    } catch (e) {
+      throw new NotFound('Admin not found');
+    }
+  }
+
   async setModerator(id: string, req: any): Promise<User> {
     const admin = await this.adminModel.findToken(req);
     const newSub = await this.adminModel.findById(id).exec();

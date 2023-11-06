@@ -44,8 +44,18 @@ export class AdminController {
   @ApiResponse({ status: 200, type: Admin })
   @ApiBearerAuth('BearerAuthMethod')
   @Get('/find')
-  async findUsers(@Req() req: any): Promise<Admin[]> {
+  async findAdmins(@Req() req: any): Promise<Admin[]> {
     return this.adminService.findAllAdmins(req);
+  }
+
+  @ApiOperation({
+    summary: 'Get admin by ID (only "superadmin" and "admin" role)',
+  })
+  @ApiResponse({ status: 200, type: Admin })
+  @ApiBearerAuth('BearerAuthMethod')
+  @Get('/find/:id')
+  async findAdminId(@Param('id') id: string, @Req() req: any): Promise<Admin> {
+    return this.adminService.findAdminById(id, req);
   }
 
   @ApiOperation({ summary: 'Login Admin' })
@@ -122,7 +132,7 @@ export class AdminController {
     return this.adminService.deleteOrder(id, request);
   }
 
-  @ApiOperation({ summary: 'Set moderator' })
+  @ApiOperation({ summary: 'Set moderator (admin only)' })
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')
   @Patch('/role/:Id')
