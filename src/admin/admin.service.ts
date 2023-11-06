@@ -6,12 +6,16 @@ import { compareSync, hashSync } from 'bcrypt';
 import { sign, verify, JwtPayload } from 'jsonwebtoken';
 import { CreateAdminDto } from './dto/create.admin.dto';
 import { Admin, AdminSchema } from './admin.model';
+import { UpdateUserDto } from 'src/users/dto/update.user.dto';
+import { User } from 'src/users/users.model';
 
 @Injectable()
 export class AdminService {
   constructor(
     @InjectModel(Admin.name)
     private adminModel: Admin,
+    @InjectModel(User.name)
+    private userModel: User,
   ) {}
 
   async createAdmin(admin: CreateAdminDto, req: any): Promise<Admin> {
@@ -72,6 +76,53 @@ export class AdminService {
         { token: null },
       );
       return await this.adminModel.findById({ _id: admin.id });
+    } catch (e) {
+      throw new BadRequest(e.message);
+    }
+  }
+
+  async findAllAdmins(req: any): Promise<Admin[]> {
+    try {
+      const findSuper = await this.findToken(req);
+      if (!findSuper) {
+        throw new Unauthorized('jwt expired');
+      }
+      if (findSuper.role === 'superadmin' || findSuper.role === 'admin') {
+        const find = await this.adminModel.find().exec();
+        return find;
+      } else {
+        throw new BadRequest('You are not admin');
+      }
+    } catch (e) {
+      throw new NotFound('User not found');
+    }
+  }
+
+  async findByIdUpdate(
+    id: string,
+    user: UpdateUserDto,
+    req: any,
+  ): Promise<User> {
+    const { ...params } = user;
+    try {
+      const findSuper = await this.findToken(req);
+      if (!findSuper) {
+        throw new Unauthorized('jwt expired');
+      }
+      if (findSuper.role === 'moderator' || findSuper.role === 'admin') {
+        if (params) {
+          await this.userModel.findByIdAndUpdate(
+            { _id: id },
+            {
+              ...params,
+            },
+          );
+          const userUpdate = this.userModel.findById({ _id: id });
+          return userUpdate;
+        } else {
+          throw new BadRequest('You are not admin');
+        }
+      }
     } catch (e) {
       throw new BadRequest(e.message);
     }

@@ -34,10 +34,22 @@ export class UpdateUserDto {
   readonly photo: Array<object>;
   @ApiProperty({ example: ['https://'], description: 'User photo collection' })
   readonly video: Array<string>;
-  @ApiProperty({ example: ['music', 'show'], description: 'User avatar' })
+  @ApiProperty({
+    example: [
+      {
+        _id: '65258a576f9a7d99e555c7bd',
+        name: 'Музичні послуги',
+        subcategories: [
+          {
+            name: 'Жива музика',
+            id: '872c7525-ef5b-4dc3-9082-bdb98426fb1a',
+          },
+        ],
+      },
+    ],
+    description: 'Category and subcategory',
+  })
   readonly category: Array<string>;
-  @ApiProperty({ example: ['rock', 'pop'], description: 'User avatar' })
-  readonly genre: Array<string>;
   @ApiProperty({ example: '100$', description: 'Price' })
   readonly price: string;
 }

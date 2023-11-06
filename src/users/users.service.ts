@@ -286,25 +286,6 @@ export class UsersService {
     }
   }
 
-  async findByIdUpdate(id: string, user: UpdateUserDto): Promise<User> {
-    const { ...params } = user;
-
-    try {
-      if (params) {
-        await this.userModel.findByIdAndUpdate(
-          { _id: id },
-          {
-            ...params,
-          },
-        );
-        const userUpdate = this.userModel.findById({ _id: id });
-        return userUpdate;
-      }
-    } catch (e) {
-      throw new BadRequest(e.message);
-    }
-  }
-
   async update(user: UpdateUserDto, req: any): Promise<User> {
     const {
       firstName,
@@ -320,7 +301,6 @@ export class UsersService {
       photo,
       video,
       category,
-      genre,
       price,
     } = user;
     const findId = await this.findToken(req);
@@ -343,7 +323,6 @@ export class UsersService {
         photo ||
         video ||
         category ||
-        genre ||
         price
       ) {
         if (category) {
@@ -373,7 +352,6 @@ export class UsersService {
             master_photo,
             photo,
             video,
-            genre,
             price,
           },
         );

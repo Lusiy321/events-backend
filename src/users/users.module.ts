@@ -29,6 +29,7 @@ import { TelegramModule } from 'src/telegram/telegram.module';
     { provide: 'USER_SERVICE', useClass: UsersService },
     UsersService,
   ],
+  exports: [UsersService],
   controllers: [UsersController],
 })
 export class UsersModule {}

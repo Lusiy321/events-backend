@@ -41,6 +41,7 @@ exports.UsersModule = UsersModule = __decorate([
             { provide: 'USER_SERVICE', useClass: users_service_1.UsersService },
             users_service_1.UsersService,
         ],
+        exports: [users_service_1.UsersService],
         controllers: [users_controller_1.UsersController],
     })
 ], UsersModule);

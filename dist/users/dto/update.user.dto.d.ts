@@ -13,6 +13,5 @@ export declare class UpdateUserDto {
     readonly photo: Array<object>;
     readonly video: Array<string>;
     readonly category: Array<string>;
-    readonly genre: Array<string>;
     readonly price: string;
 }

@@ -139,16 +139,16 @@ export class UsersController {
     return this.usersService.addSubcategory(id, subCategory);
   }
 
-  @ApiOperation({ summary: 'Find by id and update' })
-  @ApiResponse({ status: 200, type: Category })
-  @HttpCode(200)
-  @Put('/find-by-id/:id')
-  async find(
-    @Param('id') id: string,
-    @Body() user: UpdateUserDto,
-  ): Promise<User> {
-    return this.usersService.findByIdUpdate(id, user);
-  }
+  // @ApiOperation({ summary: 'Find by id and update' })
+  // @ApiResponse({ status: 200, type: User })
+  // @HttpCode(200)
+  // @Put('/find-by-id/:id')
+  // async find(
+  //   @Param('id') id: string,
+  //   @Body() user: UpdateUserDto,
+  // ): Promise<User> {
+  //   return this.usersService.findByIdUpdate(id, user);
+  // }
 
   @ApiOperation({ summary: 'Сортировка по категориям пользователей' })
   @ApiResponse({ status: 200, type: User })

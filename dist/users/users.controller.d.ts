@@ -22,7 +22,6 @@ export declare class UsersController {
     googleAuthRedirect(res: any, req: any): Promise<any>;
     createCat(category: CreateCategoryDto): Promise<Category>;
     addSubcategory(id: string, subCategory: CreateCategoryDto): Promise<Category>;
-    find(id: string, user: UpdateUserDto): Promise<User>;
     findCategoryId(id: string): Promise<User[]>;
     findSubcategoryId(id: string): Promise<User[]>;
     refresh(request: any): Promise<User>;

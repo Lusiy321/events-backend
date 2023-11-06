@@ -73,13 +73,23 @@ __decorate([
     __metadata("design:type", Array)
 ], UpdateUserDto.prototype, "video", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: ['music', 'show'], description: 'User avatar' }),
+    (0, swagger_1.ApiProperty)({
+        example: [
+            {
+                _id: '65258a576f9a7d99e555c7bd',
+                name: 'Музичні послуги',
+                subcategories: [
+                    {
+                        name: 'Жива музика',
+                        id: '872c7525-ef5b-4dc3-9082-bdb98426fb1a',
+                    },
+                ],
+            },
+        ],
+        description: 'Category and subcategory',
+    }),
     __metadata("design:type", Array)
 ], UpdateUserDto.prototype, "category", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: ['rock', 'pop'], description: 'User avatar' }),
-    __metadata("design:type", Array)
-], UpdateUserDto.prototype, "genre", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: '100$', description: 'Price' }),
     __metadata("design:type", String)

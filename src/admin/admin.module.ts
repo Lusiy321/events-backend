@@ -6,6 +6,7 @@ import { AdminService } from './admin.service';
 import { JwtModule } from '@nestjs/jwt';
 import { User, UserSchema } from 'src/users/users.model';
 import { OrderSchema, Orders } from 'src/orders/order.model';
+import { UsersService } from 'src/users/users.service';
 
 @Module({
   imports: [

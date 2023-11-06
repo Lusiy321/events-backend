@@ -25,7 +25,6 @@ export declare class UsersService {
     updateRestorePassword(id: string, newPass: UpdatePasswordUserDto): Promise<User>;
     login(user: CreateUserDto): Promise<User>;
     logout(req: any): Promise<User>;
-    findByIdUpdate(id: string, user: UpdateUserDto): Promise<User>;
     update(user: UpdateUserDto, req: any): Promise<User>;
     findOrCreateUser(googleId: string, firstName: string, email: string): Promise<any>;
     findToken(req: any): Promise<User>;

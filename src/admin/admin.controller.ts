@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Req,
 } from '@nestjs/common';
 import {
@@ -16,11 +17,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
-import { Orders } from 'src/orders/order.model';
-import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/users/users.model';
 import { Admin } from './admin.model';
 import { CreateAdminDto } from './dto/create.admin.dto';
+import { UpdateUserDto } from 'src/users/dto/update.user.dto';
 
 @ApiTags('Admin')
 @Controller('admin')
@@ -34,6 +34,16 @@ export class AdminController {
   @Post('/')
   async create(@Body() adm: CreateAdminDto, @Req() req: any): Promise<Admin> {
     return this.adminService.createAdmin(adm, req);
+  }
+
+  @ApiOperation({
+    summary: 'Get all admins (only "superadmin" and "admin" role)',
+  })
+  @ApiResponse({ status: 200, type: Admin })
+  @ApiBearerAuth('BearerAuthMethod')
+  @Get('/find')
+  async findUsers(@Req() req: any): Promise<Admin[]> {
+    return this.adminService.findAllAdmins(req);
   }
 
   @ApiOperation({ summary: 'Login Admin' })
@@ -58,5 +68,20 @@ export class AdminController {
   @Patch('refresh')
   async refresh(@Req() req: any) {
     return await this.adminService.refreshAccessToken(req);
+  }
+  @ApiOperation({
+    summary:
+      'Find by id and update all rows in User (only "admin" or "moderator" role)',
+  })
+  @ApiResponse({ status: 200, type: User })
+  @ApiBearerAuth('BearerAuthMethod')
+  @HttpCode(200)
+  @Put('/find-by-id/:id')
+  async find(
+    @Param('id') id: string,
+    @Body() user: UpdateUserDto,
+    @Req() req: any,
+  ): Promise<User> {
+    return this.adminService.findByIdUpdate(id, user, req);
   }
 }
