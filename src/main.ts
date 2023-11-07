@@ -3,13 +3,15 @@ import { AppModule } from './app.module';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ViberService } from './viber/viber.service';
 
 async function start() {
   const PORT = process.env.PORT || 5000;
   const app = await NestFactory.create(AppModule, new ExpressAdapter(express), {
     cors: true,
   });
-
+  const viberService = app.get(ViberService);
+  viberService.startServer();
   app.enableCors();
   const config = new DocumentBuilder()
     .setTitle('Event and Show server')

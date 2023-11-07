@@ -27,6 +27,10 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "lastName", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Vovan-123545', description: 'User password' }),
+    __metadata("design:type", String)
+], UpdateUserDto.prototype, "password", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({ example: 'My music work', description: 'User post title' }),
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "title", void 0);

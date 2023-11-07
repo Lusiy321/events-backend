@@ -113,7 +113,7 @@ export class AdminController {
     return this.adminService.verifyUser(id, request, usr);
   }
 
-  @ApiOperation({ summary: 'Delet user' })
+  @ApiOperation({ summary: 'Delet User' })
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')
   @Delete('/user/:id')
@@ -130,14 +130,6 @@ export class AdminController {
     @Req() request: any,
   ): Promise<Orders> {
     return this.adminService.deleteOrder(id, request);
-  }
-
-  @ApiOperation({ summary: 'Set moderator (admin only)' })
-  @ApiResponse({ status: 200, type: User })
-  @ApiBearerAuth('BearerAuthMethod')
-  @Patch('/role/:Id')
-  async setRole(@Param('Id') id: string, @Req() request: any): Promise<User> {
-    return this.adminService.setModerator(id, request);
   }
 
   @ApiOperation({ summary: 'Set ban user' })

@@ -2,6 +2,7 @@ export declare class UpdateUserDto {
     id: string;
     readonly firstName: string;
     readonly lastName: string;
+    readonly password: string;
     readonly title: string;
     readonly description: string;
     readonly phone: string;

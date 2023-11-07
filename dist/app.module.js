@@ -23,13 +23,15 @@ const admin_service_1 = require("./admin/admin.service");
 const admin_controller_1 = require("./admin/admin.controller");
 const admin_module_1 = require("./admin/admin.module");
 const admin_model_1 = require("./admin/admin.model");
+const viber_service_1 = require("./viber/viber.service");
+const viber_module_1 = require("./viber/viber.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         controllers: [users_controller_1.UsersController, admin_controller_1.AdminController],
-        providers: [users_service_1.UsersService, telegram_service_1.TelegramService, admin_service_1.AdminService],
+        providers: [users_service_1.UsersService, telegram_service_1.TelegramService, admin_service_1.AdminService, viber_service_1.ViberService],
         imports: [
             config_1.ConfigModule.forRoot({
                 envFilePath: `.env`,
@@ -51,6 +53,7 @@ exports.AppModule = AppModule = __decorate([
             telegram_module_1.TelegramModule,
             orders_module_1.OrdersModule,
             admin_module_1.AdminModule,
+            viber_module_1.ViberModule,
         ],
     })
 ], AppModule);

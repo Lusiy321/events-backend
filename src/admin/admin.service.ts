@@ -24,11 +24,11 @@ export class AdminService {
 
   // ADMINS
   async createAdmin(admin: CreateAdminDto, req: any): Promise<Admin> {
+    const findSuper = await this.findToken(req);
+    if (!findSuper) {
+      throw new Unauthorized('jwt expired');
+    }
     try {
-      const findSuper = await this.findToken(req);
-      if (!findSuper) {
-        throw new Unauthorized('jwt expired');
-      }
       if (findSuper.role === 'superadmin') {
         const { username } = admin;
         const lowerCase = username.toLowerCase();
@@ -87,11 +87,11 @@ export class AdminService {
   }
 
   async findAllAdmins(req: any): Promise<Admin[]> {
+    const findSuper = await this.findToken(req);
+    if (!findSuper) {
+      throw new Unauthorized('jwt expired');
+    }
     try {
-      const findSuper = await this.findToken(req);
-      if (!findSuper) {
-        throw new Unauthorized('jwt expired');
-      }
       if (findSuper.role === 'superadmin' || findSuper.role === 'admin') {
         const find = await this.adminModel.find().exec();
         return find;
@@ -104,11 +104,11 @@ export class AdminService {
   }
 
   async findAdminById(id: string, req: any): Promise<Admin> {
+    const findSuper = await this.findToken(req);
+    if (!findSuper) {
+      throw new Unauthorized('jwt expired');
+    }
     try {
-      const findSuper = await this.findToken(req);
-      if (!findSuper) {
-        throw new Unauthorized('jwt expired');
-      }
       if (findSuper.role === 'superadmin' || findSuper.role === 'admin') {
         const find = await this.adminModel.findById(id).exec();
         return find;
@@ -117,33 +117,6 @@ export class AdminService {
       }
     } catch (e) {
       throw new NotFound('Admin not found');
-    }
-  }
-
-  async setModerator(id: string, req: any): Promise<User> {
-    const admin = await this.adminModel.findToken(req);
-    const newSub = await this.adminModel.findById(id).exec();
-    if (!admin) {
-      throw new Unauthorized('jwt expired');
-    }
-    try {
-      if (!admin || !newSub) {
-        throw new Conflict('User not found');
-      }
-
-      if (admin.role === 'admin' && newSub.role === 'moderator') {
-        newSub.role = 'admin';
-        return newSub.save();
-      } else if (admin.role === 'admin' && newSub.role === 'admin') {
-        newSub.role = 'moderator';
-        return newSub.save();
-      } else {
-        throw new Conflict(
-          'Only moderator and their subordinates can change user moderator',
-        );
-      }
-    } catch (e) {
-      throw new NotFound('User not found');
     }
   }
 
@@ -162,13 +135,23 @@ export class AdminService {
       }
       if (findSuper.role === 'moderator' || findSuper.role === 'admin') {
         if (params) {
+          if (params.password) {
+            const user = await this.userModel.findById({ _id: id });
+            user.setPassword(params.password);
+            user.save();
+            const userUpdate = this.userModel.findById({ _id: id });
+            return userUpdate;
+          }
+
           await this.userModel.findByIdAndUpdate(
             { _id: id },
             {
               ...params,
             },
           );
+
           const userUpdate = this.userModel.findById({ _id: id });
+
           return userUpdate;
         } else {
           throw new BadRequest('You are not admin');
@@ -180,7 +163,7 @@ export class AdminService {
   }
 
   async banUser(id: string, req: any): Promise<User> {
-    const admin = await this.adminModel.findToken(req);
+    const admin = await this.findToken(req);
     const newSub = await this.userModel.findById(id);
     if (!admin) {
       throw new Unauthorized('jwt expired');
@@ -209,7 +192,7 @@ export class AdminService {
   }
 
   async deleteUser(id: string, req: any): Promise<User> {
-    const admin = await this.adminModel.findToken(req);
+    const admin = await this.findToken(req);
     if (!admin) {
       throw new Unauthorized('jwt expired');
     }
@@ -226,7 +209,7 @@ export class AdminService {
   }
 
   async deleteOrder(id: string, req: any): Promise<Orders> {
-    const admin = await this.adminModel.findToken(req);
+    const admin = await this.findToken(req);
     if (!admin) {
       throw new Unauthorized('jwt expired');
     }
@@ -243,7 +226,7 @@ export class AdminService {
   }
 
   async verifyUser(id: string, req: any, userUp: VerifyUserDto): Promise<User> {
-    const admin = await this.adminModel.findToken(req);
+    const admin = await this.findToken(req);
     const user = await this.userModel.findById(id);
     if (!admin) {
       throw new Unauthorized('jwt expired');
@@ -301,13 +284,13 @@ export class AdminService {
   }
 
   async refreshAccessToken(req: any): Promise<Admin> {
-    try {
-      const { authorization = '' } = req.headers;
-      const [bearer, token] = authorization.split(' ');
+    const { authorization = '' } = req.headers;
+    const [bearer, token] = authorization.split(' ');
 
-      if (bearer !== 'Bearer') {
-        throw new Unauthorized('Not authorized');
-      }
+    if (bearer !== 'Bearer') {
+      throw new Unauthorized('Not authorized');
+    }
+    try {
       const SECRET_KEY = process.env.SECRET_KEY;
       const user = await this.adminModel.findOne({ token: token });
       if (!user) {

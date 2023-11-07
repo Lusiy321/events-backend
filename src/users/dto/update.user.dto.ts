@@ -8,6 +8,8 @@ export class UpdateUserDto {
   readonly firstName: string;
   @ApiProperty({ example: 'Zelenskiy', description: 'User last name' })
   readonly lastName: string;
+  @ApiProperty({ example: 'Vovan-123545', description: 'User password' })
+  readonly password: string;
   @ApiProperty({ example: 'My music work', description: 'User post title' })
   readonly title: string;
   @ApiProperty({ example: 'I sing song', description: 'User post description' })

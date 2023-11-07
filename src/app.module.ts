@@ -15,10 +15,12 @@ import { AdminService } from './admin/admin.service';
 import { AdminController } from './admin/admin.controller';
 import { AdminModule } from './admin/admin.module';
 import { Admin, AdminSchema } from './admin/admin.model';
+import { ViberService } from './viber/viber.service';
+import { ViberModule } from './viber/viber.module';
 
 @Module({
   controllers: [UsersController, AdminController],
-  providers: [UsersService, TelegramService, AdminService],
+  providers: [UsersService, TelegramService, AdminService, ViberService],
   imports: [
     ConfigModule.forRoot({
       envFilePath: `.env`,
@@ -40,6 +42,7 @@ import { Admin, AdminSchema } from './admin/admin.model';
     TelegramModule,
     OrdersModule,
     AdminModule,
+    ViberModule,
   ],
 })
 export class AppModule {}
