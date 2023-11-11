@@ -19,9 +19,8 @@ const admin_service_1 = require("./admin.service");
 const users_model_1 = require("../users/users.model");
 const admin_model_1 = require("./admin.model");
 const create_admin_dto_1 = require("./dto/create.admin.dto");
-const update_user_dto_1 = require("../users/dto/update.user.dto");
-const order_model_1 = require("../orders/order.model");
 const verify_user_dto_1 = require("../users/dto/verify.user.dto");
+const update_user_adm_dto_1 = require("./dto/update.user.adm.dto");
 let AdminController = class AdminController {
     constructor(adminService) {
         this.adminService = adminService;
@@ -50,11 +49,8 @@ let AdminController = class AdminController {
     async setVerify(usr, id, request) {
         return this.adminService.verifyUser(id, request, usr);
     }
-    async deleteUrs(id, request) {
-        return this.adminService.deleteUser(id, request);
-    }
-    async deleteOrd(id, request) {
-        return this.adminService.deleteOrder(id, request);
+    async deleteUrs(request, data) {
+        return this.adminService.deleteUser(request, data);
     }
     async setBan(id, request) {
         return this.adminService.banUser(id, request);
@@ -139,7 +135,7 @@ __decorate([
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, update_user_dto_1.UpdateUserDto, Object]),
+    __metadata("design:paramtypes", [String, update_user_adm_dto_1.UpdateUserAdmDto, Object]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "find", null);
 __decorate([
@@ -158,26 +154,15 @@ __decorate([
 ], AdminController.prototype, "setVerify", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Delet User' }),
-    (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: Object }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
-    (0, common_1.Delete)('/user/:id'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Req)()),
+    (0, common_1.Delete)('/'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "deleteUrs", null);
-__decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Delet Order' }),
-    (0, swagger_1.ApiResponse)({ status: 200, type: order_model_1.Orders }),
-    (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
-    (0, common_1.Delete)('/order/:id'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Req)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", Promise)
-], AdminController.prototype, "deleteOrd", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Set ban user' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),

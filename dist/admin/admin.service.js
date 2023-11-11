@@ -45,7 +45,7 @@ let AdminService = class AdminService {
         }
         try {
             if (findSuper.role === 'superadmin') {
-                const { username } = admin;
+                const { username } = admin.toLowerCase();
                 const lowerCase = username.toLowerCase();
                 const registration = await this.adminModel.findOne({
                     username: lowerCase,
@@ -97,36 +97,18 @@ let AdminService = class AdminService {
         }
     }
     async findAllAdmins(req) {
-        const findSuper = await this.findToken(req);
-        if (!findSuper) {
-            throw new http_errors_1.Unauthorized('jwt expired');
-        }
         try {
-            if (findSuper.role === 'superadmin' || findSuper.role === 'admin') {
-                const find = await this.adminModel.find().exec();
-                return find;
-            }
-            else {
-                throw new http_errors_1.BadRequest('You are not admin');
-            }
+            const find = await this.adminModel.find().exec();
+            return find;
         }
         catch (e) {
             throw new http_errors_1.NotFound('User not found');
         }
     }
     async findAdminById(id, req) {
-        const findSuper = await this.findToken(req);
-        if (!findSuper) {
-            throw new http_errors_1.Unauthorized('jwt expired');
-        }
         try {
-            if (findSuper.role === 'superadmin' || findSuper.role === 'admin') {
-                const find = await this.adminModel.findById(id).exec();
-                return find;
-            }
-            else {
-                throw new http_errors_1.BadRequest('You are not admin');
-            }
+            const find = await this.adminModel.findById(id).exec();
+            return find;
         }
         catch (e) {
             throw new http_errors_1.NotFound('Admin not found');
@@ -190,15 +172,25 @@ let AdminService = class AdminService {
             throw new http_errors_1.NotFound('User not found');
         }
     }
-    async deleteUser(id, req) {
+    async deleteUser(req, data) {
         const admin = await this.findToken(req);
+        const params = __rest(data, []);
+        console.log(params);
         if (!admin) {
             throw new http_errors_1.Unauthorized('jwt expired');
         }
         try {
             if (admin.role === 'admin' || admin.role === 'moderator') {
-                const find = await this.userModel.findByIdAndRemove(id).exec();
-                return find;
+                if ('userId' in params && Array.isArray(params.userId)) {
+                    const arr = params.userId;
+                    const action = arr.map(async (id) => await this.userModel.findByIdAndRemove(id));
+                    return params;
+                }
+                else if ('postId' in params && Array.isArray(params.postId)) {
+                    const arr = params.postId;
+                    const action = arr.map(async (id) => await this.ordersModel.findByIdAndRemove(id));
+                    return params;
+                }
             }
             else {
                 throw new http_errors_1.Conflict('Only admin can delete user');

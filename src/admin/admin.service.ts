@@ -10,6 +10,7 @@ import { UpdateUserDto } from 'src/users/dto/update.user.dto';
 import { User } from 'src/users/users.model';
 import { Orders } from 'src/orders/order.model';
 import { VerifyUserDto } from 'src/users/dto/verify.user.dto';
+import { UpdateUserAdmDto } from './dto/update.user.adm.dto';
 
 @Injectable()
 export class AdminService {
@@ -124,7 +125,7 @@ export class AdminService {
 
   async findByIdUpdate(
     id: string,
-    user: UpdateUserDto,
+    user: UpdateUserAdmDto,
     req: any,
   ): Promise<User> {
     const { ...params } = user;
@@ -191,15 +192,29 @@ export class AdminService {
     }
   }
 
-  async deleteUser(id: string, req: any): Promise<User> {
+  async deleteUser(req: any, data: object): Promise<Object> {
     const admin = await this.findToken(req);
+    const { ...params } = data;
+    console.log(params);
     if (!admin) {
       throw new Unauthorized('jwt expired');
     }
+
     try {
       if (admin.role === 'admin' || admin.role === 'moderator') {
-        const find = await this.userModel.findByIdAndRemove(id).exec();
-        return find;
+        if ('userId' in params && Array.isArray(params.userId)) {
+          const arr = params.userId;
+          const action = arr.map(
+            async (id: string) => await this.userModel.findByIdAndRemove(id),
+          );
+          return params;
+        } else if ('postId' in params && Array.isArray(params.postId)) {
+          const arr = params.postId;
+          const action = arr.map(
+            async (id: string) => await this.ordersModel.findByIdAndRemove(id),
+          );
+          return params;
+        }
       } else {
         throw new Conflict('Only admin can delete user');
       }

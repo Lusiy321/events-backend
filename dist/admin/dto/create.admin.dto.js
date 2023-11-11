@@ -12,6 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateAdminDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 class CreateAdminDto {
+    toLowerCase() {
+        throw new Error('Method not implemented.');
+    }
 }
 exports.CreateAdminDto = CreateAdminDto;
 __decorate([

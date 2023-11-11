@@ -20,9 +20,8 @@ import { AdminService } from './admin.service';
 import { User } from 'src/users/users.model';
 import { Admin } from './admin.model';
 import { CreateAdminDto } from './dto/create.admin.dto';
-import { UpdateUserDto } from 'src/users/dto/update.user.dto';
-import { Orders } from 'src/orders/order.model';
 import { VerifyUserDto } from 'src/users/dto/verify.user.dto';
+import { UpdateUserAdmDto } from './dto/update.user.adm.dto';
 
 @ApiTags('Admin')
 @Controller('admin')
@@ -93,7 +92,7 @@ export class AdminController {
   @Put('/find-by-id/:id')
   async find(
     @Param('id') id: string,
-    @Body() user: UpdateUserDto,
+    @Body() user: UpdateUserAdmDto,
     @Req() req: any,
   ): Promise<User> {
     return this.adminService.findByIdUpdate(id, user, req);
@@ -114,22 +113,11 @@ export class AdminController {
   }
 
   @ApiOperation({ summary: 'Delet User' })
-  @ApiResponse({ status: 200, type: User })
+  @ApiResponse({ status: 200, type: Object })
   @ApiBearerAuth('BearerAuthMethod')
-  @Delete('/user/:id')
-  async deleteUrs(@Param('id') id: string, @Req() request: any): Promise<User> {
-    return this.adminService.deleteUser(id, request);
-  }
-
-  @ApiOperation({ summary: 'Delet Order' })
-  @ApiResponse({ status: 200, type: Orders })
-  @ApiBearerAuth('BearerAuthMethod')
-  @Delete('/order/:id')
-  async deleteOrd(
-    @Param('id') id: string,
-    @Req() request: any,
-  ): Promise<Orders> {
-    return this.adminService.deleteOrder(id, request);
+  @Delete('/')
+  async deleteUrs(@Req() request: any, @Body() data: object): Promise<Object> {
+    return this.adminService.deleteUser(request, data);
   }
 
   @ApiOperation({ summary: 'Set ban user' })
