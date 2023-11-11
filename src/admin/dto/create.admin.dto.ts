@@ -2,6 +2,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateAdminDto {
+  toLowerCase(): { username: string } {
+    throw new Error('Method not implemented.');
+  }
   @ApiProperty({
     example: 'zelenskiy',
     description: 'Admin username',

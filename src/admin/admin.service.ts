@@ -30,7 +30,7 @@ export class AdminService {
     }
     try {
       if (findSuper.role === 'superadmin') {
-        const { username } = admin;
+        const { username } = admin.toLowerCase();
         const lowerCase = username.toLowerCase();
 
         const registration = await this.adminModel.findOne({
