@@ -121,7 +121,9 @@ let AdminService = class AdminService {
             if (!findSuper) {
                 throw new http_errors_1.Unauthorized('jwt expired');
             }
-            if (findSuper.role === 'moderator' || findSuper.role === 'admin') {
+            if (findSuper.role === 'moderator' ||
+                findSuper.role === 'admin' ||
+                findSuper.role === 'superadmin') {
                 if (params) {
                     if (params.password) {
                         const user = await this.userModel.findById({ _id: id });
@@ -153,7 +155,9 @@ let AdminService = class AdminService {
             throw new http_errors_1.Conflict('User not found');
         }
         try {
-            const adm = admin.role === 'admin' || admin.role === 'moderator';
+            const adm = admin.role === 'admin' ||
+                admin.role === 'moderator' ||
+                admin.role === 'superadmin';
             if (adm && newSub.ban === false) {
                 newSub.ban = true;
                 newSub.save();
@@ -180,35 +184,27 @@ let AdminService = class AdminService {
             throw new http_errors_1.Unauthorized('jwt expired');
         }
         try {
-            if (admin.role === 'admin' || admin.role === 'moderator') {
+            if (admin.role === 'admin' ||
+                admin.role === 'moderator' ||
+                admin.role === 'superadmin') {
                 if ('userId' in params && Array.isArray(params.userId)) {
                     const arr = params.userId;
-                    const action = arr.map(async (id) => await this.userModel.findByIdAndRemove(id));
+                    arr.map(async (id) => await this.userModel.findByIdAndRemove(id));
                     return params;
                 }
                 else if ('postId' in params && Array.isArray(params.postId)) {
                     const arr = params.postId;
-                    const action = arr.map(async (id) => await this.ordersModel.findByIdAndRemove(id));
+                    arr.map(async (id) => await this.ordersModel.findByIdAndRemove(id));
                     return params;
                 }
-            }
-            else {
-                throw new http_errors_1.Conflict('Only admin can delete user');
-            }
-        }
-        catch (e) {
-            throw new http_errors_1.NotFound('User not found');
-        }
-    }
-    async deleteOrder(id, req) {
-        const admin = await this.findToken(req);
-        if (!admin) {
-            throw new http_errors_1.Unauthorized('jwt expired');
-        }
-        try {
-            if (admin.role === 'admin' || admin.role === 'moderator') {
-                const find = await this.ordersModel.findByIdAndRemove(id).exec();
-                return find;
+                else if ('adminId' in params && Array.isArray(params.adminId)) {
+                    const arr = params.adminId;
+                    arr.map(async (id) => await this.adminModel.findByIdAndRemove(id));
+                    return params;
+                }
+                else {
+                    throw new http_errors_1.NotFound('User not found');
+                }
             }
             else {
                 throw new http_errors_1.Conflict('Only admin can delete user');
@@ -228,7 +224,9 @@ let AdminService = class AdminService {
             throw new http_errors_1.Conflict('Not found');
         }
         try {
-            const adm = admin.role === 'admin' || admin.role === 'moderator';
+            const adm = admin.role === 'admin' ||
+                admin.role === 'moderator' ||
+                admin.role === 'superadmin';
             if (adm && user.verify === 'new') {
                 const params = __rest(userUp, []);
                 await this.userModel.findByIdAndUpdate({ _id: id }, Object.assign({}, params));

@@ -134,7 +134,11 @@ export class AdminService {
       if (!findSuper) {
         throw new Unauthorized('jwt expired');
       }
-      if (findSuper.role === 'moderator' || findSuper.role === 'admin') {
+      if (
+        findSuper.role === 'moderator' ||
+        findSuper.role === 'admin' ||
+        findSuper.role === 'superadmin'
+      ) {
         if (params) {
           if (params.password) {
             const user = await this.userModel.findById({ _id: id });
@@ -174,7 +178,10 @@ export class AdminService {
       throw new Conflict('User not found');
     }
     try {
-      const adm = admin.role === 'admin' || admin.role === 'moderator';
+      const adm =
+        admin.role === 'admin' ||
+        admin.role === 'moderator' ||
+        admin.role === 'superadmin';
 
       if (adm && newSub.ban === false) {
         newSub.ban = true;
@@ -201,37 +208,32 @@ export class AdminService {
     }
 
     try {
-      if (admin.role === 'admin' || admin.role === 'moderator') {
+      if (
+        admin.role === 'admin' ||
+        admin.role === 'moderator' ||
+        admin.role === 'superadmin'
+      ) {
         if ('userId' in params && Array.isArray(params.userId)) {
           const arr = params.userId;
-          const action = arr.map(
+          arr.map(
             async (id: string) => await this.userModel.findByIdAndRemove(id),
           );
           return params;
         } else if ('postId' in params && Array.isArray(params.postId)) {
           const arr = params.postId;
-          const action = arr.map(
+          arr.map(
             async (id: string) => await this.ordersModel.findByIdAndRemove(id),
           );
           return params;
+        } else if ('adminId' in params && Array.isArray(params.adminId)) {
+          const arr = params.adminId;
+          arr.map(
+            async (id: string) => await this.adminModel.findByIdAndRemove(id),
+          );
+          return params;
+        } else {
+          throw new NotFound('User not found');
         }
-      } else {
-        throw new Conflict('Only admin can delete user');
-      }
-    } catch (e) {
-      throw new NotFound('User not found');
-    }
-  }
-
-  async deleteOrder(id: string, req: any): Promise<Orders> {
-    const admin = await this.findToken(req);
-    if (!admin) {
-      throw new Unauthorized('jwt expired');
-    }
-    try {
-      if (admin.role === 'admin' || admin.role === 'moderator') {
-        const find = await this.ordersModel.findByIdAndRemove(id).exec();
-        return find;
       } else {
         throw new Conflict('Only admin can delete user');
       }
@@ -251,7 +253,10 @@ export class AdminService {
       throw new Conflict('Not found');
     }
     try {
-      const adm = admin.role === 'admin' || admin.role === 'moderator';
+      const adm =
+        admin.role === 'admin' ||
+        admin.role === 'moderator' ||
+        admin.role === 'superadmin';
       if (adm && user.verify === 'new') {
         const { ...params } = userUp;
         await this.userModel.findByIdAndUpdate({ _id: id }, { ...params });
