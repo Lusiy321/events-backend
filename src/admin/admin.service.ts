@@ -87,34 +87,34 @@ export class AdminService {
   }
 
   async findAllAdmins(req: any): Promise<Admin[]> {
-    const findSuper = await this.findToken(req);
-    if (!findSuper) {
-      throw new Unauthorized('jwt expired');
-    }
+    // const findSuper = await this.findToken(req);
+    // if (!findSuper) {
+    //   throw new Unauthorized('jwt expired');
+    // }
     try {
-      if (findSuper.role === 'superadmin' || findSuper.role === 'admin') {
-        const find = await this.adminModel.find().exec();
-        return find;
-      } else {
-        throw new BadRequest('You are not admin');
-      }
+      // if (findSuper.role === 'superadmin' || findSuper.role === 'admin') {
+      const find = await this.adminModel.find().exec();
+      return find;
+      // } else {
+      //   throw new BadRequest('You are not admin');
+      // }
     } catch (e) {
       throw new NotFound('User not found');
     }
   }
 
   async findAdminById(id: string, req: any): Promise<Admin> {
-    const findSuper = await this.findToken(req);
-    if (!findSuper) {
-      throw new Unauthorized('jwt expired');
-    }
+    // const findSuper = await this.findToken(req);
+    // if (!findSuper) {
+    //   throw new Unauthorized('jwt expired');
+    // }
     try {
-      if (findSuper.role === 'superadmin' || findSuper.role === 'admin') {
-        const find = await this.adminModel.findById(id).exec();
-        return find;
-      } else {
-        throw new BadRequest('You are not admin');
-      }
+      // if (findSuper.role === 'superadmin' || findSuper.role === 'admin') {
+      const find = await this.adminModel.findById(id).exec();
+      return find;
+      // } else {
+      //   throw new BadRequest('You are not admin');
+      // }
     } catch (e) {
       throw new NotFound('Admin not found');
     }
