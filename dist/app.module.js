@@ -25,6 +25,7 @@ const admin_module_1 = require("./admin/admin.module");
 const admin_model_1 = require("./admin/admin.model");
 const viber_service_1 = require("./viber/viber.service");
 const viber_module_1 = require("./viber/viber.module");
+const posts_module_1 = require("./posts/posts.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -54,6 +55,7 @@ exports.AppModule = AppModule = __decorate([
             orders_module_1.OrdersModule,
             admin_module_1.AdminModule,
             viber_module_1.ViberModule,
+            posts_module_1.PostsModule,
         ],
     })
 ], AppModule);

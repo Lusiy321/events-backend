@@ -184,23 +184,33 @@ let AdminService = class AdminService {
             throw new http_errors_1.Unauthorized('jwt expired');
         }
         try {
+            let respUsers = [];
             if (admin.role === 'admin' ||
                 admin.role === 'moderator' ||
                 admin.role === 'superadmin') {
                 if ('userId' in params && Array.isArray(params.userId)) {
                     const arr = params.userId;
-                    arr.map(async (id) => await this.userModel.findByIdAndRemove(id));
-                    return params;
+                    arr.map(async (id) => {
+                        const delUsr = await this.userModel.findByIdAndRemove(id);
+                        respUsers.push(delUsr);
+                    });
+                    return respUsers;
                 }
                 else if ('postId' in params && Array.isArray(params.postId)) {
                     const arr = params.postId;
-                    arr.map(async (id) => await this.ordersModel.findByIdAndRemove(id));
-                    return params;
+                    arr.map(async (id) => {
+                        const delUsr = await this.ordersModel.findByIdAndRemove(id);
+                        respUsers.push(delUsr);
+                    });
+                    return respUsers;
                 }
                 else if ('adminId' in params && Array.isArray(params.adminId)) {
                     const arr = params.adminId;
-                    arr.map(async (id) => await this.adminModel.findByIdAndRemove(id));
-                    return params;
+                    arr.map(async (id) => {
+                        const delUsr = await this.adminModel.findByIdAndRemove(id);
+                        respUsers.push(delUsr);
+                    });
+                    return respUsers;
                 }
                 else {
                     throw new http_errors_1.NotFound('User not found');

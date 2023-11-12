@@ -199,7 +199,7 @@ export class AdminService {
     }
   }
 
-  async deleteUser(req: any, data: object): Promise<Object> {
+  async deleteUser(req: any, data: object): Promise<Object[]> {
     const admin = await this.findToken(req);
     const { ...params } = data;
     console.log(params);
@@ -208,6 +208,7 @@ export class AdminService {
     }
 
     try {
+      let respUsers = [];
       if (
         admin.role === 'admin' ||
         admin.role === 'moderator' ||
@@ -215,22 +216,26 @@ export class AdminService {
       ) {
         if ('userId' in params && Array.isArray(params.userId)) {
           const arr = params.userId;
-          arr.map(
-            async (id: string) => await this.userModel.findByIdAndRemove(id),
-          );
-          return params;
+
+          arr.map(async (id: string) => {
+            const delUsr = await this.userModel.findByIdAndRemove(id);
+            respUsers.push(delUsr);
+          });
+          return respUsers;
         } else if ('postId' in params && Array.isArray(params.postId)) {
           const arr = params.postId;
-          arr.map(
-            async (id: string) => await this.ordersModel.findByIdAndRemove(id),
-          );
-          return params;
+          arr.map(async (id: string) => {
+            const delUsr = await this.ordersModel.findByIdAndRemove(id);
+            respUsers.push(delUsr);
+          });
+          return respUsers;
         } else if ('adminId' in params && Array.isArray(params.adminId)) {
           const arr = params.adminId;
-          arr.map(
-            async (id: string) => await this.adminModel.findByIdAndRemove(id),
-          );
-          return params;
+          arr.map(async (id: string) => {
+            const delUsr = await this.adminModel.findByIdAndRemove(id);
+            respUsers.push(delUsr);
+          });
+          return respUsers;
         } else {
           throw new NotFound('User not found');
         }

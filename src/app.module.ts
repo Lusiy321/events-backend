@@ -17,6 +17,7 @@ import { AdminModule } from './admin/admin.module';
 import { Admin, AdminSchema } from './admin/admin.model';
 import { ViberService } from './viber/viber.service';
 import { ViberModule } from './viber/viber.module';
+import { PostsModule } from './posts/posts.module';
 
 @Module({
   controllers: [UsersController, AdminController],
@@ -43,6 +44,7 @@ import { ViberModule } from './viber/viber.module';
     OrdersModule,
     AdminModule,
     ViberModule,
+    PostsModule,
   ],
 })
 export class AppModule {}
