@@ -72,6 +72,12 @@ export class Orders extends Model<Orders> {
   })
   tg_chat: number;
 
+  @Prop({
+    type: String,
+    default: null,
+  })
+  viber: string;
+
   @ApiProperty({
     example: 'Kyiv',
     description: 'User location',

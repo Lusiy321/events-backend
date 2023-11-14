@@ -23,25 +23,17 @@
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
 import { Model } from 'mongoose';
-import { Categories } from 'src/users/dto/caterory.interface';
-export type OrdersDocument = Orders & Document;
-export declare class Orders extends Model<Orders> {
-    phone: string;
+export type ViberDocument = Viber & Document;
+export declare class Viber extends Model<Viber> {
+    id: string;
     name: string;
-    description: string;
-    category: Array<Categories>;
-    telegram: string;
-    tg_chat: number;
-    viber: string;
-    location: string;
-    price: string;
-    date: string;
-    active: boolean;
-    sms: number;
-    verify: boolean;
+    avatar: string;
+    country: string;
+    language: string;
+    apiVersion: number;
 }
-export declare const OrderSchema: import("mongoose").Schema<Orders, Model<Orders, any, any, any, import("mongoose").Document<unknown, any, Orders> & Orders & {
+export declare const ViberSchema: import("mongoose").Schema<Viber, Model<Viber, any, any, any, import("mongoose").Document<unknown, any, Viber> & Viber & {
     _id: import("mongoose").Types.ObjectId;
-}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Orders, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<Orders>> & import("mongoose").FlatRecord<Orders> & {
+}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Viber, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<Viber>> & import("mongoose").FlatRecord<Viber> & {
     _id: import("mongoose").Types.ObjectId;
 }>;

@@ -1,10 +1,12 @@
 export declare const ViberBot: any;
+import { User } from 'src/users/users.model';
+import { Orders } from 'src/orders/order.model';
 export declare class ViberService {
+    private userModel;
+    private orderModel;
     private app;
     private bot;
-    constructor();
-    handleIncomingMessage(message: any, response: any): void;
-    private sendDefaultResponse;
-    private sendSubscriptionPrompt;
+    constructor(userModel: User, orderModel: Orders);
+    sendNewOrder(userId: string, order: Orders): Promise<void>;
     startServer(): any;
 }

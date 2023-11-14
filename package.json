@@ -50,7 +50,9 @@
     "swagger-ui-express": "^4.6.3",
     "twilio": "^4.18.1",
     "uuid": "^9.0.1",
-    "viber-bot": "^1.0.18"
+    "viber-bot": "^1.0.18",
+    "winston": "^3.11.0",
+    "winston-console-formatter": "^1.0.0-beta.3"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.5.0",

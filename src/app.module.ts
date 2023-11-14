@@ -10,7 +10,6 @@ import { TelegramService } from './telegram/telegram.service';
 import { TelegramModule } from './telegram/telegram.module';
 import { OrdersModule } from './orders/orders.module';
 import { OrderSchema, Orders } from './orders/order.model';
-import { HttpModule } from '@nestjs/axios';
 import { AdminService } from './admin/admin.service';
 import { AdminController } from './admin/admin.controller';
 import { AdminModule } from './admin/admin.module';
@@ -18,6 +17,7 @@ import { Admin, AdminSchema } from './admin/admin.model';
 import { ViberService } from './viber/viber.service';
 import { ViberModule } from './viber/viber.module';
 import { PostsModule } from './posts/posts.module';
+import { Viber, ViberSchema } from './viber/viber.model';
 
 @Module({
   controllers: [UsersController, AdminController],
@@ -38,6 +38,9 @@ import { PostsModule } from './posts/posts.module';
     ]),
     MongooseModule.forFeature([
       { name: Orders.name, schema: OrderSchema, collection: 'orders' },
+    ]),
+    MongooseModule.forFeature([
+      { name: Viber.name, schema: ViberSchema, collection: 'viber' },
     ]),
     UsersModule,
     TelegramModule,

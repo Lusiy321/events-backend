@@ -78,6 +78,7 @@ export class User extends Model<User> {
 
   @Prop({
     type: Number,
+    default: null,
   })
   tg_chat: number;
 
@@ -87,8 +88,7 @@ export class User extends Model<User> {
   })
   @Prop({
     type: String,
-    minlength: 10,
-    maxlength: 13,
+    default: null,
   })
   viber: string;
 

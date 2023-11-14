@@ -3,6 +3,7 @@ import { ViberService } from './viber.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { OrderSchema, Orders } from 'src/orders/order.model';
 import { User, UserSchema } from 'src/users/users.model';
+import { Viber, ViberSchema } from './viber.model';
 
 @Module({
   imports: [

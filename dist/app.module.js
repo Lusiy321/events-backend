@@ -26,6 +26,7 @@ const admin_model_1 = require("./admin/admin.model");
 const viber_service_1 = require("./viber/viber.service");
 const viber_module_1 = require("./viber/viber.module");
 const posts_module_1 = require("./posts/posts.module");
+const viber_model_1 = require("./viber/viber.model");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -49,6 +50,9 @@ exports.AppModule = AppModule = __decorate([
             ]),
             mongoose_1.MongooseModule.forFeature([
                 { name: order_model_1.Orders.name, schema: order_model_1.OrderSchema, collection: 'orders' },
+            ]),
+            mongoose_1.MongooseModule.forFeature([
+                { name: viber_model_1.Viber.name, schema: viber_model_1.ViberSchema, collection: 'viber' },
             ]),
             users_module_1.UsersModule,
             telegram_module_1.TelegramModule,

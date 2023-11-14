@@ -95,6 +95,7 @@ __decorate([
 __decorate([
     (0, mongoose_1.Prop)({
         type: Number,
+        default: null,
     }),
     __metadata("design:type", Number)
 ], User.prototype, "tg_chat", void 0);
@@ -105,8 +106,7 @@ __decorate([
     }),
     (0, mongoose_1.Prop)({
         type: String,
-        minlength: 10,
-        maxlength: 13,
+        default: null,
     }),
     __metadata("design:type", String)
 ], User.prototype, "viber", void 0);

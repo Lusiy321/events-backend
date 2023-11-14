@@ -35,7 +35,7 @@ let TelegramService = class TelegramService {
                     keyboard: [
                         [
                             {
-                                text: 'Запросить номер телефона',
+                                text: 'Відправити номер телефону',
                                 request_contact: true,
                             },
                         ],
@@ -43,7 +43,7 @@ let TelegramService = class TelegramService {
                     one_time_keyboard: true,
                 },
             };
-            this.bot.sendMessage(chatId, 'Пожалуйста, нажмите на кнопку "Запросить номер телефона" для предоставления номера телефона.', opts);
+            this.bot.sendMessage(chatId, 'Будь ласка, натисніть кнопку "Відправити номер телефону" для надання номеру телефону.', opts);
         });
         this.bot.on('contact', async (msg) => {
             const chatId = msg.chat.id;
@@ -51,7 +51,7 @@ let TelegramService = class TelegramService {
             const user = await this.userModel.findOne({ phone: phoneNumber }).exec();
             if (user) {
                 await this.userModel.findByIdAndUpdate(user.id, { tg_chat: chatId });
-                this.bot.sendMessage(chatId, `Спасибо, ${msg.from.first_name} теперь тебе будут приходить уведомления о новых предложенияех в твоей категории.`);
+                this.bot.sendMessage(chatId, `Дякую, ${msg.from.first_name} тепер тобі будуть надходити повідомлення про нові пропозиції в твоїй категорії.`);
             }
             else {
                 const order = await this.ordersModel
@@ -62,7 +62,7 @@ let TelegramService = class TelegramService {
                         tg_chat: chatId,
                     });
                 }
-                this.bot.sendMessage(chatId, `Спасибо, ${msg.from.first_name} теперь тебе будут приходить уведомления о новых предложенияех в твоей категории.`);
+                this.bot.sendMessage(chatId, `Дякую, ${msg.from.first_name} тепер тобі будуть надходити повідомлення про нові пропозиції в твоїй категорії.`);
             }
         });
         this.bot.on('callback_query', async (query) => {
@@ -94,7 +94,7 @@ let TelegramService = class TelegramService {
                     await this.ordersModel.findByIdAndUpdate(order.id, { tg_chat: null });
                 }
             }
-            this.bot.sendMessage(chatId, `Вы включили уведомление`);
+            this.bot.sendMessage(chatId, `Ви ввімкнули повідомлення`);
         });
     }
     async sendMessage(chatId, msg) {
@@ -103,7 +103,7 @@ let TelegramService = class TelegramService {
             return message;
         }
         catch (error) {
-            throw new Error(`Ошибка отправки сообщения: ${error}`);
+            throw new Error(`Помилка надсилання повідомлення: ${error}`);
         }
     }
     async sendAgreement(phone, chatId) {
@@ -115,7 +115,7 @@ let TelegramService = class TelegramService {
                 await this.sendMessage(chatId, msgTrue);
                 const msgOrder = `Користувач ${user.firstName} ${user.lastName} готовий виконати ваше замовлення "${order.description}".
       Ви можете написати йому в телеграм @${user.telegram}, або зателефонувати по номеру ${user.phone}.
-      Посылання на профіль виконавця ${process.env.FRONT_LINK}${user._id}. ${user.video[0]}`;
+      Посилання на профіль виконавця ${process.env.FRONT_LINK}${user._id}. ${user.video[0]}`;
                 await this.sendMessage(order.tg_chat, msgOrder);
                 return true;
             }
@@ -131,12 +131,12 @@ let TelegramService = class TelegramService {
             }
         }
         catch (e) {
-            throw new Error(`Ошибка отправки сообщения: ${e}`);
+            throw new Error(`Помилка надсилання повідомлення: ${e}`);
         }
     }
     async sendNewOrder(chatId, order) {
         try {
-            const msg = `Доброго дня, з'явилось нове повідомлення по Вашому профілю. 
+            const msg = `Доброго дня, з'явилось нове повідомлення за Вашим профілем. 
       Замовник: ${order.name}.
       Дата події: ${order.date}.
       Категорія: ${order.category[0].name}.
@@ -152,7 +152,7 @@ let TelegramService = class TelegramService {
                         },
                         {
                             text: 'Не цікаво',
-                            callback_data: 'not',
+                            callback_data: 'disagree',
                         },
                     ],
                 ],
@@ -163,7 +163,7 @@ let TelegramService = class TelegramService {
             return result;
         }
         catch (error) {
-            throw new Error(`Ошибка отправки сообщения: ${error}`);
+            throw new Error(`Помилка надсиланння повідомлення: ${error}`);
         }
     }
 };

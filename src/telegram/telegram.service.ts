@@ -29,7 +29,7 @@ export class TelegramService {
           keyboard: [
             [
               {
-                text: 'Запросить номер телефона',
+                text: 'Відправити номер телефону',
                 request_contact: true,
               },
             ],
@@ -39,7 +39,7 @@ export class TelegramService {
       };
       this.bot.sendMessage(
         chatId,
-        'Пожалуйста, нажмите на кнопку "Запросить номер телефона" для предоставления номера телефона.',
+        'Будь ласка, натисніть кнопку "Відправити номер телефону" для надання номеру телефону.',
         opts,
       );
     });
@@ -52,7 +52,7 @@ export class TelegramService {
         await this.userModel.findByIdAndUpdate(user.id, { tg_chat: chatId });
         this.bot.sendMessage(
           chatId,
-          `Спасибо, ${msg.from.first_name} теперь тебе будут приходить уведомления о новых предложенияех в твоей категории.`,
+          `Дякую, ${msg.from.first_name} тепер тобі будуть надходити повідомлення про нові пропозиції в твоїй категорії.`,
         );
       } else {
         const order = await this.ordersModel
@@ -65,7 +65,7 @@ export class TelegramService {
         }
         this.bot.sendMessage(
           chatId,
-          `Спасибо, ${msg.from.first_name} теперь тебе будут приходить уведомления о новых предложенияех в твоей категории.`,
+          `Дякую, ${msg.from.first_name} тепер тобі будуть надходити повідомлення про нові пропозиції в твоїй категорії.`,
         );
       }
     });
@@ -100,7 +100,7 @@ export class TelegramService {
           await this.ordersModel.findByIdAndUpdate(order.id, { tg_chat: null });
         }
       }
-      this.bot.sendMessage(chatId, `Вы включили уведомление`);
+      this.bot.sendMessage(chatId, `Ви ввімкнули повідомлення`);
     });
   }
 
@@ -109,7 +109,7 @@ export class TelegramService {
       const message = await this.bot.sendMessage(chatId, msg);
       return message;
     } catch (error) {
-      throw new Error(`Ошибка отправки сообщения: ${error}`);
+      throw new Error(`Помилка надсилання повідомлення: ${error}`);
     }
   }
 
@@ -123,7 +123,7 @@ export class TelegramService {
         await this.sendMessage(chatId, msgTrue);
         const msgOrder = `Користувач ${user.firstName} ${user.lastName} готовий виконати ваше замовлення "${order.description}".
       Ви можете написати йому в телеграм @${user.telegram}, або зателефонувати по номеру ${user.phone}.
-      Посылання на профіль виконавця ${process.env.FRONT_LINK}${user._id}. ${user.video[0]}`;
+      Посилання на профіль виконавця ${process.env.FRONT_LINK}${user._id}. ${user.video[0]}`;
         await this.sendMessage(order.tg_chat, msgOrder);
         return true;
       } else if (order.tg_chat === null) {
@@ -136,13 +136,13 @@ export class TelegramService {
         return true;
       }
     } catch (e) {
-      throw new Error(`Ошибка отправки сообщения: ${e}`);
+      throw new Error(`Помилка надсилання повідомлення: ${e}`);
     }
   }
 
   async sendNewOrder(chatId: string, order: Orders) {
     try {
-      const msg = `Доброго дня, з'явилось нове повідомлення по Вашому профілю. 
+      const msg = `Доброго дня, з'явилось нове повідомлення за Вашим профілем. 
       Замовник: ${order.name}.
       Дата події: ${order.date}.
       Категорія: ${order.category[0].name}.
@@ -158,7 +158,7 @@ export class TelegramService {
             },
             {
               text: 'Не цікаво',
-              callback_data: 'not',
+              callback_data: 'disagree',
             },
           ],
         ],
@@ -168,7 +168,7 @@ export class TelegramService {
       });
       return result;
     } catch (error) {
-      throw new Error(`Ошибка отправки сообщения: ${error}`);
+      throw new Error(`Помилка надсиланння повідомлення: ${error}`);
     }
   }
 }
