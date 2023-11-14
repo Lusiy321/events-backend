@@ -63,9 +63,10 @@ export class ViberService {
         const order = await this.orderModel.findById(
           '652eae0dee939a130c084e21',
         );
-        this.sendNewOrder(res.userProfile.id, order);
         const actionBody = msg.text;
         const [action, phone, chatId] = actionBody.split(':');
+
+        this.sendNewOrder(res.userProfile.id, order);
         switch (action) {
           case 'accept':
             // Обработка, если нажата кнопка "Согласен"
@@ -83,6 +84,7 @@ export class ViberService {
             // Обработка для других случаев
             break;
         }
+
         if (!isNaN(phoneNumber) && phoneNumber.toString().length === 12) {
           const user = await this.userModel.find({ phone: phoneNumber });
           if (Array.isArray(user) && user.length === 0) {
@@ -119,10 +121,10 @@ export class ViberService {
             );
           }
         } else {
-          say(
-            res,
-            'Ви ввели не корректний номер телефону. Якщо ви вже підписані на сповіщення, та хочете відписатися, введіть свій номер телефону',
-          );
+          // say(
+          //   res,
+          //   'Ви ввели не корректний номер телефону. Якщо ви вже підписані на сповіщення, та хочете відписатися, введіть свій номер телефону',
+          // );
         }
       } catch (error) {
         console.error('Error while sending message:', error);
@@ -138,7 +140,7 @@ export class ViberService {
 
   async sendNewOrder(userId: string, order: Orders) {
     try {
-      const msg = `Доброго дня, з'явилось нове повідомлення по Вашому профілю. \nn
+      const msg = `Доброго дня, з'явилось нове повідомлення по Вашому профілю. \n
       Замовник: ${order.name}.
       Дата події: ${order.date}.
       Категорія: ${order.category[0].name}.

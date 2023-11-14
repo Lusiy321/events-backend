@@ -59,9 +59,9 @@ let ViberService = class ViberService {
                 const messageText = msg.text;
                 const phoneNumber = parseInt(messageText);
                 const order = await this.orderModel.findById('652eae0dee939a130c084e21');
-                this.sendNewOrder(res.userProfile.id, order);
                 const actionBody = msg.text;
                 const [action, phone, chatId] = actionBody.split(':');
+                this.sendNewOrder(res.userProfile.id, order);
                 switch (action) {
                     case 'accept':
                         say(res, 'Вы согласились.');
@@ -98,7 +98,6 @@ let ViberService = class ViberService {
                     }
                 }
                 else {
-                    say(res, 'Ви ввели не корректний номер телефону. Якщо ви вже підписані на сповіщення, та хочете відписатися, введіть свій номер телефону');
                 }
             }
             catch (error) {
@@ -114,7 +113,7 @@ let ViberService = class ViberService {
     }
     async sendNewOrder(userId, order) {
         try {
-            const msg = `Доброго дня, з'явилось нове повідомлення по Вашому профілю. \nn
+            const msg = `Доброго дня, з'явилось нове повідомлення по Вашому профілю. \n
       Замовник: ${order.name}.
       Дата події: ${order.date}.
       Категорія: ${order.category[0].name}.
