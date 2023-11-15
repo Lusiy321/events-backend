@@ -80,31 +80,35 @@ let ViberService = class ViberService {
                         break;
                 }
                 if (!isNaN(phoneNumber) && phoneNumber.toString().length === 12) {
-                    const user = await this.userModel.find({ phone: phoneNumber });
-                    if (user.viber === undefined || user.viber === null) {
-                        user.viber = res.userProfile.id;
-                        say(res, `Дякую, ${res.userProfile.name} теперь Вам будуть надходити сповіщення про нові пропозиції твоїй категорії.`);
-                    }
-                    else {
-                        user.viber = null;
-                        say(res, `${res.userProfile.name} Ви відписалися від сповіщення про нові пропозиції твоїй категорії.`);
-                    }
-                    if (Array.isArray(user) && user.length === 0) {
-                        const order = await this.orderModel.find({ phone: phoneNumber });
-                        if (Array.isArray(order) && order.length === 0) {
-                            say(res, `${res.userProfile.name}, Ми не знайшли Ваш номер в базі`);
+                    const user = await this.userModel.findOne({ phone: phoneNumber });
+                    if (user) {
+                        const { viber } = user;
+                        if (viber === null) {
+                            user.viber = res.userProfile.id;
+                            user.save();
+                            say(res, `Дякую, ${res.userProfile.name} теперь Вам будуть надходити сповіщення про нові пропозиції твоїй категорії.`);
                         }
-                        else if (order.vibe === null) {
+                        else {
+                            user.viber = null;
+                            user.save();
+                            say(res, `${res.userProfile.name} Ви відписалися від сповіщення про нові пропозиції твоїй категорії.`);
+                        }
+                    }
+                    if (!user) {
+                        const order = await this.orderModel.findOne({ phone: phoneNumber });
+                        if (order) {
                             order.viber = res.userProfile.id;
+                            order.save();
                             say(res, `Дякую, ${res.userProfile.name} теперь тобі будуть надходити сповіщення про нові пропозиції твоїй категорії.`);
                         }
                         else {
                             order.viber = null;
+                            order.save();
                             say(res, `${res.userProfile.name}, Ви відписалися від сповіщення про нові пропозиції у обраній категорії.`);
                         }
-                    }
-                    else {
-                        console.error('Not found');
+                        if (!order) {
+                            say(res, `${res.userProfile.name}, Ми не знайшли Ваш номер в базі`);
+                        }
                     }
                 }
             }
