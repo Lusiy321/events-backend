@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, forwardRef, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 export const ViberBot = require('viber-bot').Bot;
 const Keyboard = require('viber-bot').Keyboard;
@@ -16,6 +16,7 @@ const KeyboardMessage = require('viber-bot').Message.Keyboard;
 import * as express from 'express';
 import { User } from 'src/users/users.model';
 import { Orders } from 'src/orders/order.model';
+import { TelegramService } from 'src/telegram/telegram.service';
 const ngrok = require('ngrok');
 
 const MAIN_KEYBOARD = {
@@ -41,6 +42,8 @@ export class ViberService {
   private app: express.Express;
   private bot: typeof ViberBot;
   constructor(
+    @Inject(forwardRef(() => TelegramService))
+    private readonly telegramService: TelegramService,
     @InjectModel(User.name)
     private userModel: User,
     @InjectModel(Orders.name)
@@ -194,7 +197,7 @@ export class ViberService {
     try {
       const order = await this.orderModel.findOne({ phone: phone });
       const user = await this.userModel.findOne({ viber: chatId });
-      const { viber, active, description } = order;
+      const { viber, active, description, tg_chat } = order;
       if (viber !== null && active === true) {
         const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"${order.description}".\n \nВ категорії:\n"${order.category[0].name} - ${order.category[0].subcategories[0].name}". \n \nОчікуйте на дзвінок або повідомлення`;
         this.bot.sendMessage({ id: chatId }, [
@@ -211,7 +214,9 @@ export class ViberService {
           new KeyboardMessage(MAIN_KEYBOARD),
         ]);
         return true;
-      } else if (viber === null) {
+      } else if (tg_chat !== null && order.active === true) {
+        this.telegramService.sendAgreement(order.phone, tg_chat);
+      } else if (viber === null && tg_chat === null) {
         const msg = `Замовник ще не активував чат-бот, спробуйте пізніше`;
         this.bot.sendMessage(chatId, msg);
         return false;

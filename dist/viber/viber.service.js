@@ -30,6 +30,7 @@ const RichMediaMessage = require('viber-bot').Message.RichMedia;
 const KeyboardMessage = require('viber-bot').Message.Keyboard;
 const users_model_1 = require("../users/users.model");
 const order_model_1 = require("../orders/order.model");
+const telegram_service_1 = require("../telegram/telegram.service");
 const ngrok = require('ngrok');
 const MAIN_KEYBOARD = {
     Type: 'keyboard',
@@ -49,7 +50,8 @@ const MAIN_KEYBOARD = {
     ],
 };
 let ViberService = class ViberService {
-    constructor(userModel, orderModel) {
+    constructor(telegramService, userModel, orderModel) {
+        this.telegramService = telegramService;
         this.userModel = userModel;
         this.orderModel = orderModel;
         this.bot = new exports.ViberBot({
@@ -173,7 +175,7 @@ let ViberService = class ViberService {
         try {
             const order = await this.orderModel.findOne({ phone: phone });
             const user = await this.userModel.findOne({ viber: chatId });
-            const { viber, active, description } = order;
+            const { viber, active, description, tg_chat } = order;
             if (viber !== null && active === true) {
                 const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"${order.description}".\n \nВ категорії:\n"${order.category[0].name} - ${order.category[0].subcategories[0].name}". \n \nОчікуйте на дзвінок або повідомлення`;
                 this.bot.sendMessage({ id: chatId }, [
@@ -188,7 +190,10 @@ let ViberService = class ViberService {
                 ]);
                 return true;
             }
-            else if (viber === null) {
+            else if (tg_chat !== null && order.active === true) {
+                this.telegramService.sendAgreement(order.phone, tg_chat);
+            }
+            else if (viber === null && tg_chat === null) {
                 const msg = `Замовник ще не активував чат-бот, спробуйте пізніше`;
                 this.bot.sendMessage(chatId, msg);
                 return false;
@@ -237,9 +242,11 @@ let ViberService = class ViberService {
 exports.ViberService = ViberService;
 exports.ViberService = ViberService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, mongoose_1.InjectModel)(users_model_1.User.name)),
-    __param(1, (0, mongoose_1.InjectModel)(order_model_1.Orders.name)),
-    __metadata("design:paramtypes", [users_model_1.User,
+    __param(0, (0, common_1.Inject)((0, common_1.forwardRef)(() => telegram_service_1.TelegramService))),
+    __param(1, (0, mongoose_1.InjectModel)(users_model_1.User.name)),
+    __param(2, (0, mongoose_1.InjectModel)(order_model_1.Orders.name)),
+    __metadata("design:paramtypes", [telegram_service_1.TelegramService,
+        users_model_1.User,
         order_model_1.Orders])
 ], ViberService);
 //# sourceMappingURL=viber.service.js.map

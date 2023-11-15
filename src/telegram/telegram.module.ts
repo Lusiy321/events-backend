@@ -4,6 +4,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/users/users.model';
 import { TelegramController } from './telegram.controller';
 import { OrderSchema, Orders } from 'src/orders/order.model';
+import { ViberModule } from 'src/viber/viber.module';
+import { forwardRef } from '@nestjs/common';
+import { ViberService } from 'src/viber/viber.service';
 
 @Module({
   imports: [

@@ -111,7 +111,7 @@ let TelegramService = class TelegramService {
             const order = await this.ordersModel.findOne({ phone: phone });
             const user = await this.userModel.findOne({ tg_chat: chatId });
             if (order.tg_chat !== null && order.active === true) {
-                const msgTrue = `Доброго дня, замовник отримав Вашу відповідь`;
+                const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"${order.description}".\n \nВ категорії:\n"${order.category[0].name} - ${order.category[0].subcategories[0].name}". \n \nОчікуйте на дзвінок або повідомлення`;
                 await this.sendMessage(chatId, msgTrue);
                 const msgOrder = `Користувач ${user.firstName} ${user.lastName} готовий виконати ваше замовлення "${order.description}".
       Ви можете написати йому в телеграм @${user.telegram}, або зателефонувати по номеру ${user.phone}.
@@ -119,7 +119,9 @@ let TelegramService = class TelegramService {
                 await this.sendMessage(order.tg_chat, msgOrder);
                 return true;
             }
-            else if (order.tg_chat === null) {
+            else if (order.viber !== null && order.active === true) {
+            }
+            else if (order.tg_chat === null && order.viber === null) {
                 const msg = `Замовник ще не активував чат-бот, спробуйте пізніше`;
                 await this.sendMessage(chatId, msg);
                 return false;

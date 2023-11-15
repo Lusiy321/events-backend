@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -7,7 +7,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { GoogleStrategy } from './utils/GoogleStrategy';
 import { SessionSerializer } from './utils/Serializer';
 import { Category, CategorySchema } from './category.model';
-import { TelegramModule } from 'src/telegram/telegram.module';
 
 @Module({
   imports: [
@@ -21,7 +20,6 @@ import { TelegramModule } from 'src/telegram/telegram.module';
     MongooseModule.forFeature([
       { name: Category.name, schema: CategorySchema, collection: 'categories' },
     ]),
-    TelegramModule,
   ],
   providers: [
     GoogleStrategy,

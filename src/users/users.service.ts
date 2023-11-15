@@ -16,7 +16,6 @@ import { Category } from './category.model';
 import { CreateCategoryDto } from './dto/create.category.dto';
 import { Subcategories } from './utils/subcategory.interface';
 import { v4 as uuidv4 } from 'uuid';
-import { Categories } from './dto/caterory.interface';
 
 @Injectable()
 export class UsersService {

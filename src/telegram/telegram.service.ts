@@ -1,15 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, forwardRef, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { InlineKeyboardMarkup } from 'node-telegram-bot-api';
 import { Orders } from 'src/orders/order.model';
 import { User } from 'src/users/users.model';
+import { ViberService } from 'src/viber/viber.service';
 
 @Injectable()
 export class TelegramService {
   private bot: TelegramBot;
 
   constructor(
+    // @Inject(forwardRef(() => ViberService))
+    // private readonly viberService: ViberService,
     @InjectModel(Orders.name)
     private ordersModel: Orders,
     @InjectModel(User.name)
@@ -119,14 +122,16 @@ export class TelegramService {
       const user = await this.userModel.findOne({ tg_chat: chatId });
 
       if (order.tg_chat !== null && order.active === true) {
-        const msgTrue = `Доброго дня, замовник отримав Вашу відповідь`;
+        const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"${order.description}".\n \nВ категорії:\n"${order.category[0].name} - ${order.category[0].subcategories[0].name}". \n \nОчікуйте на дзвінок або повідомлення`;
         await this.sendMessage(chatId, msgTrue);
         const msgOrder = `Користувач ${user.firstName} ${user.lastName} готовий виконати ваше замовлення "${order.description}".
       Ви можете написати йому в телеграм @${user.telegram}, або зателефонувати по номеру ${user.phone}.
       Посилання на профіль виконавця ${process.env.FRONT_LINK}${user._id}. ${user.video[0]}`;
         await this.sendMessage(order.tg_chat, msgOrder);
         return true;
-      } else if (order.tg_chat === null) {
+      } else if (order.viber !== null && order.active === true) {
+        // this.viberService.sendAgreement(order.phone, order.viber);
+      } else if (order.tg_chat === null && order.viber === null) {
         const msg = `Замовник ще не активував чат-бот, спробуйте пізніше`;
         await this.sendMessage(chatId, msg);
         return false;

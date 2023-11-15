@@ -16,7 +16,6 @@ const jwt_1 = require("@nestjs/jwt");
 const GoogleStrategy_1 = require("./utils/GoogleStrategy");
 const Serializer_1 = require("./utils/Serializer");
 const category_model_1 = require("./category.model");
-const telegram_module_1 = require("../telegram/telegram.module");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;
@@ -33,7 +32,6 @@ exports.UsersModule = UsersModule = __decorate([
             mongoose_1.MongooseModule.forFeature([
                 { name: category_model_1.Category.name, schema: category_model_1.CategorySchema, collection: 'categories' },
             ]),
-            telegram_module_1.TelegramModule,
         ],
         providers: [
             GoogleStrategy_1.GoogleStrategy,

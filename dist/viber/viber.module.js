@@ -12,6 +12,7 @@ const viber_service_1 = require("./viber.service");
 const mongoose_1 = require("@nestjs/mongoose");
 const order_model_1 = require("../orders/order.model");
 const users_model_1 = require("../users/users.model");
+const telegram_module_1 = require("../telegram/telegram.module");
 let ViberModule = class ViberModule {
 };
 exports.ViberModule = ViberModule;
@@ -24,6 +25,7 @@ exports.ViberModule = ViberModule = __decorate([
             mongoose_1.MongooseModule.forFeature([
                 { name: users_model_1.User.name, schema: users_model_1.UserSchema, collection: 'users' },
             ]),
+            telegram_module_1.TelegramModule,
         ],
         providers: [viber_service_1.ViberService],
         exports: [viber_service_1.ViberService],
