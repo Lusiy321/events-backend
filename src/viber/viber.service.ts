@@ -88,12 +88,17 @@ export class ViberService {
 
         if (!isNaN(phoneNumber) && phoneNumber.toString().length === 12) {
           const user = await this.userModel.find({ phone: phoneNumber });
-          console.log(user.viber);
-          if (user.viber === undefined) {
+          if (user.viber === undefined || user.viber === null) {
             user.viber = res.userProfile.id;
             say(
               res,
               `Дякую, ${res.userProfile.name} теперь Вам будуть надходити сповіщення про нові пропозиції твоїй категорії.`,
+            );
+          } else {
+            user.viber = null;
+            say(
+              res,
+              `${res.userProfile.name} Ви відписалися від сповіщення про нові пропозиції твоїй категорії.`,
             );
           }
           if (Array.isArray(user) && user.length === 0) {
@@ -116,12 +121,8 @@ export class ViberService {
                 `${res.userProfile.name}, Ви відписалися від сповіщення про нові пропозиції у обраній категорії.`,
               );
             }
-          } else if (user.viber !== undefined) {
-            user.viber = null;
-            say(
-              res,
-              `${res.userProfile.name} Ви відписалися від сповіщення про нові пропозиції твоїй категорії.`,
-            );
+          } else {
+            console.error('Not found');
           }
         }
       } catch (error) {
