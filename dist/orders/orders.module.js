@@ -15,6 +15,7 @@ const order_model_1 = require("./order.model");
 const twilio_service_1 = require("./twilio.service");
 const telegram_module_1 = require("../telegram/telegram.module");
 const users_model_1 = require("../users/users.model");
+const viber_module_1 = require("../viber/viber.module");
 let OrdersModule = class OrdersModule {
 };
 exports.OrdersModule = OrdersModule;
@@ -28,6 +29,7 @@ exports.OrdersModule = OrdersModule = __decorate([
                 { name: users_model_1.User.name, schema: users_model_1.UserSchema, collection: 'users' },
             ]),
             telegram_module_1.TelegramModule,
+            viber_module_1.ViberModule,
         ],
         controllers: [orders_controller_1.OrdersController],
         providers: [orders_service_1.OrdersService, twilio_service_1.TwilioService],

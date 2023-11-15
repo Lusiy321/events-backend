@@ -8,5 +8,6 @@ export declare class ViberService {
     private bot;
     constructor(userModel: User, orderModel: Orders);
     sendNewOrder(userId: string, order: Orders): Promise<void>;
+    sendAgreement(phone: string, chatId: string): Promise<boolean>;
     startServer(): any;
 }

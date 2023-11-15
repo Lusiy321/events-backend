@@ -19,6 +19,24 @@ import { User } from 'src/users/users.model';
 import { Orders } from 'src/orders/order.model';
 const ngrok = require('ngrok');
 
+const MAIN_KEYBOARD = {
+  Type: 'keyboard',
+  Revision: 1,
+  ButtonsGroupColumns: 3,
+  ButtonsGroupRows: 1,
+  Buttons: [
+    {
+      ActionType: 'open-url',
+      ActionBody: 'https://www.wechirka.com',
+      Text: 'Перейти на наш сайт',
+      TextSize: 'regular',
+      TextVAlign: 'middle',
+      TextHAlign: 'center',
+      BgColor: '#4CAF50',
+    },
+  ],
+};
+
 @Injectable()
 export class ViberService {
   private app: express.Express;
@@ -42,15 +60,6 @@ export class ViberService {
         `Привіт ${response.userProfile.name}. Я бот ресурсу ${this.bot.name}! Щоб отримувати сповіщеня, відправте свій номер телефону у форматі 380981231122. Сюди, Вам будуть надходити сповіщеня про найм`,
       );
     });
-    const userProfile = {
-      id: 'SGznWkU3DQy/H7jnGTnLwA==',
-      name: 'Владимир',
-      avatar:
-        'https://media-direct.cdn.viber.com/download_photo?dlid=-NN71zPkZ9zeF8VRrLdFoDfPuw3rjcoiZWKKz_MdqLrReyz1x9OVS9WwNzMNNSF62GuixjWJSTrWc4CoKlhBvy5Bwt2lRvGAvhqToJds84YMhzfetBcxWUZduSg6Ec9wXke9Dg&fltp=jpg&imsz=0000',
-      country: 'UA',
-      language: 'ru',
-      apiVersion: 10,
-    };
 
     function say(response: any, message: any) {
       response.send(new TextMessage(message));
@@ -58,35 +67,34 @@ export class ViberService {
 
     this.bot.onTextMessage(/./, async (msg: any, res: any) => {
       try {
+        this.bot.sendMessage(
+          { id: res.userProfile.id },
+          new KeyboardMessage(MAIN_KEYBOARD),
+        );
         const messageText = msg.text;
         const phoneNumber = parseInt(messageText);
-        const order = await this.orderModel.findById(
-          '652eae0dee939a130c084e21',
-        );
         const actionBody = msg.text;
         const [action, phone, chatId] = actionBody.split(':');
-
-        this.sendNewOrder(res.userProfile.id, order);
         switch (action) {
           case 'accept':
-            // Обработка, если нажата кнопка "Согласен"
+            this.sendAgreement(phone, chatId);
             say(res, 'Вы согласились.');
             break;
 
           case 'disagree':
-            // Обработка, если нажата кнопка "Не согласен"
-            say(res, 'Вы не согласились.');
-            break;
-
-          // Добавьте другие кейсы по мере необходимости
-
-          default:
-            // Обработка для других случаев
+            say(res, 'Вы не погодились на пропозицію.');
             break;
         }
 
         if (!isNaN(phoneNumber) && phoneNumber.toString().length === 12) {
           const user = await this.userModel.find({ phone: phoneNumber });
+          if (user.viber === null) {
+            user.viber = res.userProfile.id;
+            say(
+              res,
+              `Дякую, ${res.userProfile.name} теперь Вам будуть надходити сповіщення про нові пропозиції твоїй категорії.`,
+            );
+          }
           if (Array.isArray(user) && user.length === 0) {
             const order = await this.orderModel.find({ phone: phoneNumber });
             if (Array.isArray(order) && order.length === 0) {
@@ -104,15 +112,9 @@ export class ViberService {
               order.viber = null;
               say(
                 res,
-                `${res.userProfile.name}, Ви відписалися від сповіщення про нові пропозиції твоїй категорії.`,
+                `${res.userProfile.name}, Ви відписалися від сповіщення про нові пропозиції у обраній категорії.`,
               );
             }
-          } else if (user.vibe === null) {
-            user.viber = res.userProfile.id;
-            say(
-              res,
-              `Дякую, ${res.userProfile.name} теперь тобі будуть надходити сповіщення про нові пропозиції твоїй категорії.`,
-            );
           } else {
             user.viber = null;
             say(
@@ -120,11 +122,6 @@ export class ViberService {
               `${res.userProfile.name} відписалися від сповіщення про нові пропозиції твоїй категорії.`,
             );
           }
-        } else {
-          // say(
-          //   res,
-          //   'Ви ввели не корректний номер телефону. Якщо ви вже підписані на сповіщення, та хочете відписатися, введіть свій номер телефону',
-          // );
         }
       } catch (error) {
         console.error('Error while sending message:', error);
@@ -181,6 +178,33 @@ export class ViberService {
       ]);
     } catch (error) {
       throw new Error(`Помилка надсиланння повідомлення: ${error}`);
+    }
+  }
+
+  async sendAgreement(phone: string, chatId: string) {
+    try {
+      const order = await this.orderModel.findOne({ phone: phone });
+      const user = await this.userModel.findOne({ viber: chatId });
+
+      if (order.viber !== null && order.active === true) {
+        const msgTrue = `Доброго дня, замовник отримав Вашу відповідь`;
+        this.bot.sendMessage({ id: chatId }, new TextMessage(msgTrue));
+        const msgOrder = `Користувач ${user.firstName} ${user.lastName} готовий виконати ваше замовлення "${order.description}".
+      Ви можете написати йому у вайбер, або зателефонувати по номеру ${user.phone}.
+      Посилання на профіль виконавця ${process.env.FRONT_LINK}${user._id}. ${user.video[0]}`;
+        this.bot.sendMessage({ id: order.viber }, msgOrder);
+        return true;
+      } else if (order.viber === null) {
+        const msg = `Замовник ще не активував чат-бот, спробуйте пізніше`;
+        this.bot.sendMessage(chatId, msg);
+        return false;
+      } else {
+        const msg = `Замовник призупинив пошук`;
+        this.bot.sendMessage(chatId, msg);
+        return true;
+      }
+    } catch (e) {
+      throw new Error(`Помилка надсилання повідомлення: ${e}`);
     }
   }
 

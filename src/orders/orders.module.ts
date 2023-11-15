@@ -6,6 +6,7 @@ import { OrderSchema, Orders } from './order.model';
 import { TwilioService } from './twilio.service';
 import { TelegramModule } from 'src/telegram/telegram.module';
 import { User, UserSchema } from 'src/users/users.model';
+import { ViberModule } from 'src/viber/viber.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { User, UserSchema } from 'src/users/users.model';
       { name: User.name, schema: UserSchema, collection: 'users' },
     ]),
     TelegramModule,
+    ViberModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService, TwilioService],

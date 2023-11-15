@@ -31,10 +31,12 @@ const http_errors_1 = require("http-errors");
 const twilio_service_1 = require("./twilio.service");
 const telegram_service_1 = require("../telegram/telegram.service");
 const users_model_1 = require("../users/users.model");
+const viber_service_1 = require("../viber/viber.service");
 let OrdersService = class OrdersService {
-    constructor(twilioService, telegramService, ordersModel, userModel) {
+    constructor(twilioService, telegramService, viberService, ordersModel, userModel) {
         this.twilioService = twilioService;
         this.telegramService = telegramService;
+        this.viberService = viberService;
         this.ordersModel = ordersModel;
         this.userModel = userModel;
     }
@@ -87,8 +89,9 @@ let OrdersService = class OrdersService {
                 const order = await this.ordersModel.findById(createdOrder._id);
                 const usersArr = await this.findUserByCategory(order);
                 for (const user of usersArr) {
-                    if (user.tg_chat !== null) {
+                    if (user.tg_chat !== null || user.viber !== null) {
                         await this.telegramService.sendNewOrder(user.tg_chat, order);
+                        await this.viberService.sendNewOrder(user.viber, order);
                     }
                 }
                 return await this.ordersModel.findById(createdOrder._id);
@@ -145,10 +148,11 @@ let OrdersService = class OrdersService {
 exports.OrdersService = OrdersService;
 exports.OrdersService = OrdersService = __decorate([
     (0, common_1.Injectable)(),
-    __param(2, (0, mongoose_1.InjectModel)(order_model_1.Orders.name)),
-    __param(3, (0, mongoose_1.InjectModel)(users_model_1.User.name)),
+    __param(3, (0, mongoose_1.InjectModel)(order_model_1.Orders.name)),
+    __param(4, (0, mongoose_1.InjectModel)(users_model_1.User.name)),
     __metadata("design:paramtypes", [twilio_service_1.TwilioService,
         telegram_service_1.TelegramService,
+        viber_service_1.ViberService,
         order_model_1.Orders,
         users_model_1.User])
 ], OrdersService);
