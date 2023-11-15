@@ -35,12 +35,12 @@ export class Admin extends Model<Admin> {
   avatar: string;
 
   @ApiProperty({
-    example: '"admin" ,"moderator", "smm"',
+    example: '"admin" ,"moderator", "smm", "contentManager"',
     description: 'Admin role',
   })
   @Prop({
     type: String,
-    enum: ['admin', 'moderator', 'smm'],
+    enum: ['admin', 'moderator', 'smm', 'contentManager'],
     default: 'moderator',
   })
   role: role;

@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
+import { role } from './role.admin.dto';
 
 export class CreateAdminDto {
   toLowerCase(): { username: string } {
@@ -13,4 +14,10 @@ export class CreateAdminDto {
 
   @ApiProperty({ example: 'admin-123', description: 'Admin password' })
   readonly password: string;
+
+  @ApiProperty({
+    example: ['admin', 'moderator', 'smm', 'contentManager'],
+    description: 'Admin role',
+  })
+  readonly role: role;
 }
