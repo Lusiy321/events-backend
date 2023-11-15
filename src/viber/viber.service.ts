@@ -14,7 +14,6 @@ const FileMessage = require('viber-bot').Message.File;
 const RichMediaMessage = require('viber-bot').Message.RichMedia;
 const KeyboardMessage = require('viber-bot').Message.Keyboard;
 import * as express from 'express';
-import { Viber } from './viber.model';
 import { User } from 'src/users/users.model';
 import { Orders } from 'src/orders/order.model';
 const ngrok = require('ngrok');
@@ -78,11 +77,10 @@ export class ViberService {
         switch (action) {
           case 'accept':
             this.sendAgreement(phone, chatId);
-            say(res, 'Вы согласились.');
             break;
 
           case 'disagree':
-            say(res, 'Вы не погодились на пропозицію.');
+            say(res, 'Ви не погодились на пропозицію.');
             break;
         }
 
@@ -196,16 +194,24 @@ export class ViberService {
     try {
       const order = await this.orderModel.findOne({ phone: phone });
       const user = await this.userModel.findOne({ viber: chatId });
+      const { viber, active, description } = order;
+      if (viber !== null && active === true) {
+        const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"${order.description}".\n \nВ категорії:\n"${order.category[0].name} - ${order.category[0].subcategories[0].name}". \n \nОчікуйте на дзвінок або повідомлення`;
+        this.bot.sendMessage({ id: chatId }, [
+          new TextMessage(msgTrue),
+          new KeyboardMessage(MAIN_KEYBOARD),
+        ]);
 
-      if (order.viber !== null && order.active === true) {
-        const msgTrue = `Доброго дня, замовник отримав Вашу відповідь`;
-        this.bot.sendMessage({ id: chatId }, new TextMessage(msgTrue));
-        const msgOrder = `Користувач ${user.firstName} ${user.lastName} готовий виконати ваше замовлення "${order.description}".
-      Ви можете написати йому у вайбер, або зателефонувати по номеру ${user.phone}.
-      Посилання на профіль виконавця ${process.env.FRONT_LINK}${user._id}. ${user.video[0]}`;
-        this.bot.sendMessage({ id: order.viber }, msgOrder);
+        const msgOrder =
+          `Користувач ${user.firstName} ${user.lastName} готовий виконати ваше замовлення "${description}". \n Посилання на профіль виконавця: ${process.env.FRONT_LINK}${user._id}.\n Ви можете написати йому у вайбер, або зателефонувати по номеру. \n` +
+          `\n Телефон: +${user.phone}`;
+
+        await this.bot.sendMessage({ id: viber }, [
+          new TextMessage(msgOrder),
+          new KeyboardMessage(MAIN_KEYBOARD),
+        ]);
         return true;
-      } else if (order.viber === null) {
+      } else if (viber === null) {
         const msg = `Замовник ще не активував чат-бот, спробуйте пізніше`;
         this.bot.sendMessage(chatId, msg);
         return false;
