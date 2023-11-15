@@ -96,18 +96,21 @@ let ViberService = class ViberService {
                     }
                     if (!user) {
                         const order = await this.orderModel.findOne({ phone: phoneNumber });
-                        if (order) {
-                            order.viber = res.userProfile.id;
-                            order.save();
-                            say(res, `Дякую, ${res.userProfile.name} теперь тобі будуть надходити сповіщення про нові пропозиції твоїй категорії.`);
-                        }
-                        else {
-                            order.viber = null;
-                            order.save();
-                            say(res, `${res.userProfile.name}, Ви відписалися від сповіщення про нові пропозиції у обраній категорії.`);
-                        }
                         if (!order) {
                             say(res, `${res.userProfile.name}, Ми не знайшли Ваш номер в базі`);
+                        }
+                        else {
+                            const { viber } = order;
+                            if (viber === null) {
+                                order.viber = res.userProfile.id;
+                                order.save();
+                                say(res, `Дякую, ${res.userProfile.name} теперь тобі будуть надходити сповіщення про нові пропозиції твоїй категорії.`);
+                            }
+                            else if (viber === res.userProfile.id) {
+                                order.viber = null;
+                                order.save();
+                                say(res, `${res.userProfile.name}, Ви відписалися від сповіщення про нові пропозиції у обраній категорії.`);
+                            }
                         }
                     }
                 }
