@@ -81,7 +81,8 @@ let ViberService = class ViberService {
                 }
                 if (!isNaN(phoneNumber) && phoneNumber.toString().length === 12) {
                     const user = await this.userModel.find({ phone: phoneNumber });
-                    if (user.viber === null) {
+                    console.log(user.viber);
+                    if (user.viber === undefined) {
                         user.viber = res.userProfile.id;
                         say(res, `Дякую, ${res.userProfile.name} теперь Вам будуть надходити сповіщення про нові пропозиції твоїй категорії.`);
                     }
@@ -99,9 +100,9 @@ let ViberService = class ViberService {
                             say(res, `${res.userProfile.name}, Ви відписалися від сповіщення про нові пропозиції у обраній категорії.`);
                         }
                     }
-                    else {
+                    else if (user.viber !== undefined) {
                         user.viber = null;
-                        say(res, `${res.userProfile.name} відписалися від сповіщення про нові пропозиції твоїй категорії.`);
+                        say(res, `${res.userProfile.name} Ви відписалися від сповіщення про нові пропозиції твоїй категорії.`);
                     }
                 }
             }
