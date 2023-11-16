@@ -11,6 +11,7 @@ import { User } from 'src/users/users.model';
 import { Orders } from 'src/orders/order.model';
 import { VerifyUserDto } from 'src/users/dto/verify.user.dto';
 import { UpdateUserAdmDto } from './dto/update.user.adm.dto';
+import { LoginAdminDto } from './dto/login.admin.dto';
 
 @Injectable()
 export class AdminService {
@@ -31,11 +32,10 @@ export class AdminService {
     }
     try {
       if (findSuper.role === 'superadmin') {
-        const { username } = admin.toLowerCase();
-        const lowerCase = username.toLowerCase();
+        const { username } = admin;
 
         const registration = await this.adminModel.findOne({
-          username: lowerCase,
+          username: username,
         });
         if (registration) {
           throw new Conflict(`Admin with ${username} in use`);
@@ -54,7 +54,7 @@ export class AdminService {
     }
   }
 
-  async login(user: CreateAdminDto): Promise<Admin> {
+  async login(user: LoginAdminDto): Promise<Admin> {
     try {
       const { username, password } = user;
       const lowerCase = username.toLowerCase();

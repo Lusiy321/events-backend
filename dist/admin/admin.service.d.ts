@@ -4,13 +4,14 @@ import { User } from 'src/users/users.model';
 import { Orders } from 'src/orders/order.model';
 import { VerifyUserDto } from 'src/users/dto/verify.user.dto';
 import { UpdateUserAdmDto } from './dto/update.user.adm.dto';
+import { LoginAdminDto } from './dto/login.admin.dto';
 export declare class AdminService {
     private adminModel;
     private userModel;
     private ordersModel;
     constructor(adminModel: Admin, userModel: User, ordersModel: Orders);
     createAdmin(admin: CreateAdminDto, req: any): Promise<Admin>;
-    login(user: CreateAdminDto): Promise<Admin>;
+    login(user: LoginAdminDto): Promise<Admin>;
     logout(req: any): Promise<Admin>;
     findAllAdmins(req: any): Promise<Admin[]>;
     findAdminById(id: string, req: any): Promise<Admin>;

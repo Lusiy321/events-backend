@@ -1,8 +1,9 @@
 export declare enum role {
     superadmin = "superadmin",
     admin = "admin",
-    user = "smm",
-    moderator = "moderator"
+    smm = "smm",
+    moderator = "moderator",
+    contentManager = "contentManager"
 }
 export declare class RoleAdminDto {
     readonly role: role;

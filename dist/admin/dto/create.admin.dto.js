@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateAdminDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
+const role_admin_dto_1 = require("./role.admin.dto");
 class CreateAdminDto {
     toLowerCase() {
         throw new Error('Method not implemented.');
@@ -28,4 +29,11 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: 'admin-123', description: 'Admin password' }),
     __metadata("design:type", String)
 ], CreateAdminDto.prototype, "password", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: ['admin', 'moderator', 'smm', 'contentManager'],
+        description: 'Admin role',
+    }),
+    __metadata("design:type", String)
+], CreateAdminDto.prototype, "role", void 0);
 //# sourceMappingURL=create.admin.dto.js.map

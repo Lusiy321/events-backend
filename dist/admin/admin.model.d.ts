@@ -28,6 +28,7 @@ export type AdminDocument = Admin & Document;
 export declare class Admin extends Model<Admin> {
     username: string;
     password: string;
+    readonly email: string;
     avatar: string;
     role: role;
     token: string;

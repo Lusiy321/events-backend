@@ -45,10 +45,9 @@ let AdminService = class AdminService {
         }
         try {
             if (findSuper.role === 'superadmin') {
-                const { username } = admin.toLowerCase();
-                const lowerCase = username.toLowerCase();
+                const { username } = admin;
                 const registration = await this.adminModel.findOne({
-                    username: lowerCase,
+                    username: username,
                 });
                 if (registration) {
                     throw new http_errors_1.Conflict(`Admin with ${username} in use`);

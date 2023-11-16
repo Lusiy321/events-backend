@@ -9,21 +9,23 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RoleAdminDto = exports.role = void 0;
+exports.LoginAdminDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
-var role;
-(function (role) {
-    role["superadmin"] = "superadmin";
-    role["admin"] = "admin";
-    role["smm"] = "smm";
-    role["moderator"] = "moderator";
-    role["contentManager"] = "contentManager";
-})(role || (exports.role = role = {}));
-class RoleAdminDto {
+class LoginAdminDto {
+    toLowerCase() {
+        throw new Error('Method not implemented.');
+    }
 }
-exports.RoleAdminDto = RoleAdminDto;
+exports.LoginAdminDto = LoginAdminDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'moderator', description: 'admin role' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'zelenskiy',
+        description: 'Admin username',
+    }),
     __metadata("design:type", String)
-], RoleAdminDto.prototype, "role", void 0);
-//# sourceMappingURL=role.admin.dto.js.map
+], LoginAdminDto.prototype, "username", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'admin-123', description: 'Admin password' }),
+    __metadata("design:type", String)
+], LoginAdminDto.prototype, "password", void 0);
+//# sourceMappingURL=login.admin.dto.js.map

@@ -24,9 +24,15 @@ export class Admin extends Model<Admin> {
   })
   password: string;
 
+  @ApiProperty({ example: 'zelenskiy@gmail.com', description: 'Admin email' })
+  @Prop({
+    type: String,
+  })
+  readonly email: string;
+
   @ApiProperty({
     example: 'https://',
-    description: 'User avatarURL',
+    description: 'Admin avatarURL',
   })
   @Prop({
     type: String,

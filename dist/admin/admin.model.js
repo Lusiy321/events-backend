@@ -36,9 +36,16 @@ __decorate([
     __metadata("design:type", String)
 ], Admin.prototype, "password", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'zelenskiy@gmail.com', description: 'Admin email' }),
+    (0, mongoose_1.Prop)({
+        type: String,
+    }),
+    __metadata("design:type", String)
+], Admin.prototype, "email", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({
         example: 'https://',
-        description: 'User avatarURL',
+        description: 'Admin avatarURL',
     }),
     (0, mongoose_1.Prop)({
         type: String,
@@ -48,12 +55,12 @@ __decorate([
 ], Admin.prototype, "avatar", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        example: '"admin" ,"moderator", "smm"',
+        example: '"admin" ,"moderator", "smm", "contentManager"',
         description: 'Admin role',
     }),
     (0, mongoose_1.Prop)({
         type: String,
-        enum: ['admin', 'moderator', 'smm'],
+        enum: ['admin', 'moderator', 'smm', 'contentManager'],
         default: 'moderator',
     }),
     __metadata("design:type", String)
