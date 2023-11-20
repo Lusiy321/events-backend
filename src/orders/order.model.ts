@@ -74,6 +74,18 @@ export class Orders extends Model<Orders> {
 
   @Prop({
     type: String,
+    default: 'none',
+  })
+  botLink: string;
+
+  @Prop({
+    type: String,
+    default: 'none',
+  })
+  exactLocation: string;
+
+  @Prop({
+    type: String,
     default: null,
   })
   viber: string;

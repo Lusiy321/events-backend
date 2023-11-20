@@ -147,6 +147,13 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "master_photo", void 0);
 __decorate([
+    (0, mongoose_1.Prop)({
+        type: String,
+        default: 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+    }),
+    __metadata("design:type", String)
+], User.prototype, "avatar", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({
         example: [
             { publicId: '1', url: 'https://' },

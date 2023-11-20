@@ -90,6 +90,20 @@ __decorate([
 __decorate([
     (0, mongoose_1.Prop)({
         type: String,
+        default: 'none',
+    }),
+    __metadata("design:type", String)
+], Orders.prototype, "botLink", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: String,
+        default: 'none',
+    }),
+    __metadata("design:type", String)
+], Orders.prototype, "exactLocation", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: String,
         default: null,
     }),
     __metadata("design:type", String)

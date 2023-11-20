@@ -11,6 +11,7 @@ export declare class UpdateUserDto {
     readonly whatsapp: string;
     readonly location: string;
     readonly master_photo: string;
+    readonly avatar: string;
     readonly photo: Array<object>;
     readonly video: Array<string>;
     readonly category: Array<string>;

@@ -125,6 +125,12 @@ export class User extends Model<User> {
   })
   master_photo: string;
 
+  @Prop({
+    type: String,
+    default: 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+  })
+  avatar: string;
+
   @ApiProperty({
     example: [
       { publicId: '1', url: 'https://' },

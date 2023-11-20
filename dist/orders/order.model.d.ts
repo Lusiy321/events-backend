@@ -32,6 +32,8 @@ export declare class Orders extends Model<Orders> {
     category: Array<Categories>;
     telegram: string;
     tg_chat: number;
+    botLink: string;
+    exactLocation: string;
     viber: string;
     location: string;
     price: string;

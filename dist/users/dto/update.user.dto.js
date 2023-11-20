@@ -66,6 +66,10 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "master_photo", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'https://', description: 'User photo' }),
+    __metadata("design:type", String)
+], UpdateUserDto.prototype, "avatar", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({
         example: [{ id: '1', url: 'https://' }],
         description: 'User photo collection',
