@@ -15,25 +15,20 @@ const mongoose_1 = require("@nestjs/mongoose");
 const users_controller_1 = require("./users/users.controller");
 const users_service_1 = require("./users/users.service");
 const category_model_1 = require("./users/category.model");
-const telegram_service_1 = require("./telegram/telegram.service");
-const telegram_module_1 = require("./telegram/telegram.module");
 const orders_module_1 = require("./orders/orders.module");
 const order_model_1 = require("./orders/order.model");
 const admin_service_1 = require("./admin/admin.service");
 const admin_controller_1 = require("./admin/admin.controller");
 const admin_module_1 = require("./admin/admin.module");
 const admin_model_1 = require("./admin/admin.model");
-const viber_service_1 = require("./viber/viber.service");
-const viber_module_1 = require("./viber/viber.module");
 const posts_module_1 = require("./posts/posts.module");
-const viber_model_1 = require("./viber/viber.model");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         controllers: [users_controller_1.UsersController, admin_controller_1.AdminController],
-        providers: [users_service_1.UsersService, telegram_service_1.TelegramService, admin_service_1.AdminService, viber_service_1.ViberService],
+        providers: [users_service_1.UsersService, admin_service_1.AdminService],
         imports: [
             config_1.ConfigModule.forRoot({
                 envFilePath: `.env`,
@@ -51,14 +46,9 @@ exports.AppModule = AppModule = __decorate([
             mongoose_1.MongooseModule.forFeature([
                 { name: order_model_1.Orders.name, schema: order_model_1.OrderSchema, collection: 'orders' },
             ]),
-            mongoose_1.MongooseModule.forFeature([
-                { name: viber_model_1.Viber.name, schema: viber_model_1.ViberSchema, collection: 'viber' },
-            ]),
             users_module_1.UsersModule,
-            telegram_module_1.TelegramModule,
             orders_module_1.OrdersModule,
             admin_module_1.AdminModule,
-            viber_module_1.ViberModule,
             posts_module_1.PostsModule,
         ],
     })

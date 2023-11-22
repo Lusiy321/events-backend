@@ -28,8 +28,6 @@ exports.UsersModule = UsersModule = __decorate([
             }),
             mongoose_1.MongooseModule.forFeature([
                 { name: users_model_1.User.name, schema: users_model_1.UserSchema, collection: 'users' },
-            ]),
-            mongoose_1.MongooseModule.forFeature([
                 { name: category_model_1.Category.name, schema: category_model_1.CategorySchema, collection: 'categories' },
             ]),
         ],

@@ -6,22 +6,17 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UsersController } from './users/users.controller';
 import { UsersService } from './users/users.service';
 import { Category, CategorySchema } from './users/category.model';
-import { TelegramService } from './telegram/telegram.service';
-import { TelegramModule } from './telegram/telegram.module';
 import { OrdersModule } from './orders/orders.module';
 import { OrderSchema, Orders } from './orders/order.model';
 import { AdminService } from './admin/admin.service';
 import { AdminController } from './admin/admin.controller';
 import { AdminModule } from './admin/admin.module';
 import { Admin, AdminSchema } from './admin/admin.model';
-import { ViberService } from './viber/viber.service';
-import { ViberModule } from './viber/viber.module';
 import { PostsModule } from './posts/posts.module';
-import { Viber, ViberSchema } from './viber/viber.model';
 
 @Module({
   controllers: [UsersController, AdminController],
-  providers: [UsersService, TelegramService, AdminService, ViberService],
+  providers: [UsersService, AdminService],
   imports: [
     ConfigModule.forRoot({
       envFilePath: `.env`,
@@ -39,14 +34,9 @@ import { Viber, ViberSchema } from './viber/viber.model';
     MongooseModule.forFeature([
       { name: Orders.name, schema: OrderSchema, collection: 'orders' },
     ]),
-    MongooseModule.forFeature([
-      { name: Viber.name, schema: ViberSchema, collection: 'viber' },
-    ]),
     UsersModule,
-    TelegramModule,
     OrdersModule,
     AdminModule,
-    ViberModule,
     PostsModule,
   ],
 })

@@ -13,9 +13,8 @@ const orders_service_1 = require("./orders.service");
 const mongoose_1 = require("@nestjs/mongoose");
 const order_model_1 = require("./order.model");
 const twilio_service_1 = require("./twilio.service");
-const telegram_module_1 = require("../telegram/telegram.module");
 const users_model_1 = require("../users/users.model");
-const viber_module_1 = require("../viber/viber.module");
+const mesengers_service_1 = require("./mesengers.service");
 let OrdersModule = class OrdersModule {
 };
 exports.OrdersModule = OrdersModule;
@@ -24,15 +23,11 @@ exports.OrdersModule = OrdersModule = __decorate([
         imports: [
             mongoose_1.MongooseModule.forFeature([
                 { name: order_model_1.Orders.name, schema: order_model_1.OrderSchema, collection: 'orders' },
-            ]),
-            mongoose_1.MongooseModule.forFeature([
                 { name: users_model_1.User.name, schema: users_model_1.UserSchema, collection: 'users' },
             ]),
-            telegram_module_1.TelegramModule,
-            viber_module_1.ViberModule,
         ],
         controllers: [orders_controller_1.OrdersController],
-        providers: [orders_service_1.OrdersService, twilio_service_1.TwilioService],
+        providers: [orders_service_1.OrdersService, twilio_service_1.TwilioService, mesengers_service_1.MesengersService],
     })
 ], OrdersModule);
 //# sourceMappingURL=orders.module.js.map

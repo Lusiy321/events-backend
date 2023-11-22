@@ -18,7 +18,6 @@ const orders_service_1 = require("./orders.service");
 const twilio_service_1 = require("./twilio.service");
 const swagger_1 = require("@nestjs/swagger");
 const order_model_1 = require("./order.model");
-const create_order_dto_1 = require("./dto/create.order.dto");
 const mongoose_1 = require("@nestjs/mongoose");
 const http_errors_1 = require("http-errors");
 let OrdersController = class OrdersController {
@@ -32,9 +31,6 @@ let OrdersController = class OrdersController {
     }
     async findIdOrders(id) {
         return this.ordersService.findOrderById(id);
-    }
-    async create(user) {
-        return this.ordersService.create(user);
     }
     async sendVerificationCode(phoneNumber) {
         const user = await this.ordersModel.findOne({ phone: phoneNumber });
@@ -72,15 +68,6 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "findIdOrders", null);
-__decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Create Order' }),
-    (0, swagger_1.ApiResponse)({ status: 200, type: order_model_1.Orders }),
-    (0, common_1.Post)('/'),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_order_dto_1.CreateOrderDto]),
-    __metadata("design:returntype", Promise)
-], OrdersController.prototype, "create", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Send sms code' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: order_model_1.Orders }),

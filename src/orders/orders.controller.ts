@@ -40,12 +40,12 @@ export class OrdersController {
     return this.ordersService.findOrderById(id);
   }
 
-  @ApiOperation({ summary: 'Create Order' })
-  @ApiResponse({ status: 200, type: Orders })
-  @Post('/')
-  async create(@Body() user: CreateOrderDto): Promise<Orders> {
-    return this.ordersService.create(user);
-  }
+  // @ApiOperation({ summary: 'Create Order' })
+  // @ApiResponse({ status: 200, type: Orders })
+  // @Post('/')
+  // async create(@Body() user: CreateOrderDto): Promise<Orders> {
+  //   return this.ordersService.create(user);
+  // }
 
   @ApiOperation({ summary: 'Send sms code' })
   @ApiResponse({ status: 200, type: Orders })

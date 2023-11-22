@@ -16,8 +16,6 @@ import { Category, CategorySchema } from './category.model';
     }),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema, collection: 'users' },
-    ]),
-    MongooseModule.forFeature([
       { name: Category.name, schema: CategorySchema, collection: 'categories' },
     ]),
   ],

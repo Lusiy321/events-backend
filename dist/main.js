@@ -5,14 +5,11 @@ const app_module_1 = require("./app.module");
 const platform_express_1 = require("@nestjs/platform-express");
 const express_1 = require("express");
 const swagger_1 = require("@nestjs/swagger");
-const viber_service_1 = require("./viber/viber.service");
 async function start() {
     const PORT = process.env.PORT || 5000;
     const app = await core_1.NestFactory.create(app_module_1.AppModule, new platform_express_1.ExpressAdapter(express_1.default), {
         cors: true,
     });
-    const viberService = app.get(viber_service_1.ViberService);
-    viberService.startServer();
     app.enableCors();
     const config = new swagger_1.DocumentBuilder()
         .setTitle('Event and Show server')

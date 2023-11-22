@@ -4,17 +4,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Conflict, NotFound, BadRequest, Unauthorized } from 'http-errors';
 import { CreateOrderDto } from './dto/create.order.dto';
 import { TwilioService } from './twilio.service';
-import { TelegramService } from 'src/telegram/telegram.service';
 import { User } from 'src/users/users.model';
 import { Categories } from 'src/users/dto/caterory.interface';
-import { ViberService } from 'src/viber/viber.service';
+import { MesengersService } from 'src/orders/mesengers.service';
 
 @Injectable()
 export class OrdersService {
   constructor(
     private readonly twilioService: TwilioService,
-    private readonly telegramService: TelegramService,
-    private readonly viberService: ViberService,
+    private readonly mesengersService: MesengersService,
     @InjectModel(Orders.name)
     private ordersModel: Orders,
     @InjectModel(User.name)
@@ -80,8 +78,8 @@ export class OrdersService {
 
         for (const user of usersArr) {
           if (user.tg_chat !== null || user.viber !== null) {
-            await this.telegramService.sendNewOrder(user.tg_chat, order);
-            await this.viberService.sendNewOrder(user.viber, order);
+            await this.mesengersService.sendNewTgOrder(user.tg_chat, order);
+            await this.mesengersService.sendNewViberOrder(user.viber, order);
           }
         }
 
