@@ -36,6 +36,9 @@ let OrdersController = class OrdersController {
     async create(user) {
         return this.ordersService.create(user);
     }
+    async bot(res) {
+        return res.redirect('viber://pa?chatURI=wechirka', 200);
+    }
     async sendVerificationCode(phoneNumber) {
         const user = await this.ordersModel.findOne({ phone: phoneNumber });
         try {
@@ -81,6 +84,15 @@ __decorate([
     __metadata("design:paramtypes", [create_order_dto_1.CreateOrderDto]),
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "create", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'BOT' }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: order_model_1.Orders }),
+    (0, common_1.Get)('/bot'),
+    __param(0, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], OrdersController.prototype, "bot", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Send sms code' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: order_model_1.Orders }),

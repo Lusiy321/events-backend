@@ -205,10 +205,10 @@ let MesengersService = class MesengersService {
             const msg = `Доброго дня, з'явилось нове повідомлення по Вашому профілю. \n
       Замовник: ${order.name}.
       Дата події: ${order.date}.
-      Категорія: ${order.category[0].name}.
+      Категорія: ${order.category[0].subcategories[0]}.
       Вимоги замовника: ${order.description}.
       Локація: ${order.location}.
-      Гонорар: ${order.price}`;
+      Гонорар: ${order.price}₴`;
             const KEYBOARD = {
                 Type: 'keyboard',
                 Revision: 1,
@@ -338,7 +338,7 @@ let MesengersService = class MesengersService {
                 await this.sendMessage(chatId, msgTrue);
                 const msgOrder = `Виконавець ${user.firstName} готовий виконати ваше замовлення "${order.description}".
       Ви можете написати йому в телеграм @${user.telegram}, або зателефонувати по номеру ${user.phone}. \n
-      Посилання на профіль виконавця ${process.env.FRONT_LINK}${user._id}. ${user.video[0]}`;
+      Посилання на профіль виконавця ${process.env.FRONT_LINK}artists/${user._id}. ${user.video[0]}`;
                 await this.sendMessage(order.tg_chat.toString(), msgOrder);
                 return true;
             }
@@ -373,10 +373,10 @@ let MesengersService = class MesengersService {
             const msg = `Доброго дня, з'явилось нове повідомлення за Вашим профілем. 
       Замовник: ${order.name}.
       Дата події: ${order.date}.
-      Категорія: ${order.category[0].name}.
+      Категорія: ${order.category[0].subcategories[0]}.
       Вимоги замовника: ${order.description}.
       Локація: ${order.location}.
-      Гонорар: ${order.price}`;
+      Гонорар: ${order.price}₴`;
             const keyboard = {
                 inline_keyboard: [
                     [

@@ -7,6 +7,8 @@ import {
   Param,
   Post,
   Query,
+  Redirect,
+  Res,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { TwilioService } from './twilio.service';
@@ -45,6 +47,13 @@ export class OrdersController {
   @Post('/')
   async create(@Body() user: CreateOrderDto): Promise<Orders> {
     return this.ordersService.create(user);
+  }
+
+  @ApiOperation({ summary: 'BOT' })
+  @ApiResponse({ status: 200, type: Orders })
+  @Get('/bot')
+  async bot(@Res() res: any) {
+    return res.redirect('viber://pa?chatURI=wechirka', 200);
   }
 
   @ApiOperation({ summary: 'Send sms code' })
