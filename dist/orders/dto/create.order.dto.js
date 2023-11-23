@@ -66,6 +66,13 @@ __decorate([
 ], CreateOrderDto.prototype, "price", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
+        example: 't.me/1387912',
+        description: 'Bot link',
+    }),
+    __metadata("design:type", String)
+], CreateOrderDto.prototype, "botLink", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
         example: '10.11.2024',
         description: 'Order data',
     }),

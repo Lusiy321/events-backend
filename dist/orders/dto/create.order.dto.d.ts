@@ -6,5 +6,6 @@ export declare class CreateOrderDto {
     readonly description: string;
     readonly location: string;
     readonly price: string;
+    readonly botLink: string;
     readonly date: string;
 }

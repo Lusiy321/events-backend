@@ -70,27 +70,18 @@ let OrdersService = class OrdersService {
         const max = 999999;
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
-    async create(order) {
+    async create(orderObj) {
         try {
-            const params = __rest(order, []);
-            const existingOrder = await this.ordersModel.findOne({
-                phone: order.phone,
-                active: true,
-            });
-            if (existingOrder) {
-                throw new http_errors_1.Conflict(`Пользователь с номером телефона ${order.phone} уже существует`);
-            }
-            else {
-                const verificationCode = await this.generateSixDigitNumber();
-                const createdOrder = await this.ordersModel.create(params);
-                await this.ordersModel.findByIdAndUpdate({ _id: createdOrder._id }, { sms: verificationCode });
-                const order = await this.ordersModel.findById(createdOrder._id);
-                const usersArr = await this.findUserByCategory(order);
-                for (const user of usersArr) {
-                    if (user.tg_chat !== null || user.viber !== null) {
-                        await this.mesengersService.sendNewTgOrder(user.tg_chat, order);
-                        await this.mesengersService.sendNewViberOrder(user.viber, order);
-                    }
+            const params = __rest(orderObj, []);
+            const verificationCode = await this.generateSixDigitNumber();
+            const createdOrder = await this.ordersModel.create(params);
+            await this.ordersModel.findByIdAndUpdate({ _id: createdOrder._id }, { sms: verificationCode });
+            const order = await this.ordersModel.findById(createdOrder._id);
+            const usersArr = await this.findUserByCategory(order);
+            for (const user of usersArr) {
+                if (user.tg_chat !== null || user.viber !== null) {
+                    await this.mesengersService.sendNewTgOrder(user.tg_chat, order);
+                    await this.mesengersService.sendNewViberOrder(user.viber, order);
                 }
                 return await this.ordersModel.findById(createdOrder._id);
             }

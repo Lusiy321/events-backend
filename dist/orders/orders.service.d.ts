@@ -13,7 +13,7 @@ export declare class OrdersService {
     findOrderById(id: string): Promise<Orders>;
     findOrderByPhone(phone: string): Promise<Orders>;
     generateSixDigitNumber(): Promise<number>;
-    create(order: CreateOrderDto): Promise<Orders>;
+    create(orderObj: CreateOrderDto): Promise<Orders>;
     verifyOrder(code: string): Promise<any>;
     findUserByCategory(order: Orders): Promise<any>;
 }
