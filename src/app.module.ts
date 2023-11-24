@@ -13,6 +13,7 @@ import { AdminController } from './admin/admin.controller';
 import { AdminModule } from './admin/admin.module';
 import { Admin, AdminSchema } from './admin/admin.model';
 import { PostsModule } from './posts/posts.module';
+import { BannersModule } from './banners/banners.module';
 
 @Module({
   controllers: [UsersController, AdminController],
@@ -38,6 +39,7 @@ import { PostsModule } from './posts/posts.module';
     OrdersModule,
     AdminModule,
     PostsModule,
+    BannersModule,
   ],
 })
 export class AppModule {}

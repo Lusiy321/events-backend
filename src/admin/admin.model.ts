@@ -28,7 +28,7 @@ export class Admin extends Model<Admin> {
   @Prop({
     type: String,
   })
-  readonly email: string;
+  email: string;
 
   @ApiProperty({
     example: 'https://',
