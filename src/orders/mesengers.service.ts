@@ -158,25 +158,44 @@ export class MesengersService {
       { command: '/stop', description: 'Зупинити оповіщення' },
     ]);
 
+    // KEYBOARDS
+
+    const optURL = {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: 'Перейти на сайт',
+              url: 'https://www.wechirka.com/',
+            },
+          ],
+        ],
+        resize_keyboard: true,
+      },
+    };
+
+    const optCont = {
+      reply_markup: {
+        keyboard: [
+          [
+            {
+              text: 'Відправити номер телефону',
+              request_contact: true,
+            },
+          ],
+        ],
+        resize_keyboard: true,
+      },
+    };
+
+    // START BOT
     this.tg_bot.onText(/\/start/, async (msg) => {
       const chatId = msg.chat.id;
-      const opts = {
-        reply_markup: {
-          keyboard: [
-            [
-              {
-                text: 'Відправити номер телефону',
-                request_contact: true,
-              },
-            ],
-          ],
-          one_time_keyboard: true,
-        },
-      };
+
       this.tg_bot.sendMessage(
         chatId,
         'Будь ласка, натисніть кнопку "Відправити номер телефону" для надання номеру телефону.',
-        opts,
+        optCont,
       );
     });
 
@@ -186,9 +205,11 @@ export class MesengersService {
       const user = await this.userModel.findOne({ phone: phoneNumber }).exec();
       if (user) {
         await this.userModel.findByIdAndUpdate(user.id, { tg_chat: chatId });
+
         this.tg_bot.sendMessage(
           chatId,
-          `Дякую, ${msg.from.first_name} тепер тобі будуть надходити повідомлення про нові пропозиції в твоїй категорії.`,
+          `Дякую, ${msg.from.first_name} тепер Вам будуть надходити повідомлення про нові пропозиції в твоїй категорії. Щоб вимкнути оповіщення виберіть "Меню" та натисніть /stop`,
+          optURL,
         );
       } else {
         const order = await this.ordersModel
@@ -201,7 +222,8 @@ export class MesengersService {
         }
         this.tg_bot.sendMessage(
           chatId,
-          `Дякую, ${msg.from.first_name} тепер тобі будуть надходити повідомлення про нові пропозиції в твоїй категорії.`,
+          `Дякую, ${msg.from.first_name} тепер Вам будуть надходити повідомлення про нові пропозиції в твоїй категорії. Щоб вимкнути оповіщення виберіть "Меню" та натисніть /stop`,
+          optURL,
         );
       }
     });
@@ -235,7 +257,11 @@ export class MesengersService {
           await this.ordersModel.findByIdAndUpdate(order.id, { tg_chat: null });
         }
       }
-      this.tg_bot.sendMessage(chatId, `Ви ввімкнули повідомлення`);
+      this.tg_bot.sendMessage(
+        chatId,
+        `Ви вимкнули оповіщення. Щоб знову отримувати оповіщення, натисніть кнопку "Відправити номер телефону".`,
+        optCont,
+      );
     });
   }
   // VIMER METHODS ON CLASS
@@ -433,7 +459,13 @@ export class MesengersService {
             },
             {
               text: 'Не цікаво',
-              callback_data: 'disagree',
+              callback_data: `disagree:${chatId}`,
+            },
+          ],
+          [
+            {
+              text: 'Перейти на сайт',
+              url: 'https://www.wechirka.com/',
             },
           ],
         ],
