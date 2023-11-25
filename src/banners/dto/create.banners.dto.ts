@@ -9,6 +9,9 @@ export class CreateBannerDto {
   @ApiProperty({ example: 'Some text of banner', description: 'Banner text' })
   readonly text: string;
 
-  @ApiProperty({ example: 'top', description: 'Banner position' })
+  @ApiProperty({
+    example: 'top',
+    description: 'Banner position: enum [top, left, right]',
+  })
   readonly role: place;
 }

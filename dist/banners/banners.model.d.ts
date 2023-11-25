@@ -23,18 +23,15 @@
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
 import { Model } from 'mongoose';
-import { role } from './dto/role.admin.dto';
-export type AdminDocument = Admin & Document;
-export declare class Admin extends Model<Admin> {
-    username: string;
-    password: string;
-    email: string;
-    avatar: string;
-    role: role;
-    token: string;
+import { place } from './dto/position.banner';
+export type BannerDocument = Banner & Document;
+export declare class Banner extends Model<Banner> {
+    img: string;
+    text: string;
+    position: place;
 }
-export declare const AdminSchema: import("mongoose").Schema<Admin, Model<Admin, any, any, any, import("mongoose").Document<unknown, any, Admin> & Admin & {
+export declare const BannerSchema: import("mongoose").Schema<Banner, Model<Banner, any, any, any, import("mongoose").Document<unknown, any, Banner> & Banner & {
     _id: import("mongoose").Types.ObjectId;
-}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Admin, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<Admin>> & import("mongoose").FlatRecord<Admin> & {
+}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Banner, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<Banner>> & import("mongoose").FlatRecord<Banner> & {
     _id: import("mongoose").Types.ObjectId;
 }>;

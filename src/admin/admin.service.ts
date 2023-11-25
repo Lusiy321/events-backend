@@ -202,7 +202,6 @@ export class AdminService {
   async deleteUser(req: any, data: object): Promise<Object[]> {
     const admin = await this.findToken(req);
     const { ...params } = data;
-    console.log(params);
     if (!admin) {
       throw new Unauthorized('jwt expired');
     }

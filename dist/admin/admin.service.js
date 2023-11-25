@@ -178,7 +178,6 @@ let AdminService = class AdminService {
     async deleteUser(req, data) {
         const admin = await this.findToken(req);
         const params = __rest(data, []);
-        console.log(params);
         if (!admin) {
             throw new http_errors_1.Unauthorized('jwt expired');
         }

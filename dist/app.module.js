@@ -22,6 +22,7 @@ const admin_controller_1 = require("./admin/admin.controller");
 const admin_module_1 = require("./admin/admin.module");
 const admin_model_1 = require("./admin/admin.model");
 const posts_module_1 = require("./posts/posts.module");
+const banners_module_1 = require("./banners/banners.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -50,6 +51,7 @@ exports.AppModule = AppModule = __decorate([
             orders_module_1.OrdersModule,
             admin_module_1.AdminModule,
             posts_module_1.PostsModule,
+            banners_module_1.BannersModule,
         ],
     })
 ], AppModule);
