@@ -109,9 +109,6 @@ export class User extends Model<User> {
   })
   @Prop({
     type: String,
-    minlength: 2,
-    maxlength: 20,
-    default: 'Kyiv',
   })
   location: string;
 

@@ -96,9 +96,6 @@ export class Orders extends Model<Orders> {
   })
   @Prop({
     type: String,
-    minlength: 2,
-    maxlength: 20,
-    default: 'Kyiv',
   })
   location: string;
 

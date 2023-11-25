@@ -115,9 +115,6 @@ __decorate([
     }),
     (0, mongoose_1.Prop)({
         type: String,
-        minlength: 2,
-        maxlength: 20,
-        default: 'Kyiv',
     }),
     __metadata("design:type", String)
 ], Orders.prototype, "location", void 0);
