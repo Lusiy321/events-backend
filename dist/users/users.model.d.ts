@@ -40,7 +40,7 @@ export declare class User extends Model<User> {
     whatsapp: string;
     location: string;
     master_photo: string;
-    avatar: string;
+    avatar: object;
     photo: Array<string>;
     video: Array<string>;
     category: Array<Categories>;

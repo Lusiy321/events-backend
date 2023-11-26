@@ -21,7 +21,7 @@ export class User extends Model<User> {
   @Prop({
     type: String,
     minlength: 2,
-    maxlength: 20,
+    maxlength: 30,
   })
   lastName: string;
 
@@ -123,10 +123,13 @@ export class User extends Model<User> {
   master_photo: string;
 
   @Prop({
-    type: String,
-    default: 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+    type: Object,
+    default: {
+      publicId: '1',
+      url: 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+    },
   })
-  avatar: string;
+  avatar: object;
 
   @ApiProperty({
     example: [

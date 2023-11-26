@@ -31,7 +31,7 @@ __decorate([
     (0, mongoose_1.Prop)({
         type: String,
         minlength: 2,
-        maxlength: 20,
+        maxlength: 30,
     }),
     __metadata("design:type", String)
 ], User.prototype, "lastName", void 0);
@@ -145,10 +145,13 @@ __decorate([
 ], User.prototype, "master_photo", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
-        type: String,
-        default: 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+        type: Object,
+        default: {
+            publicId: '1',
+            url: 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+        },
     }),
-    __metadata("design:type", String)
+    __metadata("design:type", Object)
 ], User.prototype, "avatar", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
