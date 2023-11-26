@@ -142,7 +142,7 @@ export class User extends Model<User> {
     type: Array<Object>,
     default: [],
   })
-  photo: Array<string>;
+  photo: Array<object>;
 
   @ApiProperty({
     example: ['https://', 'https://'],

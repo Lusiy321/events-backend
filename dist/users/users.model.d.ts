@@ -41,7 +41,7 @@ export declare class User extends Model<User> {
     location: string;
     master_photo: string;
     avatar: object;
-    photo: Array<string>;
+    photo: Array<object>;
     video: Array<string>;
     category: Array<Categories>;
     isOnline: boolean;

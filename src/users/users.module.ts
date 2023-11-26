@@ -7,6 +7,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { GoogleStrategy } from './utils/GoogleStrategy';
 import { SessionSerializer } from './utils/Serializer';
 import { Category, CategorySchema } from './category.model';
+import { CloudinaryService } from './cloudinary.service';
+import { ConfigService } from '@nestjs/config';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [
@@ -18,14 +21,19 @@ import { Category, CategorySchema } from './category.model';
       { name: User.name, schema: UserSchema, collection: 'users' },
       { name: Category.name, schema: CategorySchema, collection: 'categories' },
     ]),
+    MulterModule.register({
+      dest: './uploads',
+    }),
   ],
   providers: [
     GoogleStrategy,
     SessionSerializer,
     { provide: 'USER_SERVICE', useClass: UsersService },
     UsersService,
+    CloudinaryService,
+    ConfigService,
   ],
-  exports: [UsersService],
+  exports: [UsersService, CloudinaryService],
   controllers: [UsersController],
 })
 export class UsersModule {}

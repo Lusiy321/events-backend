@@ -11,7 +11,9 @@ import {
   Query,
   Req,
   Res,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { User } from './users.model';
 import { UsersService } from './users.service';
@@ -31,11 +33,18 @@ import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
 import { Category } from './category.model';
 import { CreateCategoryDto } from './dto/create.category.dto';
 import { STATUS_CODES } from 'http';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { CloudinaryService } from './cloudinary.service';
+import { diskStorage } from 'multer';
+import * as path from 'path';
 
 @ApiTags('User')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   @ApiOperation({ summary: 'Create User' })
   @ApiResponse({ status: 201, type: User })
@@ -93,11 +102,42 @@ export class UsersController {
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')
   @Put('/')
+  @UseInterceptors(FilesInterceptor('images', 5))
   async update(
-    @Body() user: UpdateUserDto,
+    @Body() data: UpdateUserDto,
     @Req() request: any,
   ): Promise<User> {
-    return this.usersService.update(user, request);
+    return this.usersService.update(data, request);
+  }
+
+  @ApiOperation({ summary: 'Upload' })
+  @ApiResponse({ status: 200, type: User })
+  @ApiBearerAuth('BearerAuthMethod')
+  @Post('upload')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const filename =
+            path.parse(file.originalname).name.replace(/\s/g, '') +
+            '-' +
+            Date.now();
+          const extension = path.parse(file.originalname).ext;
+          cb(null, `${filename}${extension}`);
+        },
+      }),
+    }),
+  )
+  async upload(
+    @Req() req: any,
+    @UploadedFiles() images: Express.Multer.File[],
+  ): Promise<void> {
+    const user = await this.usersService.findToken(req);
+    console.log(images);
+    const uploadLink = await this.cloudinaryService.uploadImages(user, images);
+    console.log(uploadLink);
+    return uploadLink;
   }
 
   @ApiOperation({ summary: 'Login Google User' })
@@ -115,9 +155,7 @@ export class UsersController {
   async googleAuthRedirect(@Res() res: any, @Req() req: any) {
     const userId = req.user.id;
     const user = await this.usersService.findById(userId);
-    return res.redirect(
-      `https://show-git-main-smirnypavel.vercel.app/?token=${user.token}`,
-    );
+    return res.redirect(`${process.env.FRONT_LINK}?token=${user.token}`);
   }
 
   @ApiOperation({ summary: 'Создание категории в БД с категориями' })
@@ -138,17 +176,6 @@ export class UsersController {
   ): Promise<Category> {
     return this.usersService.addSubcategory(id, subCategory);
   }
-
-  // @ApiOperation({ summary: 'Find by id and update' })
-  // @ApiResponse({ status: 200, type: User })
-  // @HttpCode(200)
-  // @Put('/find-by-id/:id')
-  // async find(
-  //   @Param('id') id: string,
-  //   @Body() user: UpdateUserDto,
-  // ): Promise<User> {
-  //   return this.usersService.findByIdUpdate(id, user);
-  // }
 
   @ApiOperation({ summary: 'Сортировка по категориям пользователей' })
   @ApiResponse({ status: 200, type: User })

@@ -1,3 +1,4 @@
+/// <reference types="multer" />
 import { User } from './users.model';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create.user.dto';
@@ -7,9 +8,11 @@ import { MailUserDto } from './dto/email.user.dto';
 import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
 import { Category } from './category.model';
 import { CreateCategoryDto } from './dto/create.category.dto';
+import { CloudinaryService } from './cloudinary.service';
 export declare class UsersController {
     private readonly usersService;
-    constructor(usersService: UsersService);
+    private readonly cloudinaryService;
+    constructor(usersService: UsersService, cloudinaryService: CloudinaryService);
     create(user: CreateUserDto): Promise<User>;
     searchUser(query: any): Promise<User[]>;
     findUsers(): Promise<User[]>;
@@ -17,7 +20,8 @@ export declare class UsersController {
     findCat(): Promise<Category[]>;
     login(user: CreateUserDto): Promise<User>;
     logout(request: any): Promise<User>;
-    update(user: UpdateUserDto, request: any): Promise<User>;
+    update(data: UpdateUserDto, request: any): Promise<User>;
+    upload(req: any, images: Express.Multer.File[]): Promise<void>;
     googleLogin(): Promise<void>;
     googleAuthRedirect(res: any, req: any): Promise<any>;
     createCat(category: CreateCategoryDto): Promise<Category>;

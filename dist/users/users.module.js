@@ -16,6 +16,9 @@ const jwt_1 = require("@nestjs/jwt");
 const GoogleStrategy_1 = require("./utils/GoogleStrategy");
 const Serializer_1 = require("./utils/Serializer");
 const category_model_1 = require("./category.model");
+const cloudinary_service_1 = require("./cloudinary.service");
+const config_1 = require("@nestjs/config");
+const platform_express_1 = require("@nestjs/platform-express");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;
@@ -30,14 +33,19 @@ exports.UsersModule = UsersModule = __decorate([
                 { name: users_model_1.User.name, schema: users_model_1.UserSchema, collection: 'users' },
                 { name: category_model_1.Category.name, schema: category_model_1.CategorySchema, collection: 'categories' },
             ]),
+            platform_express_1.MulterModule.register({
+                dest: './uploads',
+            }),
         ],
         providers: [
             GoogleStrategy_1.GoogleStrategy,
             Serializer_1.SessionSerializer,
             { provide: 'USER_SERVICE', useClass: users_service_1.UsersService },
             users_service_1.UsersService,
+            cloudinary_service_1.CloudinaryService,
+            config_1.ConfigService,
         ],
-        exports: [users_service_1.UsersService],
+        exports: [users_service_1.UsersService, cloudinary_service_1.CloudinaryService],
         controllers: [users_controller_1.UsersController],
     })
 ], UsersModule);

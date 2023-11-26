@@ -26,9 +26,14 @@ const email_user_dto_1 = require("./dto/email.user.dto");
 const updatePassword_user_dto_1 = require("./dto/updatePassword.user.dto");
 const category_model_1 = require("./category.model");
 const create_category_dto_1 = require("./dto/create.category.dto");
+const platform_express_1 = require("@nestjs/platform-express");
+const cloudinary_service_1 = require("./cloudinary.service");
+const multer_1 = require("multer");
+const path = require("path");
 let UsersController = class UsersController {
-    constructor(usersService) {
+    constructor(usersService, cloudinaryService) {
         this.usersService = usersService;
+        this.cloudinaryService = cloudinaryService;
     }
     async create(user) {
         return this.usersService.create(user);
@@ -51,8 +56,15 @@ let UsersController = class UsersController {
     async logout(request) {
         return this.usersService.logout(request);
     }
-    async update(user, request) {
-        return this.usersService.update(user, request);
+    async update(data, request) {
+        return this.usersService.update(data, request);
+    }
+    async upload(req, images) {
+        const user = await this.usersService.findToken(req);
+        console.log(images);
+        const uploadLink = await this.cloudinaryService.uploadImages(user, images);
+        console.log(uploadLink);
+        return uploadLink;
     }
     async googleLogin() {
         return;
@@ -60,7 +72,7 @@ let UsersController = class UsersController {
     async googleAuthRedirect(res, req) {
         const userId = req.user.id;
         const user = await this.usersService.findById(userId);
-        return res.redirect(`https://show-git-main-smirnypavel.vercel.app/?token=${user.token}`);
+        return res.redirect(`${process.env.FRONT_LINK}?token=${user.token}`);
     }
     async createCat(category) {
         return this.usersService.createCategory(category);
@@ -161,12 +173,36 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
     (0, common_1.Put)('/'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)('images', 5)),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [update_user_dto_1.UpdateUserDto, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "update", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Upload' }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
+    (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
+    (0, common_1.Post)('upload'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
+        storage: (0, multer_1.diskStorage)({
+            destination: './uploads',
+            filename: (req, file, cb) => {
+                const filename = path.parse(file.originalname).name.replace(/\s/g, '') +
+                    '-' +
+                    Date.now();
+                const extension = path.parse(file.originalname).ext;
+                cb(null, `${filename}${extension}`);
+            },
+        }),
+    })),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.UploadedFiles)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Array]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "upload", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Login Google User' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: google_user_dto_1.GoogleUserDto }),
@@ -279,6 +315,7 @@ __decorate([
 exports.UsersController = UsersController = __decorate([
     (0, swagger_1.ApiTags)('User'),
     (0, common_1.Controller)('users'),
-    __metadata("design:paramtypes", [users_service_1.UsersService])
+    __metadata("design:paramtypes", [users_service_1.UsersService,
+        cloudinary_service_1.CloudinaryService])
 ], UsersController);
 //# sourceMappingURL=users.controller.js.map
