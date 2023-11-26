@@ -1,8 +1,9 @@
 /// <reference types="multer" />
 import { User } from './users.model';
 export declare class CloudinaryService {
+    private userModel;
     private readonly cloudinaryConfig;
-    constructor();
+    constructor(userModel: User);
     uploadImages(user: User, images: Express.Multer.File[]): Promise<void>;
     private uploadImage;
 }

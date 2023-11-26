@@ -102,7 +102,6 @@ export class UsersController {
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')
   @Put('/')
-  @UseInterceptors(FilesInterceptor('images', 5))
   async update(
     @Body() data: UpdateUserDto,
     @Req() request: any,
@@ -115,7 +114,7 @@ export class UsersController {
   @ApiBearerAuth('BearerAuthMethod')
   @Post('upload')
   @UseInterceptors(
-    FileInterceptor('file', {
+    FilesInterceptor('file', 5, {
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, cb) => {
@@ -132,12 +131,10 @@ export class UsersController {
   async upload(
     @Req() req: any,
     @UploadedFiles() images: Express.Multer.File[],
-  ): Promise<void> {
+  ): Promise<User> {
     const user = await this.usersService.findToken(req);
-    console.log(images);
-    const uploadLink = await this.cloudinaryService.uploadImages(user, images);
-    console.log(uploadLink);
-    return uploadLink;
+    await this.cloudinaryService.uploadImages(user, images);
+    return await this.usersService.findById(user.id);
   }
 
   @ApiOperation({ summary: 'Login Google User' })

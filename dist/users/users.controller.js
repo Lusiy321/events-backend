@@ -61,10 +61,8 @@ let UsersController = class UsersController {
     }
     async upload(req, images) {
         const user = await this.usersService.findToken(req);
-        console.log(images);
-        const uploadLink = await this.cloudinaryService.uploadImages(user, images);
-        console.log(uploadLink);
-        return uploadLink;
+        await this.cloudinaryService.uploadImages(user, images);
+        return await this.usersService.findById(user.id);
     }
     async googleLogin() {
         return;
@@ -173,7 +171,6 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
     (0, common_1.Put)('/'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)('images', 5)),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
@@ -185,7 +182,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
     (0, common_1.Post)('upload'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
+    (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)('file', 5, {
         storage: (0, multer_1.diskStorage)({
             destination: './uploads',
             filename: (req, file, cb) => {

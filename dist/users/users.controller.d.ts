@@ -21,7 +21,7 @@ export declare class UsersController {
     login(user: CreateUserDto): Promise<User>;
     logout(request: any): Promise<User>;
     update(data: UpdateUserDto, request: any): Promise<User>;
-    upload(req: any, images: Express.Multer.File[]): Promise<void>;
+    upload(req: any, images: Express.Multer.File[]): Promise<User>;
     googleLogin(): Promise<void>;
     googleAuthRedirect(res: any, req: any): Promise<any>;
     createCat(category: CreateCategoryDto): Promise<Category>;
