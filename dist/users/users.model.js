@@ -135,13 +135,16 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiProperty)({
         example: 'https://',
-        description: 'User avatarURL',
+        description: 'User master photo',
     }),
     (0, mongoose_1.Prop)({
-        type: String,
-        default: 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+        type: Object,
+        default: {
+            publicId: '1',
+            url: 'https://marketer.ua/wp-content/uploads/2021/12/events-1.jpg',
+        },
     }),
-    __metadata("design:type", String)
+    __metadata("design:type", Object)
 ], User.prototype, "master_photo", void 0);
 __decorate([
     (0, mongoose_1.Prop)({

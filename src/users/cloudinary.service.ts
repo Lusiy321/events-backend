@@ -3,6 +3,8 @@ import { v2 as cloudinary } from 'cloudinary';
 import { createReadStream } from 'fs';
 import { User } from './users.model';
 import { InjectModel } from '@nestjs/mongoose';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class CloudinaryService {
@@ -55,13 +57,12 @@ export class CloudinaryService {
                 publicId: result.public_id,
                 url: result.secure_url,
               };
-              console.log(user);
               user.photo.push(url);
-              user.save();
+
               await this.userModel.findByIdAndUpdate(
                 { _id: user.id },
                 {
-                  $set: { photo: user.photo },
+                  $set: { photo: user.photo, master_photo: user.photo[0] },
                 },
               );
               resolve();
@@ -74,5 +75,142 @@ export class CloudinaryService {
         reject(error);
       }
     });
+  }
+
+  async deleteImage(user: User, photoId: string): Promise<void> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        cloudinary.uploader.destroy(
+          photoId,
+          { ...this.cloudinaryConfig },
+          async (error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              const updatedPhotos = user.photo.filter(
+                (item) => item.publicId !== photoId,
+              );
+              await this.userModel.findByIdAndUpdate(
+                { _id: user.id },
+                {
+                  $set: {
+                    photo: updatedPhotos,
+                    master_photo: updatedPhotos[0],
+                  },
+                },
+              );
+
+              resolve();
+            }
+          },
+        );
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  async uploadAvatar(user: User, image: Express.Multer.File[]): Promise<void> {
+    const validImages = image.filter((image) => image && image.path);
+
+    const uploadPromises = validImages.map((image) =>
+      this.uploadAvatarImage(user, image),
+    );
+    await Promise.all(uploadPromises);
+  }
+
+  private async uploadAvatarImage(
+    user: User,
+    image: Express.Multer.File,
+  ): Promise<void> {
+    if (!image || !image.path) {
+      console.error('Invalid image:', image);
+      return;
+    }
+
+    const stream = createReadStream(image.path);
+
+    return new Promise(async (resolve, reject) => {
+      try {
+        const cloudinaryStream = cloudinary.uploader.upload_stream(
+          {
+            folder: `user-${user.id}`,
+            public_id: `avatar-${image.filename}`,
+            ...this.cloudinaryConfig,
+          },
+          async (error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              const url = {
+                publicId: result.public_id,
+                url: result.secure_url,
+              };
+
+              await this.userModel.findByIdAndUpdate(
+                { _id: user.id },
+                {
+                  $set: { avatar: url },
+                },
+              );
+              resolve();
+            }
+          },
+        );
+
+        stream.pipe(cloudinaryStream);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  async deleteAvatarImage(user: User): Promise<void> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        cloudinary.uploader.destroy(
+          user.avatar.publicId,
+          { ...this.cloudinaryConfig },
+          async (error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              await this.userModel.findByIdAndUpdate(
+                { _id: user.id },
+                {
+                  $set: {
+                    avatar: null,
+                  },
+                },
+              );
+
+              resolve();
+            }
+          },
+        );
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  async deleteFilesInUploadsFolder(): Promise<void> {
+    const uploadsFolderPath = path.join(__dirname, 'uploads');
+
+    try {
+      const files = fs.readdirSync(uploadsFolderPath);
+
+      files.forEach((file) => {
+        const filePath = path.join(uploadsFolderPath, file);
+
+        fs.unlinkSync(filePath);
+        console.log(`File ${file} deleted successfully`);
+      });
+
+      console.log('All files deleted successfully');
+    } catch (error) {
+      console.error('Error deleting files:', error.message);
+      throw error;
+    }
   }
 }

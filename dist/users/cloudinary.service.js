@@ -18,6 +18,8 @@ const cloudinary_1 = require("cloudinary");
 const fs_1 = require("fs");
 const users_model_1 = require("./users.model");
 const mongoose_1 = require("@nestjs/mongoose");
+const fs = require("fs");
+const path = require("path");
 let CloudinaryService = class CloudinaryService {
     constructor(userModel) {
         this.userModel = userModel;
@@ -49,11 +51,9 @@ let CloudinaryService = class CloudinaryService {
                             publicId: result.public_id,
                             url: result.secure_url,
                         };
-                        console.log(user);
                         user.photo.push(url);
-                        user.save();
                         await this.userModel.findByIdAndUpdate({ _id: user.id }, {
-                            $set: { photo: user.photo },
+                            $set: { photo: user.photo, master_photo: user.photo[0] },
                         });
                         resolve();
                     }
@@ -64,6 +64,103 @@ let CloudinaryService = class CloudinaryService {
                 reject(error);
             }
         });
+    }
+    async deleteImage(user, photoId) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                cloudinary_1.v2.uploader.destroy(photoId, Object.assign({}, this.cloudinaryConfig), async (error, result) => {
+                    if (error) {
+                        reject(error);
+                    }
+                    else {
+                        const updatedPhotos = user.photo.filter((item) => item.publicId !== photoId);
+                        await this.userModel.findByIdAndUpdate({ _id: user.id }, {
+                            $set: {
+                                photo: updatedPhotos,
+                                master_photo: updatedPhotos[0],
+                            },
+                        });
+                        resolve();
+                    }
+                });
+            }
+            catch (error) {
+                reject(error);
+            }
+        });
+    }
+    async uploadAvatar(user, image) {
+        const validImages = image.filter((image) => image && image.path);
+        const uploadPromises = validImages.map((image) => this.uploadAvatarImage(user, image));
+        await Promise.all(uploadPromises);
+    }
+    async uploadAvatarImage(user, image) {
+        if (!image || !image.path) {
+            console.error('Invalid image:', image);
+            return;
+        }
+        const stream = (0, fs_1.createReadStream)(image.path);
+        return new Promise(async (resolve, reject) => {
+            try {
+                const cloudinaryStream = cloudinary_1.v2.uploader.upload_stream(Object.assign({ folder: `user-${user.id}`, public_id: `avatar-${image.filename}` }, this.cloudinaryConfig), async (error, result) => {
+                    if (error) {
+                        reject(error);
+                    }
+                    else {
+                        const url = {
+                            publicId: result.public_id,
+                            url: result.secure_url,
+                        };
+                        await this.userModel.findByIdAndUpdate({ _id: user.id }, {
+                            $set: { avatar: url },
+                        });
+                        resolve();
+                    }
+                });
+                stream.pipe(cloudinaryStream);
+            }
+            catch (error) {
+                reject(error);
+            }
+        });
+    }
+    async deleteAvatarImage(user) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                cloudinary_1.v2.uploader.destroy(user.avatar.publicId, Object.assign({}, this.cloudinaryConfig), async (error, result) => {
+                    if (error) {
+                        reject(error);
+                    }
+                    else {
+                        await this.userModel.findByIdAndUpdate({ _id: user.id }, {
+                            $set: {
+                                avatar: null,
+                            },
+                        });
+                        resolve();
+                    }
+                });
+            }
+            catch (error) {
+                reject(error);
+            }
+        });
+    }
+    async deleteFilesInUploadsFolder() {
+        const uploadsFolderPath = path.join(__dirname, 'uploads');
+        try {
+            const files = fs.readdirSync(uploadsFolderPath);
+            files.forEach((file) => {
+                const filePath = path.join(uploadsFolderPath, file);
+                fs.unlinkSync(filePath);
+                console.log(`File ${file} deleted successfully`);
+            });
+            console.log('All files deleted successfully');
+        }
+        catch (error) {
+            console.error('Error deleting files:', error.message);
+            throw error;
+        }
     }
 };
 exports.CloudinaryService = CloudinaryService;

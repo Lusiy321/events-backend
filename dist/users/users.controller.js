@@ -59,9 +59,26 @@ let UsersController = class UsersController {
     async update(data, request) {
         return this.usersService.update(data, request);
     }
-    async upload(req, images) {
+    async uploadPhoto(req, images) {
         const user = await this.usersService.findToken(req);
         await this.cloudinaryService.uploadImages(user, images);
+        return await this.usersService.findById(user.id);
+    }
+    async uploadUserAvatar(req, images) {
+        const user = await this.usersService.findToken(req);
+        console.log(images);
+        await this.cloudinaryService.uploadAvatar(user, images);
+        await this.cloudinaryService.deleteFilesInUploadsFolder();
+        return await this.usersService.findById(user.id);
+    }
+    async deleteImage(id, req) {
+        const user = await this.usersService.findToken(req);
+        await this.cloudinaryService.deleteImage(user, id);
+        return await this.usersService.findById(user.id);
+    }
+    async deleteAvatarImage(req) {
+        const user = await this.usersService.findToken(req);
+        await this.cloudinaryService.deleteAvatarImage(user);
         return await this.usersService.findById(user.id);
     }
     async googleLogin() {
@@ -178,11 +195,11 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "update", null);
 __decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Upload' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Upload images' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
     (0, common_1.Post)('upload'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)('file', 5, {
+    (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)('file', 1, {
         storage: (0, multer_1.diskStorage)({
             destination: './uploads',
             filename: (req, file, cb) => {
@@ -199,7 +216,51 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Array]),
     __metadata("design:returntype", Promise)
-], UsersController.prototype, "upload", null);
+], UsersController.prototype, "uploadPhoto", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Avatar image upload' }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
+    (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
+    (0, common_1.Post)('avatar'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)('file', 1, {
+        storage: (0, multer_1.diskStorage)({
+            destination: './uploads',
+            filename: (req, file, cb) => {
+                const filename = path.parse(file.originalname).name.replace(/\s/g, '') +
+                    '-' +
+                    Date.now();
+                const extension = path.parse(file.originalname).ext;
+                cb(null, `${filename}${extension}`);
+            },
+        }),
+    })),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.UploadedFiles)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Array]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "uploadUserAvatar", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Delete user photo' }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
+    (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
+    (0, common_1.Delete)('/photo/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "deleteImage", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Delete user avatar' }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
+    (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
+    (0, common_1.Delete)('avatar'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "deleteAvatarImage", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Login Google User' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: google_user_dto_1.GoogleUserDto }),

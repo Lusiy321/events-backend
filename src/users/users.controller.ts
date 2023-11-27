@@ -2,6 +2,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Param,
@@ -109,12 +110,12 @@ export class UsersController {
     return this.usersService.update(data, request);
   }
 
-  @ApiOperation({ summary: 'Upload' })
+  @ApiOperation({ summary: 'Upload images' })
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')
   @Post('upload')
   @UseInterceptors(
-    FilesInterceptor('file', 5, {
+    FilesInterceptor('file', 1, {
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, cb) => {
@@ -128,12 +129,62 @@ export class UsersController {
       }),
     }),
   )
-  async upload(
+  async uploadPhoto(
     @Req() req: any,
     @UploadedFiles() images: Express.Multer.File[],
   ): Promise<User> {
     const user = await this.usersService.findToken(req);
     await this.cloudinaryService.uploadImages(user, images);
+    return await this.usersService.findById(user.id);
+  }
+
+  @ApiOperation({ summary: 'Avatar image upload' })
+  @ApiResponse({ status: 200, type: User })
+  @ApiBearerAuth('BearerAuthMethod')
+  @Post('avatar')
+  @UseInterceptors(
+    FilesInterceptor('file', 1, {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const filename =
+            path.parse(file.originalname).name.replace(/\s/g, '') +
+            '-' +
+            Date.now();
+          const extension = path.parse(file.originalname).ext;
+          cb(null, `${filename}${extension}`);
+        },
+      }),
+    }),
+  )
+  async uploadUserAvatar(
+    @Req() req: any,
+    @UploadedFiles() images: Express.Multer.File[],
+  ): Promise<User> {
+    const user = await this.usersService.findToken(req);
+    console.log(images);
+    await this.cloudinaryService.uploadAvatar(user, images);
+    await this.cloudinaryService.deleteFilesInUploadsFolder();
+    return await this.usersService.findById(user.id);
+  }
+
+  @ApiOperation({ summary: 'Delete user photo' })
+  @ApiResponse({ status: 200, type: User })
+  @ApiBearerAuth('BearerAuthMethod')
+  @Delete('/photo/:id')
+  async deleteImage(@Param('id') id: string, @Req() req: any): Promise<User> {
+    const user = await this.usersService.findToken(req);
+    await this.cloudinaryService.deleteImage(user, id);
+    return await this.usersService.findById(user.id);
+  }
+
+  @ApiOperation({ summary: 'Delete user avatar' })
+  @ApiResponse({ status: 200, type: User })
+  @ApiBearerAuth('BearerAuthMethod')
+  @Delete('avatar')
+  async deleteAvatarImage(@Req() req: any): Promise<User> {
+    const user = await this.usersService.findToken(req);
+    await this.cloudinaryService.deleteAvatarImage(user);
     return await this.usersService.findById(user.id);
   }
 

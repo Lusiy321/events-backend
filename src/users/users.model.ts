@@ -7,6 +7,11 @@ import { verify } from './dto/verify.user.dto';
 
 export type UserDocument = User & Document;
 
+interface Photo {
+  publicId: string;
+  url: string;
+}
+
 @Schema({ versionKey: false, timestamps: true })
 export class User extends Model<User> {
   @ApiProperty({ example: 'Volodymyr', description: 'User first name' })
@@ -114,13 +119,16 @@ export class User extends Model<User> {
 
   @ApiProperty({
     example: 'https://',
-    description: 'User avatarURL',
+    description: 'User master photo',
   })
   @Prop({
-    type: String,
-    default: 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+    type: Object,
+    default: {
+      publicId: '1',
+      url: 'https://marketer.ua/wp-content/uploads/2021/12/events-1.jpg',
+    },
   })
-  master_photo: string;
+  master_photo: Photo;
 
   @Prop({
     type: Object,
@@ -129,7 +137,7 @@ export class User extends Model<User> {
       url: 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
     },
   })
-  avatar: object;
+  avatar: Photo;
 
   @ApiProperty({
     example: [
@@ -142,7 +150,7 @@ export class User extends Model<User> {
     type: Array<Object>,
     default: [],
   })
-  photo: Array<object>;
+  photo: Photo[];
 
   @ApiProperty({
     example: ['https://', 'https://'],

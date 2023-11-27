@@ -387,7 +387,6 @@ export class UsersService {
     try {
       const { authorization = '' } = req.headers;
       const [bearer, token] = authorization.split(' ');
-
       if (bearer !== 'Bearer') {
         throw new Unauthorized('Not authorized');
       }
