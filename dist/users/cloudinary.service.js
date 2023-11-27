@@ -102,22 +102,43 @@ let CloudinaryService = class CloudinaryService {
         const stream = (0, fs_1.createReadStream)(image.path);
         return new Promise(async (resolve, reject) => {
             try {
-                const cloudinaryStream = cloudinary_1.v2.uploader.upload_stream(Object.assign({ folder: `user-${user.id}`, public_id: `avatar-${image.filename}` }, this.cloudinaryConfig), async (error, result) => {
-                    if (error) {
-                        reject(error);
-                    }
-                    else {
-                        const url = {
-                            publicId: result.public_id,
-                            url: result.secure_url,
-                        };
-                        await this.userModel.findByIdAndUpdate({ _id: user.id }, {
-                            $set: { avatar: url },
-                        });
-                        resolve();
-                    }
-                });
-                stream.pipe(cloudinaryStream);
+                if (user.avatar.publicId !== '1') {
+                    await this.deleteAvatarImage(user);
+                    const cloudinaryStream = cloudinary_1.v2.uploader.upload_stream(Object.assign({ folder: `user-${user.id}`, public_id: `avatar-${image.filename}` }, this.cloudinaryConfig), async (error, result) => {
+                        if (error) {
+                            reject(error);
+                        }
+                        else {
+                            const url = {
+                                publicId: result.public_id,
+                                url: result.secure_url,
+                            };
+                            await this.userModel.findByIdAndUpdate({ _id: user.id }, {
+                                $set: { avatar: url },
+                            });
+                            resolve();
+                        }
+                    });
+                    stream.pipe(cloudinaryStream);
+                }
+                else {
+                    const cloudinaryStream = cloudinary_1.v2.uploader.upload_stream(Object.assign({ folder: `user-${user.id}`, public_id: `avatar-${image.filename}` }, this.cloudinaryConfig), async (error, result) => {
+                        if (error) {
+                            reject(error);
+                        }
+                        else {
+                            const url = {
+                                publicId: result.public_id,
+                                url: result.secure_url,
+                            };
+                            await this.userModel.findByIdAndUpdate({ _id: user.id }, {
+                                $set: { avatar: url },
+                            });
+                            resolve();
+                        }
+                    });
+                    stream.pipe(cloudinaryStream);
+                }
             }
             catch (error) {
                 reject(error);

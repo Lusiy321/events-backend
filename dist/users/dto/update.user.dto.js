@@ -39,20 +39,20 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "description", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: '+380984561225', description: 'User phone' }),
+    (0, swagger_1.ApiProperty)({ example: '380984561225', description: 'User phone' }),
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "phone", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: '@YourLogin', description: 'User telegram login' }),
+    (0, swagger_1.ApiProperty)({ example: 'YourLogin', description: 'User telegram login' }),
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "telegram", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: '+380984561225', description: 'User viber phone' }),
+    (0, swagger_1.ApiProperty)({ example: '380984561225', description: 'User viber phone' }),
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "viber", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        example: '+380984561225',
+        example: '380984561225',
         description: 'User whatsapp phone number',
     }),
     __metadata("design:type", String)
@@ -62,11 +62,23 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "location", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'https://', description: 'User photo' }),
+    (0, swagger_1.ApiProperty)({
+        example: {
+            publicId: '1',
+            url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kidn51ekkbiuqne4mbpl.jpg',
+        },
+        description: 'User master photo',
+    }),
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "master_photo", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'https://', description: 'User photo' }),
+    (0, swagger_1.ApiProperty)({
+        example: {
+            publicId: '1',
+            url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kglf7c13u3aagffbdlmo.png',
+        },
+        description: 'User master photo',
+    }),
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "avatar", void 0);
 __decorate([

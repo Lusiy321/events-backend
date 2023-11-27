@@ -134,24 +134,34 @@ __decorate([
 ], User.prototype, "location", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        example: 'https://',
+        example: {
+            publicId: '1',
+            url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kidn51ekkbiuqne4mbpl.jpg',
+        },
         description: 'User master photo',
     }),
     (0, mongoose_1.Prop)({
         type: Object,
         default: {
             publicId: '1',
-            url: 'https://marketer.ua/wp-content/uploads/2021/12/events-1.jpg',
+            url: process.env.MASTER,
         },
     }),
     __metadata("design:type", Object)
 ], User.prototype, "master_photo", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({
+        example: {
+            publicId: '1',
+            url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kglf7c13u3aagffbdlmo.png',
+        },
+        description: 'User master photo',
+    }),
     (0, mongoose_1.Prop)({
         type: Object,
         default: {
             publicId: '1',
-            url: 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+            url: process.env.AVATAR,
         },
     }),
     __metadata("design:type", Object)
@@ -159,8 +169,14 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiProperty)({
         example: [
-            { publicId: '1', url: 'https://' },
-            { publicId: '2', url: 'https://' },
+            {
+                publicId: '1',
+                url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kglf7c13u3aagffbdlmo.png',
+            },
+            {
+                publicId: '2',
+                url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kidn51ekkbiuqne4mbpl.jpg',
+            },
         ],
         description: 'User photo',
     }),

@@ -132,33 +132,64 @@ export class CloudinaryService {
 
     return new Promise(async (resolve, reject) => {
       try {
-        const cloudinaryStream = cloudinary.uploader.upload_stream(
-          {
-            folder: `user-${user.id}`,
-            public_id: `avatar-${image.filename}`,
-            ...this.cloudinaryConfig,
-          },
-          async (error, result) => {
-            if (error) {
-              reject(error);
-            } else {
-              const url = {
-                publicId: result.public_id,
-                url: result.secure_url,
-              };
+        if (user.avatar.publicId !== '1') {
+          await this.deleteAvatarImage(user);
+          const cloudinaryStream = cloudinary.uploader.upload_stream(
+            {
+              folder: `user-${user.id}`,
+              public_id: `avatar-${image.filename}`,
+              ...this.cloudinaryConfig,
+            },
+            async (error, result) => {
+              if (error) {
+                reject(error);
+              } else {
+                const url = {
+                  publicId: result.public_id,
+                  url: result.secure_url,
+                };
 
-              await this.userModel.findByIdAndUpdate(
-                { _id: user.id },
-                {
-                  $set: { avatar: url },
-                },
-              );
-              resolve();
-            }
-          },
-        );
+                await this.userModel.findByIdAndUpdate(
+                  { _id: user.id },
+                  {
+                    $set: { avatar: url },
+                  },
+                );
+                resolve();
+              }
+            },
+          );
 
-        stream.pipe(cloudinaryStream);
+          stream.pipe(cloudinaryStream);
+        } else {
+          const cloudinaryStream = cloudinary.uploader.upload_stream(
+            {
+              folder: `user-${user.id}`,
+              public_id: `avatar-${image.filename}`,
+              ...this.cloudinaryConfig,
+            },
+            async (error, result) => {
+              if (error) {
+                reject(error);
+              } else {
+                const url = {
+                  publicId: result.public_id,
+                  url: result.secure_url,
+                };
+
+                await this.userModel.findByIdAndUpdate(
+                  { _id: user.id },
+                  {
+                    $set: { avatar: url },
+                  },
+                );
+                resolve();
+              }
+            },
+          );
+
+          stream.pipe(cloudinaryStream);
+        }
       } catch (error) {
         reject(error);
       }
