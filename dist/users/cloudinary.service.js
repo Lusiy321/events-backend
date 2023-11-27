@@ -134,7 +134,7 @@ let CloudinaryService = class CloudinaryService {
                     else {
                         await this.userModel.findByIdAndUpdate({ _id: user.id }, {
                             $set: {
-                                avatar: null,
+                                avatar: process.env.AVATAR,
                             },
                         });
                         resolve();

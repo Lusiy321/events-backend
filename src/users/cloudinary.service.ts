@@ -179,7 +179,7 @@ export class CloudinaryService {
                 { _id: user.id },
                 {
                   $set: {
-                    avatar: null,
+                    avatar: process.env.AVATAR,
                   },
                 },
               );
