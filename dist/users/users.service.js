@@ -364,7 +364,7 @@ let UsersService = class UsersService {
             id: authUser._id,
         };
         const SECRET_KEY = process.env.SECRET_KEY;
-        const token = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY, { expiresIn: '10m' });
+        const token = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY, { expiresIn: '1m' });
         await this.userModel.findByIdAndUpdate(authUser._id, { token });
         const authentificationUser = await this.userModel.findById({
             _id: authUser._id,
