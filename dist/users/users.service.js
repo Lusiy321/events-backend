@@ -384,6 +384,7 @@ let UsersService = class UsersService {
             console.log(token);
             const SECRET_KEY = process.env.SECRET_KEY;
             const user = await this.userModel.findOne({ token: token });
+            console.log(user);
             if (!user) {
                 throw new http_errors_1.NotFound('User not found');
             }
