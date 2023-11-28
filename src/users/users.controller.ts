@@ -172,7 +172,9 @@ export class UsersController {
   @ApiBearerAuth('BearerAuthMethod')
   @Delete('/photo/:id')
   async deleteImage(@Param('id') id: string, @Req() req: any): Promise<User> {
+    console.log(req.headers);
     const user = await this.usersService.findToken(req);
+    console.log(user);
     await this.cloudinaryService.deleteImage(user, id);
     return await this.usersService.findById(user.id);
   }

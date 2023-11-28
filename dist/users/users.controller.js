@@ -70,7 +70,9 @@ let UsersController = class UsersController {
         return await this.usersService.findById(user.id);
     }
     async deleteImage(id, req) {
+        console.log(req.headers);
         const user = await this.usersService.findToken(req);
+        console.log(user);
         await this.cloudinaryService.deleteImage(user, id);
         return await this.usersService.findById(user.id);
     }

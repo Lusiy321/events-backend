@@ -68,6 +68,7 @@ let CloudinaryService = class CloudinaryService {
     async deleteImage(user, photoId) {
         return new Promise(async (resolve, reject) => {
             try {
+                console.log(photoId);
                 cloudinary_1.v2.uploader.destroy(photoId, Object.assign({}, this.cloudinaryConfig), async (error, result) => {
                     if (error) {
                         reject(error);
