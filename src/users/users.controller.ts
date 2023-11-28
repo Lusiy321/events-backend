@@ -164,7 +164,7 @@ export class UsersController {
     const user = await this.usersService.findToken(req);
     console.log(images);
     await this.cloudinaryService.uploadAvatar(user, images);
-    await this.cloudinaryService.deleteFilesInUploadsFolder();
+    // await this.cloudinaryService.deleteFilesInUploadsFolder();
     return await this.usersService.findById(user.id);
   }
 

@@ -389,13 +389,13 @@ export class UsersService {
       const [bearer, token] = authorization.split(' ');
       if (bearer !== 'Bearer') {
         throw new Unauthorized('Not authorized');
+      } else {
+        const SECRET_KEY = process.env.SECRET_KEY;
+        const findId = verify(token, SECRET_KEY) as JwtPayload;
+        const user = await this.userModel.findById({ _id: findId.id });
+
+        return user;
       }
-
-      const SECRET_KEY = process.env.SECRET_KEY;
-      const findId = verify(token, SECRET_KEY) as JwtPayload;
-      const user = await this.userModel.findById({ _id: findId.id });
-
-      return user;
     } catch (e) {
       throw new Unauthorized('jwt expired');
     }
@@ -422,6 +422,7 @@ export class UsersService {
       if (bearer !== 'Bearer') {
         throw new Unauthorized('Not authorized');
       }
+      console.log(token);
       const SECRET_KEY = process.env.SECRET_KEY;
       const user = await this.userModel.findOne({ token: token });
       if (!user) {

@@ -351,10 +351,12 @@ let UsersService = class UsersService {
             if (bearer !== 'Bearer') {
                 throw new http_errors_1.Unauthorized('Not authorized');
             }
-            const SECRET_KEY = process.env.SECRET_KEY;
-            const findId = (0, jsonwebtoken_1.verify)(token, SECRET_KEY);
-            const user = await this.userModel.findById({ _id: findId.id });
-            return user;
+            else {
+                const SECRET_KEY = process.env.SECRET_KEY;
+                const findId = (0, jsonwebtoken_1.verify)(token, SECRET_KEY);
+                const user = await this.userModel.findById({ _id: findId.id });
+                return user;
+            }
         }
         catch (e) {
             throw new http_errors_1.Unauthorized('jwt expired');
@@ -379,6 +381,7 @@ let UsersService = class UsersService {
             if (bearer !== 'Bearer') {
                 throw new http_errors_1.Unauthorized('Not authorized');
             }
+            console.log(token);
             const SECRET_KEY = process.env.SECRET_KEY;
             const user = await this.userModel.findOne({ token: token });
             if (!user) {
