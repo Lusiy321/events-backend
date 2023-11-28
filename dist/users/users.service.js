@@ -345,18 +345,21 @@ let UsersService = class UsersService {
         }
     }
     async findToken(req) {
-        const { authorization = '' } = req.headers;
-        const [bearer, token] = authorization.split(' ');
-        if (bearer !== 'Bearer') {
-            throw new http_errors_1.Unauthorized('Not authorized');
+        try {
+            const { authorization = '' } = req.headers;
+            const [bearer, token] = authorization.split(' ');
+            if (bearer !== 'Bearer') {
+                throw new http_errors_1.Unauthorized('Not authorized');
+            }
+            else {
+                const SECRET_KEY = process.env.SECRET_KEY;
+                const findId = (0, jsonwebtoken_1.verify)(token, SECRET_KEY);
+                const user = await this.userModel.findById({ _id: findId.id });
+                return user;
+            }
         }
-        else {
-            console.log(token);
-            const SECRET_KEY = process.env.SECRET_KEY;
-            const findId = (0, jsonwebtoken_1.verify)(token, SECRET_KEY);
-            const user = await this.userModel.findById({ _id: findId.id });
-            console.log(user);
-            return user;
+        catch (e) {
+            throw new http_errors_1.Unauthorized('jwt expired');
         }
     }
     async createToken(authUser) {
@@ -372,32 +375,27 @@ let UsersService = class UsersService {
         return authentificationUser;
     }
     async refreshAccessToken(req) {
-        try {
-            const { authorization = '' } = req.headers;
-            const [bearer, token] = authorization.split(' ');
-            if (bearer !== 'Bearer') {
-                throw new http_errors_1.Unauthorized('Not authorized');
-            }
-            console.log(token);
-            const SECRET_KEY = process.env.SECRET_KEY;
-            const user = await this.userModel.findOne({ token: token });
-            console.log(user);
-            if (!user) {
-                throw new http_errors_1.NotFound('User not found');
-            }
-            const payload = {
-                id: user._id,
-            };
-            const tokenRef = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY, { expiresIn: '24h' });
-            await this.userModel.findByIdAndUpdate(user._id, { token: tokenRef });
-            const authentificationUser = await this.userModel.findById({
-                _id: user.id,
-            });
-            return authentificationUser;
+        const { authorization = '' } = req.headers;
+        const [bearer, token] = authorization.split(' ');
+        if (bearer !== 'Bearer') {
+            throw new http_errors_1.Unauthorized('Not authorized');
         }
-        catch (error) {
-            throw new http_errors_1.BadRequest('Invalid refresh token');
+        console.log(token);
+        const SECRET_KEY = process.env.SECRET_KEY;
+        const user = await this.userModel.findOne({ token: token });
+        console.log(user);
+        if (!user) {
+            throw new http_errors_1.NotFound('User not found');
         }
+        const payload = {
+            id: user._id,
+        };
+        const tokenRef = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY, { expiresIn: '24h' });
+        await this.userModel.findByIdAndUpdate(user._id, { token: tokenRef });
+        const authentificationUser = await this.userModel.findById({
+            _id: user.id,
+        });
+        return authentificationUser;
     }
     async createCategory(category) {
         try {

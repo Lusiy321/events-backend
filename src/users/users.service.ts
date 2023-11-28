@@ -384,22 +384,20 @@ export class UsersService {
   }
   // JWT TOKEN
   async findToken(req: any): Promise<User> {
-    // try {
-    const { authorization = '' } = req.headers;
-    const [bearer, token] = authorization.split(' ');
-    if (bearer !== 'Bearer') {
-      throw new Unauthorized('Not authorized');
-    } else {
-      console.log(token);
-      const SECRET_KEY = process.env.SECRET_KEY;
-      const findId = verify(token, SECRET_KEY) as JwtPayload;
-      const user = await this.userModel.findById({ _id: findId.id });
-      console.log(user);
-      return user;
+    try {
+      const { authorization = '' } = req.headers;
+      const [bearer, token] = authorization.split(' ');
+      if (bearer !== 'Bearer') {
+        throw new Unauthorized('Not authorized');
+      } else {
+        const SECRET_KEY = process.env.SECRET_KEY;
+        const findId = verify(token, SECRET_KEY) as JwtPayload;
+        const user = await this.userModel.findById({ _id: findId.id });
+        return user;
+      }
+    } catch (e) {
+      throw new Unauthorized('jwt expired');
     }
-    // } catch (e) {
-    //   throw new Unauthorized('jwt expired');
-    // }
   }
 
   async createToken(authUser: { _id: string }) {
@@ -416,32 +414,32 @@ export class UsersService {
   }
 
   async refreshAccessToken(req: any): Promise<User> {
-    try {
-      const { authorization = '' } = req.headers;
-      const [bearer, token] = authorization.split(' ');
+    // try {
+    const { authorization = '' } = req.headers;
+    const [bearer, token] = authorization.split(' ');
 
-      if (bearer !== 'Bearer') {
-        throw new Unauthorized('Not authorized');
-      }
-      console.log(token);
-      const SECRET_KEY = process.env.SECRET_KEY;
-      const user = await this.userModel.findOne({ token: token });
-      console.log(user);
-      if (!user) {
-        throw new NotFound('User not found');
-      }
-      const payload = {
-        id: user._id,
-      };
-      const tokenRef = sign(payload, SECRET_KEY, { expiresIn: '24h' });
-      await this.userModel.findByIdAndUpdate(user._id, { token: tokenRef });
-      const authentificationUser = await this.userModel.findById({
-        _id: user.id,
-      });
-      return authentificationUser;
-    } catch (error) {
-      throw new BadRequest('Invalid refresh token');
+    if (bearer !== 'Bearer') {
+      throw new Unauthorized('Not authorized');
     }
+    console.log(token);
+    const SECRET_KEY = process.env.SECRET_KEY;
+    const user = await this.userModel.findOne({ token: token });
+    console.log(user);
+    if (!user) {
+      throw new NotFound('User not found');
+    }
+    const payload = {
+      id: user._id,
+    };
+    const tokenRef = sign(payload, SECRET_KEY, { expiresIn: '24h' });
+    await this.userModel.findByIdAndUpdate(user._id, { token: tokenRef });
+    const authentificationUser = await this.userModel.findById({
+      _id: user.id,
+    });
+    return authentificationUser;
+    // } catch (error) {
+    //   throw new BadRequest('Invalid refresh token');
+    // }
   }
   // CATEGORY
   async createCategory(category: CreateCategoryDto): Promise<Category> {
