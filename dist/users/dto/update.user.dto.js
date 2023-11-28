@@ -69,7 +69,7 @@ __decorate([
         },
         description: 'User master photo',
     }),
-    __metadata("design:type", String)
+    __metadata("design:type", Object)
 ], UpdateUserDto.prototype, "master_photo", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
@@ -79,7 +79,7 @@ __decorate([
         },
         description: 'User master photo',
     }),
-    __metadata("design:type", String)
+    __metadata("design:type", Object)
 ], UpdateUserDto.prototype, "avatar", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
@@ -89,8 +89,14 @@ __decorate([
     __metadata("design:type", Array)
 ], UpdateUserDto.prototype, "photo", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: ['https://'], description: 'User photo collection' }),
-    __metadata("design:type", Array)
+    (0, swagger_1.ApiProperty)({
+        example: {
+            publicId: '1',
+            url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kglf7c13u3aagffbdlmo.png',
+        },
+        description: 'User master photo',
+    }),
+    __metadata("design:type", Object)
 ], UpdateUserDto.prototype, "video", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({

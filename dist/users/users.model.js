@@ -188,7 +188,16 @@ __decorate([
 ], User.prototype, "photo", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        example: ['https://', 'https://'],
+        example: [
+            {
+                publicId: '1',
+                url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kglf7c13u3aagffbdlmo.png',
+            },
+            {
+                publicId: '2',
+                url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kidn51ekkbiuqne4mbpl.jpg',
+            },
+        ],
         description: 'User video',
     }),
     (0, mongoose_1.Prop)({

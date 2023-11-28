@@ -26,7 +26,7 @@ import { Model } from 'mongoose';
 import { Categories } from './dto/caterory.interface';
 import { verify } from './dto/verify.user.dto';
 export type UserDocument = User & Document;
-interface Photo {
+export interface Photo {
     publicId: string;
     url: string;
 }
@@ -46,7 +46,7 @@ export declare class User extends Model<User> {
     master_photo: Photo;
     avatar: Photo;
     photo: Photo[];
-    video: Array<string>;
+    video: Photo[];
     category: Array<Categories>;
     isOnline: boolean;
     paid: boolean;
@@ -62,4 +62,3 @@ export declare const UserSchema: import("mongoose").Schema<User, Model<User, any
 }, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, User, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<User>> & import("mongoose").FlatRecord<User> & {
     _id: import("mongoose").Types.ObjectId;
 }>;
-export {};

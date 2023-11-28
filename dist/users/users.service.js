@@ -375,27 +375,32 @@ let UsersService = class UsersService {
         return authentificationUser;
     }
     async refreshAccessToken(req) {
-        const { authorization = '' } = req.headers;
-        const [bearer, token] = authorization.split(' ');
-        if (bearer !== 'Bearer') {
-            throw new http_errors_1.Unauthorized('Not authorized');
+        try {
+            const { authorization = '' } = req.headers;
+            const [bearer, token] = authorization.split(' ');
+            if (bearer !== 'Bearer') {
+                throw new http_errors_1.Unauthorized('Not authorized');
+            }
+            console.log(token);
+            const SECRET_KEY = process.env.SECRET_KEY;
+            const user = await this.userModel.findOne({ token: token });
+            console.log(user);
+            if (!user) {
+                throw new http_errors_1.NotFound('User not found');
+            }
+            const payload = {
+                id: user._id,
+            };
+            const tokenRef = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY, { expiresIn: '24h' });
+            await this.userModel.findByIdAndUpdate(user._id, { token: tokenRef });
+            const authentificationUser = await this.userModel.findById({
+                _id: user.id,
+            });
+            return authentificationUser;
         }
-        console.log(token);
-        const SECRET_KEY = process.env.SECRET_KEY;
-        const user = await this.userModel.findOne({ token: token });
-        console.log(user);
-        if (!user) {
-            throw new http_errors_1.NotFound('User not found');
+        catch (error) {
+            throw new http_errors_1.BadRequest('Invalid refresh token');
         }
-        const payload = {
-            id: user._id,
-        };
-        const tokenRef = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY, { expiresIn: '24h' });
-        await this.userModel.findByIdAndUpdate(user._id, { token: tokenRef });
-        const authentificationUser = await this.userModel.findById({
-            _id: user.id,
-        });
-        return authentificationUser;
     }
     async createCategory(category) {
         try {

@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
+import { Photo } from '../users.model';
 
 export class UpdateUserDto {
   @ApiProperty({ example: 'fksldflk88789dksfjl', description: 'User ID' })
@@ -34,7 +35,7 @@ export class UpdateUserDto {
     },
     description: 'User master photo',
   })
-  readonly master_photo: string;
+  readonly master_photo: Photo;
   @ApiProperty({
     example: {
       publicId: '1',
@@ -42,14 +43,20 @@ export class UpdateUserDto {
     },
     description: 'User master photo',
   })
-  readonly avatar: string;
+  readonly avatar: Photo;
   @ApiProperty({
     example: [{ id: '1', url: 'https://' }],
     description: 'User photo collection',
   })
   readonly photo: Array<object>;
-  @ApiProperty({ example: ['https://'], description: 'User photo collection' })
-  readonly video: Array<string>;
+  @ApiProperty({
+    example: {
+      publicId: '1',
+      url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kglf7c13u3aagffbdlmo.png',
+    },
+    description: 'User master photo',
+  })
+  readonly video: Photo;
   @ApiProperty({
     example: [
       {

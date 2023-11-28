@@ -1,3 +1,4 @@
+import { Photo } from '../users.model';
 export declare class UpdateUserDto {
     id: string;
     readonly firstName: string;
@@ -10,10 +11,10 @@ export declare class UpdateUserDto {
     readonly viber: string;
     readonly whatsapp: string;
     readonly location: string;
-    readonly master_photo: string;
-    readonly avatar: string;
+    readonly master_photo: Photo;
+    readonly avatar: Photo;
     readonly photo: Array<object>;
-    readonly video: Array<string>;
+    readonly video: Photo;
     readonly category: Array<string>;
     readonly price: string;
 }

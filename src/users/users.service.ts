@@ -414,32 +414,32 @@ export class UsersService {
   }
 
   async refreshAccessToken(req: any): Promise<User> {
-    // try {
-    const { authorization = '' } = req.headers;
-    const [bearer, token] = authorization.split(' ');
+    try {
+      const { authorization = '' } = req.headers;
+      const [bearer, token] = authorization.split(' ');
 
-    if (bearer !== 'Bearer') {
-      throw new Unauthorized('Not authorized');
+      if (bearer !== 'Bearer') {
+        throw new Unauthorized('Not authorized');
+      }
+      console.log(token);
+      const SECRET_KEY = process.env.SECRET_KEY;
+      const user = await this.userModel.findOne({ token: token });
+      console.log(user);
+      if (!user) {
+        throw new NotFound('User not found');
+      }
+      const payload = {
+        id: user._id,
+      };
+      const tokenRef = sign(payload, SECRET_KEY, { expiresIn: '24h' });
+      await this.userModel.findByIdAndUpdate(user._id, { token: tokenRef });
+      const authentificationUser = await this.userModel.findById({
+        _id: user.id,
+      });
+      return authentificationUser;
+    } catch (error) {
+      throw new BadRequest('Invalid refresh token');
     }
-    console.log(token);
-    const SECRET_KEY = process.env.SECRET_KEY;
-    const user = await this.userModel.findOne({ token: token });
-    console.log(user);
-    if (!user) {
-      throw new NotFound('User not found');
-    }
-    const payload = {
-      id: user._id,
-    };
-    const tokenRef = sign(payload, SECRET_KEY, { expiresIn: '24h' });
-    await this.userModel.findByIdAndUpdate(user._id, { token: tokenRef });
-    const authentificationUser = await this.userModel.findById({
-      _id: user.id,
-    });
-    return authentificationUser;
-    // } catch (error) {
-    //   throw new BadRequest('Invalid refresh token');
-    // }
   }
   // CATEGORY
   async createCategory(category: CreateCategoryDto): Promise<Category> {
