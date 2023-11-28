@@ -80,7 +80,6 @@ export class CloudinaryService {
   async deleteImage(user: User, photoId: string): Promise<void> {
     return new Promise(async (resolve, reject) => {
       try {
-        console.log(photoId);
         cloudinary.uploader.destroy(
           photoId,
           { ...this.cloudinaryConfig },

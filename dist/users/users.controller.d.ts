@@ -23,7 +23,7 @@ export declare class UsersController {
     update(data: UpdateUserDto, request: any): Promise<User>;
     uploadPhoto(req: any, images: Express.Multer.File[]): Promise<User>;
     uploadUserAvatar(req: any, images: Express.Multer.File[]): Promise<User>;
-    deleteImage(id: string, req: any): Promise<User>;
+    deleteImage(id: any, req: any): Promise<User>;
     deleteAvatarImage(req: any): Promise<User>;
     googleLogin(): Promise<void>;
     googleAuthRedirect(res: any, req: any): Promise<any>;

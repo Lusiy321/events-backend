@@ -170,12 +170,10 @@ export class UsersController {
   @ApiOperation({ summary: 'Delete user photo' })
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')
-  @Delete('/photo/:id')
-  async deleteImage(@Param('id') id: string, @Req() req: any): Promise<User> {
-    console.log(req.headers);
+  @Delete('photo')
+  async deleteImage(@Body() id: any, @Req() req: any): Promise<User> {
     const user = await this.usersService.findToken(req);
-    console.log(user);
-    await this.cloudinaryService.deleteImage(user, id);
+    await this.cloudinaryService.deleteImage(user, id.id);
     return await this.usersService.findById(user.id);
   }
 
