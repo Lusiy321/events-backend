@@ -115,7 +115,7 @@ export class UsersController {
   @ApiBearerAuth('BearerAuthMethod')
   @Post('upload')
   @UseInterceptors(
-    FilesInterceptor('file', 1, {
+    FilesInterceptor('file', 5, {
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, cb) => {
@@ -162,7 +162,6 @@ export class UsersController {
     @UploadedFiles() images: Express.Multer.File[],
   ): Promise<User> {
     const user = await this.usersService.findToken(req);
-    console.log(images);
     await this.cloudinaryService.uploadAvatar(user, images);
     // await this.cloudinaryService.deleteFilesInUploadsFolder();
     return await this.usersService.findById(user.id);

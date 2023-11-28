@@ -66,7 +66,6 @@ let UsersController = class UsersController {
     }
     async uploadUserAvatar(req, images) {
         const user = await this.usersService.findToken(req);
-        console.log(images);
         await this.cloudinaryService.uploadAvatar(user, images);
         return await this.usersService.findById(user.id);
     }
@@ -198,7 +197,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
     (0, common_1.Post)('upload'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)('file', 1, {
+    (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)('file', 5, {
         storage: (0, multer_1.diskStorage)({
             destination: './uploads',
             filename: (req, file, cb) => {

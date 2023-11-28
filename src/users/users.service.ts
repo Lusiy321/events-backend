@@ -16,6 +16,7 @@ import { Category } from './category.model';
 import { CreateCategoryDto } from './dto/create.category.dto';
 import { Subcategories } from './utils/subcategory.interface';
 import { v4 as uuidv4 } from 'uuid';
+import { Categories, Subcategory } from './dto/caterory.interface';
 
 @Injectable()
 export class UsersService {
@@ -297,7 +298,6 @@ export class UsersService {
       whatsapp,
       location,
       master_photo,
-      photo,
       video,
       category,
       price,
@@ -319,7 +319,6 @@ export class UsersService {
         whatsapp ||
         location ||
         master_photo ||
-        photo ||
         video ||
         category ||
         price
@@ -327,15 +326,74 @@ export class UsersService {
         if (category) {
           const findUser = await this.userModel.findById(findId.id).exec();
           const arrCategory = findUser.category;
-          arrCategory.push(...category); // сделать проверку на существующие категории
+          function addSubcategory(
+            categories: Category[], // Исходный массив из базы данных
+            categoryId: string, // ID категории
+            newSubcategory: Subcategory, // Обьект подкатегории из того что выбрал пользователь
+            newCategory: Categories[], // Массив с новой категорией
+          ) {
+            // Если ничего нет в исходном массиве
+            if (Array.isArray(categories) && categories.length === 0) {
+              categories.push(...newCategory);
+
+              return categories;
+            }
+            const updatedCategories = categories.map((category) => {
+              if (category._id === categoryId) {
+                // Поиск по id внутри подкатегорий
+                const existingSubcategory = category.subcategories.find(
+                  (sub) => sub.id === newSubcategory.id,
+                );
+
+                // Если подкатегория существует, вернем исходную категорию
+                if (existingSubcategory) {
+                  return category;
+                }
+
+                // Если подкатегория с указанным id отсутствует, добавим новую подкатегорию
+                return {
+                  ...category,
+                  subcategories: [...category.subcategories, newSubcategory],
+                };
+              } else if (category._id !== categoryId) {
+                categories.push(...newCategory);
+                return categories;
+              }
+            });
+            return updatedCategories;
+          }
+
+          const newCategoryArr = addSubcategory(
+            arrCategory,
+            category[0]._id,
+            category[0].subcategories[0],
+            category,
+          );
+          console.log(newCategoryArr);
           await this.userModel.findByIdAndUpdate(
             { _id: findId.id },
             {
-              $set: { category: arrCategory },
+              $set: { category: newCategoryArr },
             },
           );
+          return await this.userModel.findById({ _id: findId.id });
         }
-
+        if (video) {
+          const findUser = await this.userModel.findById(findId.id).exec();
+          const arrVideo = findUser.video;
+          if (arrVideo.length <= 4) {
+            arrVideo.push(...video);
+            await this.userModel.findByIdAndUpdate(
+              { _id: findId.id },
+              {
+                $set: { video: arrVideo },
+              },
+            );
+            return await this.userModel.findById({ _id: findId.id });
+          } else {
+            throw new NotFound('To many videos');
+          }
+        }
         await this.userModel.findByIdAndUpdate(
           { _id: findId.id },
           {
@@ -349,8 +407,6 @@ export class UsersService {
             whatsapp,
             location,
             master_photo,
-            photo,
-            video,
             price,
           },
         );
@@ -421,10 +477,10 @@ export class UsersService {
       if (bearer !== 'Bearer') {
         throw new Unauthorized('Not authorized');
       }
-      console.log(token);
+
       const SECRET_KEY = process.env.SECRET_KEY;
       const user = await this.userModel.findOne({ token: token });
-      console.log(user);
+
       if (!user) {
         throw new NotFound('User not found');
       }

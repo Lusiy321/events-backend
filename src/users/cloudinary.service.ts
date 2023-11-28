@@ -95,7 +95,6 @@ export class CloudinaryService {
                 {
                   $set: {
                     photo: updatedPhotos,
-                    master_photo: updatedPhotos[0],
                   },
                 },
               );

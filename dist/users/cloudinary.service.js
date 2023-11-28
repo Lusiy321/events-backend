@@ -77,7 +77,6 @@ let CloudinaryService = class CloudinaryService {
                         await this.userModel.findByIdAndUpdate({ _id: user.id }, {
                             $set: {
                                 photo: updatedPhotos,
-                                master_photo: updatedPhotos[0],
                             },
                         });
                         resolve();

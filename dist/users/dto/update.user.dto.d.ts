@@ -1,4 +1,5 @@
 import { Photo } from '../users.model';
+import { Categories } from './caterory.interface';
 export declare class UpdateUserDto {
     id: string;
     readonly firstName: string;
@@ -12,9 +13,7 @@ export declare class UpdateUserDto {
     readonly whatsapp: string;
     readonly location: string;
     readonly master_photo: Photo;
-    readonly avatar: Photo;
-    readonly photo: Array<object>;
-    readonly video: Photo;
-    readonly category: Array<string>;
+    readonly video: Photo[];
+    readonly category: Categories[];
     readonly price: string;
 }

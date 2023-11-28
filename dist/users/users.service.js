@@ -276,7 +276,7 @@ let UsersService = class UsersService {
         }
     }
     async update(user, req) {
-        const { firstName, lastName, title, description, phone, telegram, viber, whatsapp, location, master_photo, photo, video, category, price, } = user;
+        const { firstName, lastName, title, description, phone, telegram, viber, whatsapp, location, master_photo, video, category, price, } = user;
         const findId = await this.findToken(req);
         if (!findId) {
             throw new http_errors_1.Unauthorized('jwt expired');
@@ -292,17 +292,52 @@ let UsersService = class UsersService {
                 whatsapp ||
                 location ||
                 master_photo ||
-                photo ||
                 video ||
                 category ||
                 price) {
                 if (category) {
                     const findUser = await this.userModel.findById(findId.id).exec();
                     const arrCategory = findUser.category;
-                    arrCategory.push(...category);
+                    function addSubcategory(categories, categoryId, newSubcategory, newCategory) {
+                        if (Array.isArray(categories) && categories.length === 0) {
+                            categories.push(...newCategory);
+                            return categories;
+                        }
+                        const updatedCategories = categories.map((category) => {
+                            if (category._id === categoryId) {
+                                const existingSubcategory = category.subcategories.find((sub) => sub.id === newSubcategory.id);
+                                if (existingSubcategory) {
+                                    return category;
+                                }
+                                return Object.assign(Object.assign({}, category), { subcategories: [...category.subcategories, newSubcategory] });
+                            }
+                            else if (category._id !== categoryId) {
+                                categories.push(...newCategory);
+                                return categories;
+                            }
+                        });
+                        return updatedCategories;
+                    }
+                    const newCategoryArr = addSubcategory(arrCategory, category[0]._id, category[0].subcategories[0], category);
+                    console.log(newCategoryArr);
                     await this.userModel.findByIdAndUpdate({ _id: findId.id }, {
-                        $set: { category: arrCategory },
+                        $set: { category: newCategoryArr },
                     });
+                    return await this.userModel.findById({ _id: findId.id });
+                }
+                if (video) {
+                    const findUser = await this.userModel.findById(findId.id).exec();
+                    const arrVideo = findUser.video;
+                    if (arrVideo.length <= 4) {
+                        arrVideo.push(...video);
+                        await this.userModel.findByIdAndUpdate({ _id: findId.id }, {
+                            $set: { video: arrVideo },
+                        });
+                        return await this.userModel.findById({ _id: findId.id });
+                    }
+                    else {
+                        throw new http_errors_1.NotFound('To many videos');
+                    }
                 }
                 await this.userModel.findByIdAndUpdate({ _id: findId.id }, {
                     firstName,
@@ -315,8 +350,6 @@ let UsersService = class UsersService {
                     whatsapp,
                     location,
                     master_photo,
-                    photo,
-                    video,
                     price,
                 });
                 const userUpdate = this.userModel.findById({ _id: findId.id });
@@ -381,10 +414,8 @@ let UsersService = class UsersService {
             if (bearer !== 'Bearer') {
                 throw new http_errors_1.Unauthorized('Not authorized');
             }
-            console.log(token);
             const SECRET_KEY = process.env.SECRET_KEY;
             const user = await this.userModel.findOne({ token: token });
-            console.log(user);
             if (!user) {
                 throw new http_errors_1.NotFound('User not found');
             }
