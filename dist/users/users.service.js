@@ -345,21 +345,18 @@ let UsersService = class UsersService {
         }
     }
     async findToken(req) {
-        try {
-            const { authorization = '' } = req.headers;
-            const [bearer, token] = authorization.split(' ');
-            if (bearer !== 'Bearer') {
-                throw new http_errors_1.Unauthorized('Not authorized');
-            }
-            else {
-                const SECRET_KEY = process.env.SECRET_KEY;
-                const findId = (0, jsonwebtoken_1.verify)(token, SECRET_KEY);
-                const user = await this.userModel.findById({ _id: findId.id });
-                return user;
-            }
+        const { authorization = '' } = req.headers;
+        const [bearer, token] = authorization.split(' ');
+        if (bearer !== 'Bearer') {
+            throw new http_errors_1.Unauthorized('Not authorized');
         }
-        catch (e) {
-            throw new http_errors_1.Unauthorized('jwt expired');
+        else {
+            console.log(token);
+            const SECRET_KEY = process.env.SECRET_KEY;
+            const findId = (0, jsonwebtoken_1.verify)(token, SECRET_KEY);
+            const user = await this.userModel.findById({ _id: findId.id });
+            console.log(user);
+            return user;
         }
     }
     async createToken(authUser) {
