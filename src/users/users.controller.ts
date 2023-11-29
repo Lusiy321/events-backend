@@ -167,7 +167,7 @@ export class UsersController {
     return await this.usersService.findById(user.id);
   }
 
-  @ApiOperation({ summary: 'Delete user photo' })
+  @ApiOperation({ summary: 'Delete user photo  (Body {id: kdsjfksdjfl})' })
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')
   @Delete('photo')
@@ -175,6 +175,14 @@ export class UsersController {
     const user = await this.usersService.findToken(req);
     await this.cloudinaryService.deleteImage(user, id.id);
     return await this.usersService.findById(user.id);
+  }
+
+  @ApiOperation({ summary: 'Delete user video (Body {id: kdsjfksdjfl})' })
+  @ApiResponse({ status: 200, type: User })
+  @ApiBearerAuth('BearerAuthMethod')
+  @Delete('video')
+  async deleteVideo(@Body() id: any, @Req() req: any): Promise<User> {
+    return await this.usersService.deleteUserVideo(id.id, req);
   }
 
   @ApiOperation({ summary: 'Delete user avatar' })

@@ -116,7 +116,7 @@ let UsersService = class UsersService {
             createdUser.setName(lowerCaseEmail);
             createdUser.setPassword(user.password);
             createdUser.save();
-            const verificationLink = `http://localhost:5000//verify-email/${createdUser._id}`;
+            const verificationLink = `${process.env.BACK_LINK}verify-email/${createdUser._id}`;
             await this.sendVerificationEmail(email, verificationLink);
             return await this.userModel.findById(createdUser._id);
         }
@@ -360,6 +360,23 @@ let UsersService = class UsersService {
             throw new http_errors_1.BadRequest(e.message);
         }
     }
+    async deleteUserVideo(id, req) {
+        const user = await this.findToken(req);
+        if (!user) {
+            throw new http_errors_1.Unauthorized('jwt expired');
+        }
+        try {
+            const videoArray = user.video;
+            const newArr = videoArray.filter((video) => video.publicId !== id);
+            await this.userModel.findByIdAndUpdate({ _id: user.id }, {
+                $set: { video: newArr },
+            });
+            return await this.userModel.findById({ _id: user.id });
+        }
+        catch (e) {
+            throw new http_errors_1.BadRequest(e.message);
+        }
+    }
     async findOrCreateUser(googleId, firstName, email) {
         try {
             let user = await this.userModel.findOne({ googleId });
@@ -400,7 +417,7 @@ let UsersService = class UsersService {
             id: authUser._id,
         };
         const SECRET_KEY = process.env.SECRET_KEY;
-        const token = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY, { expiresIn: '1m' });
+        const token = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY, { expiresIn: '10m' });
         await this.userModel.findByIdAndUpdate(authUser._id, { token });
         const authentificationUser = await this.userModel.findById({
             _id: authUser._id,

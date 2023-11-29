@@ -24,6 +24,7 @@ export declare class UsersController {
     uploadPhoto(req: any, images: Express.Multer.File[]): Promise<User>;
     uploadUserAvatar(req: any, images: Express.Multer.File[]): Promise<User>;
     deleteImage(id: any, req: any): Promise<User>;
+    deleteVideo(id: any, req: any): Promise<User>;
     deleteAvatarImage(req: any): Promise<User>;
     googleLogin(): Promise<void>;
     googleAuthRedirect(res: any, req: any): Promise<any>;

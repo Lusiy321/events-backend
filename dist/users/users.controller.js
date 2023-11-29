@@ -74,6 +74,9 @@ let UsersController = class UsersController {
         await this.cloudinaryService.deleteImage(user, id.id);
         return await this.usersService.findById(user.id);
     }
+    async deleteVideo(id, req) {
+        return await this.usersService.deleteUserVideo(id.id, req);
+    }
     async deleteAvatarImage(req) {
         const user = await this.usersService.findToken(req);
         await this.cloudinaryService.deleteAvatarImage(user);
@@ -239,7 +242,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "uploadUserAvatar", null);
 __decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Delete user photo' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete user photo  (Body {id: kdsjfksdjfl})' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
     (0, common_1.Delete)('photo'),
@@ -249,6 +252,17 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "deleteImage", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Delete user video (Body {id: kdsjfksdjfl})' }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
+    (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
+    (0, common_1.Delete)('video'),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "deleteVideo", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Delete user avatar' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
