@@ -38,6 +38,7 @@ import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from './cloudinary.service';
 import { diskStorage } from 'multer';
 import * as path from 'path';
+import { DelUserMediaDto } from './dto/delete.user.dto';
 
 @ApiTags('User')
 @Controller('users')
@@ -171,7 +172,10 @@ export class UsersController {
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')
   @Delete('photo')
-  async deleteImage(@Body() id: any, @Req() req: any): Promise<User> {
+  async deleteImage(
+    @Body() id: DelUserMediaDto,
+    @Req() req: any,
+  ): Promise<User> {
     const user = await this.usersService.findToken(req);
     console.log(id);
     await this.cloudinaryService.deleteImage(user, id.id);
@@ -182,7 +186,10 @@ export class UsersController {
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')
   @Delete('video')
-  async deleteVideo(@Body() id: any, @Req() req: any): Promise<User> {
+  async deleteVideo(
+    @Body() id: DelUserMediaDto,
+    @Req() req: any,
+  ): Promise<User> {
     return await this.usersService.deleteUserVideo(id.id, req);
   }
 

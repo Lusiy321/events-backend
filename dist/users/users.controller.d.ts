@@ -9,6 +9,7 @@ import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
 import { Category } from './category.model';
 import { CreateCategoryDto } from './dto/create.category.dto';
 import { CloudinaryService } from './cloudinary.service';
+import { DelUserMediaDto } from './dto/delete.user.dto';
 export declare class UsersController {
     private readonly usersService;
     private readonly cloudinaryService;
@@ -23,8 +24,8 @@ export declare class UsersController {
     update(data: UpdateUserDto, request: any): Promise<User>;
     uploadPhoto(req: any, images: Express.Multer.File[]): Promise<User>;
     uploadUserAvatar(req: any, images: Express.Multer.File[]): Promise<User>;
-    deleteImage(id: any, req: any): Promise<User>;
-    deleteVideo(id: any, req: any): Promise<User>;
+    deleteImage(id: DelUserMediaDto, req: any): Promise<User>;
+    deleteVideo(id: DelUserMediaDto, req: any): Promise<User>;
     deleteAvatarImage(req: any): Promise<User>;
     googleLogin(): Promise<void>;
     googleAuthRedirect(res: any, req: any): Promise<any>;

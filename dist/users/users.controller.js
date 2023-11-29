@@ -30,6 +30,7 @@ const platform_express_1 = require("@nestjs/platform-express");
 const cloudinary_service_1 = require("./cloudinary.service");
 const multer_1 = require("multer");
 const path = require("path");
+const delete_user_dto_1 = require("./dto/delete.user.dto");
 let UsersController = class UsersController {
     constructor(usersService, cloudinaryService) {
         this.usersService = usersService;
@@ -250,7 +251,7 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:paramtypes", [delete_user_dto_1.DelUserMediaDto, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "deleteImage", null);
 __decorate([
@@ -261,7 +262,7 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:paramtypes", [delete_user_dto_1.DelUserMediaDto, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "deleteVideo", null);
 __decorate([
