@@ -71,6 +71,7 @@ let UsersController = class UsersController {
     }
     async deleteImage(id, req) {
         const user = await this.usersService.findToken(req);
+        console.log(id);
         await this.cloudinaryService.deleteImage(user, id.id);
         return await this.usersService.findById(user.id);
     }
