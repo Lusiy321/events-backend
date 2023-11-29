@@ -77,7 +77,7 @@ let UsersController = class UsersController {
         return await this.usersService.findById(user.id);
     }
     async deleteVideo(id, req) {
-        return await this.usersService.deleteUserVideo(id.id, req);
+        return await this.usersService.deleteUserVideo(id, req);
     }
     async deleteAvatarImage(req) {
         const user = await this.usersService.findToken(req);
@@ -247,7 +247,7 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Delete user photo  (Body {id: kdsjfksdjfl})' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
-    (0, common_1.Delete)('photo'),
+    (0, common_1.Put)('photo'),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
@@ -255,14 +255,14 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "deleteImage", null);
 __decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Delete user video (Body {id: kdsjfksdjfl})' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete user video' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
-    (0, common_1.Delete)('video'),
-    __param(0, (0, common_1.Body)()),
+    (0, common_1.Delete)('video/:id'),
+    __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [delete_user_dto_1.DelUserMediaDto, Object]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "deleteVideo", null);
 __decorate([

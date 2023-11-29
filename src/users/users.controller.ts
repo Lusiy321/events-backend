@@ -171,7 +171,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Delete user photo  (Body {id: kdsjfksdjfl})' })
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')
-  @Delete('photo')
+  @Put('photo')
   async deleteImage(
     @Body() id: DelUserMediaDto,
     @Req() req: any,
@@ -182,15 +182,12 @@ export class UsersController {
     return await this.usersService.findById(user.id);
   }
 
-  @ApiOperation({ summary: 'Delete user video (Body {id: kdsjfksdjfl})' })
+  @ApiOperation({ summary: 'Delete user video' })
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')
-  @Delete('video')
-  async deleteVideo(
-    @Body() id: DelUserMediaDto,
-    @Req() req: any,
-  ): Promise<User> {
-    return await this.usersService.deleteUserVideo(id.id, req);
+  @Delete('video/:id')
+  async deleteVideo(@Param('id') id: string, @Req() req: any): Promise<User> {
+    return await this.usersService.deleteUserVideo(id, req);
   }
 
   @ApiOperation({ summary: 'Delete user avatar' })
