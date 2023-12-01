@@ -117,8 +117,8 @@ export class UsersService {
       createdUser.setName(lowerCaseEmail);
       createdUser.setPassword(user.password);
       createdUser.save();
-      const verificationLink = `${process.env.BACK_LINK}verify-email/${createdUser._id}`;
-      await this.sendVerificationEmail(email, verificationLink);
+      // const verificationLink = `${process.env.BACK_LINK}verify-email/${createdUser._id}`;
+      // await this.sendVerificationEmail(email, verificationLink);
       return await this.userModel.findById(createdUser._id);
     } catch (e) {
       throw new BadRequest(e.message);
@@ -130,6 +130,7 @@ export class UsersService {
     verificationLink: string,
   ): Promise<void> {
     const body = await verifyEmailMsg(verificationLink);
+    console.log(body);
     const msg = {
       to: email,
       from: 'lusiy321@gmail.com',

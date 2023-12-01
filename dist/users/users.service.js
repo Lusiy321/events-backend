@@ -117,8 +117,6 @@ let UsersService = class UsersService {
             createdUser.setName(lowerCaseEmail);
             createdUser.setPassword(user.password);
             createdUser.save();
-            const verificationLink = `${process.env.BACK_LINK}verify-email/${createdUser._id}`;
-            await this.sendVerificationEmail(email, verificationLink);
             return await this.userModel.findById(createdUser._id);
         }
         catch (e) {
@@ -127,6 +125,7 @@ let UsersService = class UsersService {
     }
     async sendVerificationEmail(email, verificationLink) {
         const body = await (0, email_schemas_1.verifyEmailMsg)(verificationLink);
+        console.log(body);
         const msg = {
             to: email,
             from: 'lusiy321@gmail.com',
