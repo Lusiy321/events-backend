@@ -177,7 +177,6 @@ export class UsersController {
     @Req() req: any,
   ): Promise<User> {
     const user = await this.usersService.findToken(req);
-    console.log(req.body, id);
     await this.cloudinaryService.deleteImage(user, id.id);
     return await this.usersService.findById(user.id);
   }

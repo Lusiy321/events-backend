@@ -17,6 +17,7 @@ import { CreateCategoryDto } from './dto/create.category.dto';
 import { Subcategories } from './utils/subcategory.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { Categories, Subcategory } from './dto/caterory.interface';
+import { verifyEmailMsg } from './utils/email.schemas';
 
 @Injectable()
 export class UsersService {
@@ -128,11 +129,12 @@ export class UsersService {
     email: string,
     verificationLink: string,
   ): Promise<void> {
+    const body = await verifyEmailMsg(verificationLink);
     const msg = {
       to: email,
       from: 'lusiy321@gmail.com',
-      subject: 'Email Verification from Swep',
-      html: `<p>Click the link below to verify your email:</p><p><a href="${verificationLink}">Click</a></p>`,
+      subject: 'Підтвердження e-mail Wechirka.com',
+      html: body,
     };
 
     try {
@@ -169,7 +171,7 @@ export class UsersService {
           html: `<div class="container">
           <h1>Your Password Has Been Changed</h1>
           <p>Click on the link below to go to your personal account:</p>
-          <p><a href="https://my-app-hazel-nine.vercel.app/ru/account/profile">Go to your account</a></p>
+          <p><a href="${process.env.FRONT_LINK}/profile">Go to your account</a></p>
       </div>`,
         };
         await sgMail.send(msg);
@@ -218,7 +220,7 @@ export class UsersService {
           html: `<div class="container">
           <h1>Your Password Has Been Changed</h1>
           <p>Click on the link below to go to your personal account:</p>
-          <p><a href="https://my-app-hazel-nine.vercel.app/ru/account/profile">Go to your account</a></p>
+          <p><a href="${process.env.FRONT_LINK}profile">Go to your account</a></p>
       </div>`,
         };
         return await sgMail.send(msg);
@@ -245,7 +247,7 @@ export class UsersService {
           html: `<div class="container">
           <h1>Your Password Has Been Changed</h1>
           <p>Click on the link below to go to your personal account:</p>
-          <p><a href="https://my-app-hazel-nine.vercel.app/ru/account/profile">Go to your account</a></p>
+          <p><a href="${process.env.FRONT_LINK}profile"> Go to your account </a></p>
       </div>`,
         };
         await sgMail.send(msg);
@@ -327,12 +329,11 @@ export class UsersService {
           const findUser = await this.userModel.findById(findId.id).exec();
           const arrCategory = findUser.category;
           function addSubcategory(
-            categories: Category[], // Исходный массив из базы данных
-            categoryId: string, // ID категории
-            newSubcategory: Subcategory, // Обьект подкатегории из того что выбрал пользователь
-            newCategory: Categories[], // Массив с новой категорией
+            categories: Category[],
+            categoryId: string,
+            newSubcategory: Subcategory,
+            newCategory: Categories[],
           ) {
-            // Если ничего нет в исходном массиве
             if (Array.isArray(categories) && categories.length === 0) {
               categories.push(...newCategory);
 
@@ -340,17 +341,14 @@ export class UsersService {
             }
             const updatedCategories = categories.map((category) => {
               if (category._id === categoryId) {
-                // Поиск по id внутри подкатегорий
                 const existingSubcategory = category.subcategories.find(
                   (sub) => sub.id === newSubcategory.id,
                 );
 
-                // Если подкатегория существует, вернем исходную категорию
                 if (existingSubcategory) {
                   return category;
                 }
 
-                // Если подкатегория с указанным id отсутствует, добавим новую подкатегорию
                 return {
                   ...category,
                   subcategories: [...category.subcategories, newSubcategory],
@@ -369,7 +367,6 @@ export class UsersService {
             category[0].subcategories[0],
             category,
           );
-          console.log(newCategoryArr);
           await this.userModel.findByIdAndUpdate(
             { _id: findId.id },
             {

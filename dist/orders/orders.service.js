@@ -83,6 +83,7 @@ let OrdersService = class OrdersService {
                     await this.mesengersService.sendNewTgOrder(user.tg_chat, order);
                     await this.mesengersService.sendNewViberOrder(user.viber, order);
                 }
+                await this.twilioService.sendSMS(order.phone, `Your verification code Wechirka.com: ${order.sms}`);
                 return await this.ordersModel.findById(createdOrder._id);
             }
         }

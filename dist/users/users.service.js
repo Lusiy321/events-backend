@@ -22,6 +22,7 @@ const jsonwebtoken_1 = require("jsonwebtoken");
 const sgMail = require("@sendgrid/mail");
 const category_model_1 = require("./category.model");
 const uuid_1 = require("uuid");
+const email_schemas_1 = require("./utils/email.schemas");
 let UsersService = class UsersService {
     constructor(userModel, categoryModel) {
         this.userModel = userModel;
@@ -125,11 +126,12 @@ let UsersService = class UsersService {
         }
     }
     async sendVerificationEmail(email, verificationLink) {
+        const body = await (0, email_schemas_1.verifyEmailMsg)(verificationLink);
         const msg = {
             to: email,
             from: 'lusiy321@gmail.com',
-            subject: 'Email Verification from Swep',
-            html: `<p>Click the link below to verify your email:</p><p><a href="${verificationLink}">Click</a></p>`,
+            subject: 'Підтвердження e-mail Wechirka.com',
+            html: body,
         };
         try {
             await sgMail.send(msg);
@@ -165,7 +167,7 @@ let UsersService = class UsersService {
                     html: `<div class="container">
           <h1>Your Password Has Been Changed</h1>
           <p>Click on the link below to go to your personal account:</p>
-          <p><a href="https://my-app-hazel-nine.vercel.app/ru/account/profile">Go to your account</a></p>
+          <p><a href="${process.env.FRONT_LINK}/profile">Go to your account</a></p>
       </div>`,
                 };
                 await sgMail.send(msg);
@@ -211,7 +213,7 @@ let UsersService = class UsersService {
                     html: `<div class="container">
           <h1>Your Password Has Been Changed</h1>
           <p>Click on the link below to go to your personal account:</p>
-          <p><a href="https://my-app-hazel-nine.vercel.app/ru/account/profile">Go to your account</a></p>
+          <p><a href="${process.env.FRONT_LINK}profile">Go to your account</a></p>
       </div>`,
                 };
                 return await sgMail.send(msg);
@@ -235,7 +237,7 @@ let UsersService = class UsersService {
                     html: `<div class="container">
           <h1>Your Password Has Been Changed</h1>
           <p>Click on the link below to go to your personal account:</p>
-          <p><a href="https://my-app-hazel-nine.vercel.app/ru/account/profile">Go to your account</a></p>
+          <p><a href="${process.env.FRONT_LINK}profile"> Go to your account </a></p>
       </div>`,
                 };
                 await sgMail.send(msg);
@@ -319,7 +321,6 @@ let UsersService = class UsersService {
                         return updatedCategories;
                     }
                     const newCategoryArr = addSubcategory(arrCategory, category[0]._id, category[0].subcategories[0], category);
-                    console.log(newCategoryArr);
                     await this.userModel.findByIdAndUpdate({ _id: findId.id }, {
                         $set: { category: newCategoryArr },
                     });

@@ -66,7 +66,6 @@ let CloudinaryService = class CloudinaryService {
         });
     }
     async deleteImage(user, photoId) {
-        console.log(photoId);
         return new Promise(async (resolve, reject) => {
             try {
                 cloudinary_1.v2.uploader.destroy(photoId, Object.assign({}, this.cloudinaryConfig), async (error, result) => {
@@ -174,9 +173,7 @@ let CloudinaryService = class CloudinaryService {
             files.forEach((file) => {
                 const filePath = path.join(uploadsFolderPath, file);
                 fs.unlinkSync(filePath);
-                console.log(`File ${file} deleted successfully`);
             });
-            console.log('All files deleted successfully');
         }
         catch (error) {
             console.error('Error deleting files:', error.message);
