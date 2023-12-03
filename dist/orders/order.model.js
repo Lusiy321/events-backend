@@ -158,6 +158,14 @@ __decorate([
     }),
     __metadata("design:type", Boolean)
 ], Orders.prototype, "verify", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '123564', description: 'SMS code' }),
+    (0, mongoose_1.Prop)({
+        type: Number,
+        default: 0,
+    }),
+    __metadata("design:type", Number)
+], Orders.prototype, "approve_count", void 0);
 exports.Orders = Orders = __decorate([
     (0, mongoose_1.Schema)({ versionKey: false, timestamps: true })
 ], Orders);

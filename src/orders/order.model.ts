@@ -132,6 +132,13 @@ export class Orders extends Model<Orders> {
     default: false,
   })
   verify: boolean;
+
+  @ApiProperty({ example: '123564', description: 'SMS code' })
+  @Prop({
+    type: Number,
+    default: 0,
+  })
+  approve_count: number;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Orders);

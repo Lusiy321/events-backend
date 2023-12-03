@@ -131,6 +131,7 @@ let MesengersService = class MesengersService {
         this.tg_bot = new TelegramBot(token, { polling: true });
         this.tg_bot.setMyCommands([
             { command: '/stop', description: 'Зупинити оповіщення' },
+            { command: '/orders', description: 'Управління замовленнями' },
         ]);
         const optURL = {
             reply_markup: {
@@ -162,6 +163,66 @@ let MesengersService = class MesengersService {
             const chatId = msg.chat.id;
             this.tg_bot.sendMessage(chatId, 'Будь ласка, натисніть кнопку "Відправити номер телефону" для надання номеру телефону.', optCont);
         });
+        this.tg_bot.onText(/\/orders/, async (msg) => {
+            const chatId = msg.chat.id;
+            const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
+            if (user) {
+                this.tg_bot.sendMessage(chatId, 'Ви не являетесь замовником', optCont);
+            }
+            const find = await this.ordersModel.find({ tg_chat: chatId }).exec();
+            if (Array.isArray(find) && find.length === 0) {
+                this.tg_bot.sendMessage(chatId, 'Ми не знайшли Ваших заявок, напевно ви не зарееструвались у чат боті (натисніть /start)', optCont);
+            }
+            else {
+                find.map((finded) => {
+                    const msg = `Замовник: ${finded.name}.
+      Дата події: ${finded.date}.
+      Категорія: ${finded.category[0].subcategories[0].name}.
+      Вимоги замовника: ${finded.description}.
+      Локація: ${finded.location}.
+      Гонорар: ${finded.price}₴.
+      Кількість відгуків: ${finded.approve_count}.`;
+                    if (finded.active === true) {
+                        const keyboard = {
+                            inline_keyboard: [
+                                [
+                                    {
+                                        text: 'Видалити',
+                                        callback_data: `delete:${finded._id}:${chatId}`,
+                                    },
+                                    {
+                                        text: 'Деактивувати',
+                                        callback_data: `deactive:${finded._id}:${chatId}`,
+                                    },
+                                ],
+                            ],
+                        };
+                        this.tg_bot.sendMessage(chatId, msg, {
+                            reply_markup: keyboard,
+                        });
+                    }
+                    else {
+                        const keyboard = {
+                            inline_keyboard: [
+                                [
+                                    {
+                                        text: 'Видалити',
+                                        callback_data: `delete:${finded._id}:${chatId}`,
+                                    },
+                                    {
+                                        text: 'Активувати',
+                                        callback_data: `active:${finded._id}:${chatId}`,
+                                    },
+                                ],
+                            ],
+                        };
+                        this.tg_bot.sendMessage(chatId, msg, {
+                            reply_markup: keyboard,
+                        });
+                    }
+                });
+            }
+        });
         this.tg_bot.on('contact', async (msg) => {
             const chatId = msg.chat.id;
             const phoneNumber = msg.contact.phone_number;
@@ -185,15 +246,38 @@ let MesengersService = class MesengersService {
         this.tg_bot.on('callback_query', async (query) => {
             const { data } = query;
             const [action, phone, chatId] = data.split(':');
-            if (action === 'accept') {
-                const order = await this.sendTgAgreement(phone, chatId);
-                if (order === true) {
-                    const msg = `${query.message.text} Ви погодились на це замовлення \n`;
-                    this.tg_bot.editMessageText(msg, {
-                        chat_id: chatId,
-                        message_id: query.message.message_id,
+            switch (action) {
+                case 'accept':
+                    const order = await this.sendTgAgreement(phone, chatId);
+                    if (order === true) {
+                        const msg = `${query.message.text} Ви погодились на це замовлення \n`;
+                        this.tg_bot.editMessageText(msg, {
+                            chat_id: chatId,
+                            message_id: query.message.message_id,
+                        });
+                    }
+                    break;
+                case 'delete':
+                    const delOrder = await this.ordersModel.findById(phone);
+                    this.tg_bot.sendMessage(chatId, `Ви видалили замевлення ${delOrder.description}.`, optURL);
+                    await this.ordersModel.findByIdAndRemove(phone);
+                    break;
+                case 'active':
+                    const actiOrder = await this.ordersModel.findById(phone);
+                    await this.ordersModel.findByIdAndUpdate(actiOrder.id, {
+                        active: true,
                     });
-                }
+                    this.tg_bot.sendMessage(chatId, `Ви активували замевлення ${actiOrder.description}.`, optURL);
+                    break;
+                case 'deactive':
+                    const deactiOrder = await this.ordersModel.findById(phone);
+                    await this.ordersModel.findByIdAndUpdate(deactiOrder.id, {
+                        active: false,
+                    });
+                    this.tg_bot.sendMessage(chatId, `Ви деактивували замевлення ${deactiOrder.description}.`, optURL);
+                    break;
+                default:
+                    break;
             }
         });
         this.tg_bot.onText(/\/stop/, async (msg) => {
@@ -218,7 +302,7 @@ let MesengersService = class MesengersService {
             const msg = `Доброго дня, з'явилось нове повідомлення по Вашому профілю. \n
       Замовник: ${order.name}.
       Дата події: ${order.date}.
-      Категорія: ${order.category[0].subcategories[0]}.
+      Категорія: ${order.category[0].subcategories[0].name}.
       Вимоги замовника: ${order.description}.
       Локація: ${order.location}.
       Гонорар: ${order.price}₴`;
@@ -386,7 +470,7 @@ let MesengersService = class MesengersService {
             const msg = `Доброго дня, з'явилось нове повідомлення за Вашим профілем. 
       Замовник: ${order.name}.
       Дата події: ${order.date}.
-      Категорія: ${order.category[0].subcategories[0]}.
+      Категорія: ${order.category[0].subcategories[0].name}.
       Вимоги замовника: ${order.description}.
       Локація: ${order.location}.
       Гонорар: ${order.price}₴`;

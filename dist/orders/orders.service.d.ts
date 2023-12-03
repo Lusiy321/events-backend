@@ -12,6 +12,8 @@ export declare class OrdersService {
     findAllOrders(): Promise<Orders[]>;
     findOrderById(id: string): Promise<Orders>;
     findOrderByPhone(phone: string): Promise<Orders>;
+    findOrderByTgChat(tg_chat: string): Promise<Orders>;
+    findOrderByViberChat(viberId: string): Promise<Orders>;
     generateSixDigitNumber(): Promise<number>;
     create(orderObj: CreateOrderDto): Promise<Orders>;
     verifyOrder(code: string): Promise<any>;

@@ -24,7 +24,7 @@ export class OrdersService {
       const find = await this.ordersModel.find().exec();
       return find;
     } catch (e) {
-      throw new NotFound('User not found');
+      throw new NotFound('Order not found');
     }
   }
 
@@ -33,7 +33,7 @@ export class OrdersService {
       const find = await this.ordersModel.findById({ _id: id }).exec();
       return find;
     } catch (e) {
-      throw new NotFound('User not found');
+      throw new NotFound('Order not found');
     }
   }
 
@@ -42,7 +42,25 @@ export class OrdersService {
       const find = await this.ordersModel.findOne({ phone: phone }).exec();
       return find;
     } catch (e) {
-      throw new NotFound('User not found');
+      throw new NotFound('Order not found');
+    }
+  }
+
+  async findOrderByTgChat(tg_chat: string): Promise<Orders> {
+    try {
+      const find = await this.ordersModel.find({ tg_chat: tg_chat }).exec();
+      return find;
+    } catch (e) {
+      throw new NotFound('Order not found');
+    }
+  }
+
+  async findOrderByViberChat(viberId: string): Promise<Orders> {
+    try {
+      const find = await this.ordersModel.find({ viber: viberId }).exec();
+      return find;
+    } catch (e) {
+      throw new NotFound('Order not found');
     }
   }
 
