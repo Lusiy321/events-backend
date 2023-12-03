@@ -309,7 +309,7 @@ export class MesengersService {
           const delOrder = await this.ordersModel.findById(phone);
           this.tg_bot.sendMessage(
             chatId,
-            `Ви видалили замевлення ${delOrder.description}.`,
+            `Ви видалили замевлення: ${delOrder.description}.`,
             optURL,
           );
           await this.ordersModel.findByIdAndRemove(phone);
@@ -321,7 +321,7 @@ export class MesengersService {
           });
           this.tg_bot.sendMessage(
             chatId,
-            `Ви активували замевлення ${actiOrder.description}.`,
+            `Ви активували замевлення: ${actiOrder.description}.`,
             optURL,
           );
 
@@ -333,7 +333,7 @@ export class MesengersService {
           });
           this.tg_bot.sendMessage(
             chatId,
-            `Ви деактивували замевлення ${deactiOrder.description}.`,
+            `Ви деактивували замевлення: ${deactiOrder.description}.`,
             optURL,
           );
           break;

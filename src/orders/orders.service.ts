@@ -46,24 +46,6 @@ export class OrdersService {
     }
   }
 
-  async findOrderByTgChat(tg_chat: string): Promise<Orders> {
-    try {
-      const find = await this.ordersModel.find({ tg_chat: tg_chat }).exec();
-      return find;
-    } catch (e) {
-      throw new NotFound('Order not found');
-    }
-  }
-
-  async findOrderByViberChat(viberId: string): Promise<Orders> {
-    try {
-      const find = await this.ordersModel.find({ viber: viberId }).exec();
-      return find;
-    } catch (e) {
-      throw new NotFound('Order not found');
-    }
-  }
-
   async generateSixDigitNumber() {
     const min = 100000;
     const max = 999999;

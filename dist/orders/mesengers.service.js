@@ -259,7 +259,7 @@ let MesengersService = class MesengersService {
                     break;
                 case 'delete':
                     const delOrder = await this.ordersModel.findById(phone);
-                    this.tg_bot.sendMessage(chatId, `Ви видалили замевлення ${delOrder.description}.`, optURL);
+                    this.tg_bot.sendMessage(chatId, `Ви видалили замевлення: ${delOrder.description}.`, optURL);
                     await this.ordersModel.findByIdAndRemove(phone);
                     break;
                 case 'active':
@@ -267,14 +267,14 @@ let MesengersService = class MesengersService {
                     await this.ordersModel.findByIdAndUpdate(actiOrder.id, {
                         active: true,
                     });
-                    this.tg_bot.sendMessage(chatId, `Ви активували замевлення ${actiOrder.description}.`, optURL);
+                    this.tg_bot.sendMessage(chatId, `Ви активували замевлення: ${actiOrder.description}.`, optURL);
                     break;
                 case 'deactive':
                     const deactiOrder = await this.ordersModel.findById(phone);
                     await this.ordersModel.findByIdAndUpdate(deactiOrder.id, {
                         active: false,
                     });
-                    this.tg_bot.sendMessage(chatId, `Ви деактивували замевлення ${deactiOrder.description}.`, optURL);
+                    this.tg_bot.sendMessage(chatId, `Ви деактивували замевлення: ${deactiOrder.description}.`, optURL);
                     break;
                 default:
                     break;
