@@ -35,6 +35,15 @@ const MAIN_KEYBOARD = {
       TextHAlign: 'center',
       BgColor: '#4CAF50',
     },
+    {
+      ActionType: 'reply',
+      ActionBody: `orders`,
+      Text: 'Мої заявки (лише для замовників)',
+      TextSize: 'regular',
+      TextVAlign: 'middle',
+      TextHAlign: 'center',
+      BgColor: '#4CAF50',
+    },
   ],
 };
 
@@ -69,6 +78,32 @@ export class MesengersService {
     //MAIN FUNCTION
     this.viber_bot.onTextMessage(/./, async (msg: any, res: any) => {
       try {
+        const MAIN_KEYBOARD = {
+          Type: 'keyboard',
+          Revision: 1,
+          ButtonsGroupColumns: 3,
+          ButtonsGroupRows: 1,
+          Buttons: [
+            {
+              ActionType: 'open-url',
+              ActionBody: 'https://www.wechirka.com',
+              Text: 'Перейти на наш сайт',
+              TextSize: 'regular',
+              TextVAlign: 'middle',
+              TextHAlign: 'center',
+              BgColor: '#4CAF50',
+            },
+            {
+              ActionType: 'reply',
+              ActionBody: `orders`,
+              Text: 'Мої заявки (лише для замовників)',
+              TextSize: 'regular',
+              TextVAlign: 'middle',
+              TextHAlign: 'center',
+              BgColor: '#4CAF50',
+            },
+          ],
+        };
         this.viber_bot.sendMessage(
           { id: res.userProfile.id },
           new KeyboardMessage(MAIN_KEYBOARD),
@@ -508,10 +543,15 @@ export class MesengersService {
       if (order.tg_chat !== null && order.active === true) {
         const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"${order.description}".\n \nВ категорії:\n"${order.category[0].name} - ${order.category[0].subcategories[0].name}". \n \nОчікуйте на дзвінок або повідомлення`;
         await this.sendMessage(chatId, msgTrue);
+        order.approve_count = +1;
+        await this.ordersModel.findByIdAndUpdate(order.id, {
+          approve_count: order.approve_count,
+        });
         const msgOrder = `Виконавець ${user.firstName} готовий виконати ваше замовлення "${order.description}".
       Ви можете написати йому в телеграм @${user.telegram}, або зателефонувати по номеру ${user.phone}. \n
       Посилання на профіль виконавця ${process.env.FRONT_LINK}artists/${user._id}. ${user.video[0]}`;
         await this.sendMessage(order.tg_chat.toString(), msgOrder);
+
         return true;
       } else if (order.viber !== null && order.active === true) {
         const msgOrder =
@@ -524,6 +564,10 @@ export class MesengersService {
         ]);
         const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"${order.description}".\n \nВ категорії:\n"${order.category[0].name} - ${order.category[0].subcategories[0].name}". \n \nОчікуйте на дзвінок або повідомлення`;
         await this.sendMessage(chatId, msgTrue);
+        order.approve_count = +1;
+        await this.ordersModel.findByIdAndUpdate(order.id, {
+          approve_count: order.approve_count,
+        });
         return true;
       } else if (order.tg_chat === null && order.viber === null) {
         const msg = `Замовник ще не активував чат-бот, спробуйте пізніше`;
