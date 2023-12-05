@@ -18,6 +18,7 @@ import { Subcategories } from './utils/subcategory.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { Categories, Subcategory } from './dto/caterory.interface';
 import { verifyEmailMsg } from './utils/email.schemas';
+import { first } from 'rxjs';
 
 @Injectable()
 export class UsersService {
@@ -96,7 +97,16 @@ export class UsersService {
             location: { $regex: regexReq },
           })
           .exec();
-
+        const findName = await this.userModel
+          .find({
+            firstName: { $regex: regexReq },
+          })
+          .exec();
+        const findLastName = await this.userModel
+          .find({
+            lastName: { $regex: regexReq },
+          })
+          .exec();
         function mergeAndRemoveDuplicates(...arrays: User[]) {
           const mergedArray = [].concat(...arrays);
           const uniqueArray = Array.from(new Set(mergedArray));
@@ -110,6 +120,8 @@ export class UsersService {
           findCat,
           findSubcat,
           findLocation,
+          findName,
+          findLastName,
         );
         if (Array.isArray(resultArray) && resultArray.length === 0) {
           throw new NotFound('User not found');
@@ -184,6 +196,18 @@ export class UsersService {
             location: { $regex: regexLoc },
           })
           .exec();
+        const findName = await this.userModel
+          .find({
+            firstName: { $regex: regexReq },
+            location: { $regex: regexLoc },
+          })
+          .exec();
+        const findLastName = await this.userModel
+          .find({
+            lastName: { $regex: regexReq },
+            location: { $regex: regexLoc },
+          })
+          .exec();
 
         function mergeAndRemoveDuplicates(...arrays: any[]) {
           const mergedArray = [].concat(...arrays);
@@ -197,6 +221,8 @@ export class UsersService {
           subcategory,
           findCat,
           findSubcat,
+          findName,
+          findLastName,
         );
         if (Array.isArray(resultArray) && resultArray.length === 0) {
           throw new NotFound('User not found');

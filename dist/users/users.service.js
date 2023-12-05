@@ -94,12 +94,22 @@ let UsersService = class UsersService {
                     location: { $regex: regexReq },
                 })
                     .exec();
+                const findName = await this.userModel
+                    .find({
+                    firstName: { $regex: regexReq },
+                })
+                    .exec();
+                const findLastName = await this.userModel
+                    .find({
+                    lastName: { $regex: regexReq },
+                })
+                    .exec();
                 function mergeAndRemoveDuplicates(...arrays) {
                     const mergedArray = [].concat(...arrays);
                     const uniqueArray = Array.from(new Set(mergedArray));
                     return uniqueArray;
                 }
-                const resultArray = mergeAndRemoveDuplicates(findTitle, findDescr, category, subcategory, findCat, findSubcat, findLocation);
+                const resultArray = mergeAndRemoveDuplicates(findTitle, findDescr, category, subcategory, findCat, findSubcat, findLocation, findName, findLastName);
                 if (Array.isArray(resultArray) && resultArray.length === 0) {
                     throw new http_errors_1.NotFound('User not found');
                 }
@@ -173,12 +183,24 @@ let UsersService = class UsersService {
                     location: { $regex: regexLoc },
                 })
                     .exec();
+                const findName = await this.userModel
+                    .find({
+                    firstName: { $regex: regexReq },
+                    location: { $regex: regexLoc },
+                })
+                    .exec();
+                const findLastName = await this.userModel
+                    .find({
+                    lastName: { $regex: regexReq },
+                    location: { $regex: regexLoc },
+                })
+                    .exec();
                 function mergeAndRemoveDuplicates(...arrays) {
                     const mergedArray = [].concat(...arrays);
                     const uniqueArray = Array.from(new Set(mergedArray));
                     return uniqueArray;
                 }
-                const resultArray = mergeAndRemoveDuplicates(findTitle, findDescr, category, subcategory, findCat, findSubcat);
+                const resultArray = mergeAndRemoveDuplicates(findTitle, findDescr, category, subcategory, findCat, findSubcat, findName, findLastName);
                 if (Array.isArray(resultArray) && resultArray.length === 0) {
                     throw new http_errors_1.NotFound('User not found');
                 }
