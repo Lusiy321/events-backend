@@ -55,7 +55,9 @@ export class UsersController {
     return this.usersService.create(user);
   }
 
-  @ApiOperation({ summary: 'Search posts from query ( ?req= )' })
+  @ApiOperation({
+    summary: 'Search posts from query ( ?req=музикант&loc=Київ )',
+  })
   @ApiResponse({ status: 200, type: [User] })
   @Get('/')
   async searchUser(@Query() query: any): Promise<User[]> {

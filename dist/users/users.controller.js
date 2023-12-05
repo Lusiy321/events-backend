@@ -131,7 +131,9 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "create", null);
 __decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Search posts from query ( ?req= )' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Search posts from query ( ?req=музикант&loc=Київ )',
+    }),
     (0, swagger_1.ApiResponse)({ status: 200, type: [users_model_1.User] }),
     (0, common_1.Get)('/'),
     __param(0, (0, common_1.Query)()),

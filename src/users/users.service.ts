@@ -31,52 +31,161 @@ export class UsersService {
   // USER
 
   async searchUsers(query: any): Promise<User[]> {
-    const { req } = query;
+    const { req, loc } = query;
+
     try {
       const searchItem = req;
-      if (searchItem === '' || !searchItem) {
-        return this.userModel.find().exec();
+      const regexReq = new RegExp(searchItem, 'i');
+      const regexLoc = new RegExp(loc, 'i');
+      if (searchItem === '' && loc === '') {
+        return this.userModel.find(req).exec();
       }
-      const regex = new RegExp(searchItem, 'i');
-      const find = await this.userModel
-        .find({ title: { $regex: regex } })
-        .exec();
-      if (Array.isArray(find) && find.length === 0) {
-        const descr = await this.userModel
-          .find({ description: { $regex: regex } })
+      if (req !== '' && loc === '') {
+        const findTitle = await this.userModel
+          .find({
+            title: { $regex: regexReq },
+          })
           .exec();
-        if (Array.isArray(descr) && descr.length === 0) {
-          const category = await this.userModel
-            .find({
-              category: {
-                $elemMatch: {
-                  _id: req,
-                },
+        const findCat = await this.userModel
+          .find({
+            category: {
+              $elemMatch: {
+                name: { $regex: regexReq },
               },
-            })
-            .exec();
-          if (Array.isArray(category) && category.length === 0) {
-            const subcategory = await this.userModel
-              .find({
-                'category.subcategories': {
-                  $elemMatch: {
-                    id: req,
-                  },
-                },
-              })
-              .exec();
-            if (Array.isArray(subcategory) && subcategory.length === 0) {
-              throw new NotFound('Post not found');
-            } else {
-              return subcategory;
-            }
-          } else {
-            return category;
-          }
+            },
+          })
+          .exec();
+        const findSubcat = await this.userModel
+          .find({
+            'category.subcategories': {
+              $elemMatch: {
+                name: { $regex: regexReq },
+              },
+            },
+          })
+          .exec();
+        const findDescr = await this.userModel
+          .find({
+            description: { $regex: regexReq },
+            location: { $regex: regexLoc },
+          })
+          .exec();
+        const category = await this.userModel
+          .find({
+            category: {
+              $elemMatch: {
+                _id: req,
+              },
+            },
+          })
+          .exec();
+        const subcategory = await this.userModel
+          .find({
+            'category.subcategories': {
+              $elemMatch: {
+                id: req,
+              },
+            },
+          })
+          .exec();
+
+        function mergeAndRemoveDuplicates(...arrays: User[]) {
+          const mergedArray = [].concat(...arrays);
+          const uniqueArray = Array.from(new Set(mergedArray));
+          return uniqueArray;
         }
-        return descr;
+        const resultArray = mergeAndRemoveDuplicates(
+          findTitle,
+          findDescr,
+          category,
+          subcategory,
+          findCat,
+          findSubcat,
+        );
+
+        return resultArray;
+      } else if (req === '' && loc !== '') {
+        const findLocation = await this.userModel
+          .find({
+            location: { $regex: regexLoc },
+          })
+          .exec();
+
+        return findLocation;
+      } else if (req !== '' && loc !== '') {
+        const findTitle = await this.userModel
+          .find({
+            title: { $regex: regexReq },
+            location: { $regex: regexLoc },
+          })
+          .exec();
+
+        const findDescr = await this.userModel
+          .find({
+            description: { $regex: regexReq },
+            location: { $regex: regexLoc },
+          })
+          .exec();
+
+        const category = await this.userModel
+          .find({
+            category: {
+              $elemMatch: {
+                _id: req,
+              },
+            },
+            location: { $regex: regexLoc },
+          })
+          .exec();
+
+        const subcategory = await this.userModel
+          .find({
+            'category.subcategories': {
+              $elemMatch: {
+                id: req,
+              },
+            },
+            location: { $regex: regexLoc },
+          })
+          .exec();
+        const findCat = await this.userModel
+          .find({
+            category: {
+              $elemMatch: {
+                name: { $regex: regexReq },
+              },
+            },
+            location: { $regex: regexLoc },
+          })
+          .exec();
+        const findSubcat = await this.userModel
+          .find({
+            'category.subcategories': {
+              $elemMatch: {
+                name: { $regex: regexReq },
+              },
+            },
+            location: { $regex: regexLoc },
+          })
+          .exec();
+
+        function mergeAndRemoveDuplicates(...arrays: any[]) {
+          const mergedArray = [].concat(...arrays);
+          const uniqueArray = Array.from(new Set(mergedArray));
+          return uniqueArray;
+        }
+        const resultArray = mergeAndRemoveDuplicates(
+          findTitle,
+          findDescr,
+          category,
+          subcategory,
+          findCat,
+          findSubcat,
+        );
+
+        return resultArray;
       } else {
-        return find;
+        throw new NotFound('Post not found');
       }
     } catch (e) {
       throw new NotFound('Post not found');
@@ -130,7 +239,6 @@ export class UsersService {
     verificationLink: string,
   ): Promise<void> {
     const body = await verifyEmailMsg(verificationLink);
-    console.log(body);
     const msg = {
       to: email,
       from: 'lusiy321@gmail.com',
