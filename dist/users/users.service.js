@@ -32,13 +32,16 @@ let UsersService = class UsersService {
     async searchUsers(query) {
         const { req, loc } = query;
         try {
+            if (!req && !loc) {
+                return this.userModel.find().exec();
+            }
             const searchItem = req;
             const regexReq = new RegExp(searchItem, 'i');
             const regexLoc = new RegExp(loc, 'i');
             if (searchItem === '' && loc === '') {
-                return this.userModel.find(req).exec();
+                return this.userModel.find().exec();
             }
-            if (req !== '' && loc === '') {
+            if ((req !== '' && loc === '') || !loc) {
                 const findTitle = await this.userModel
                     .find({
                     title: { $regex: regexReq },
@@ -86,21 +89,36 @@ let UsersService = class UsersService {
                     },
                 })
                     .exec();
+                const findLocation = await this.userModel
+                    .find({
+                    location: { $regex: regexReq },
+                })
+                    .exec();
                 function mergeAndRemoveDuplicates(...arrays) {
                     const mergedArray = [].concat(...arrays);
                     const uniqueArray = Array.from(new Set(mergedArray));
                     return uniqueArray;
                 }
-                const resultArray = mergeAndRemoveDuplicates(findTitle, findDescr, category, subcategory, findCat, findSubcat);
-                return resultArray;
+                const resultArray = mergeAndRemoveDuplicates(findTitle, findDescr, category, subcategory, findCat, findSubcat, findLocation);
+                if (Array.isArray(resultArray) && resultArray.length === 0) {
+                    throw new http_errors_1.NotFound('User not found');
+                }
+                else {
+                    return resultArray;
+                }
             }
-            else if (req === '' && loc !== '') {
+            else if ((req === '' && loc !== '') || !req) {
                 const findLocation = await this.userModel
                     .find({
                     location: { $regex: regexLoc },
                 })
                     .exec();
-                return findLocation;
+                if (Array.isArray(findLocation) && findLocation.length === 0) {
+                    throw new http_errors_1.NotFound('User not found');
+                }
+                else {
+                    return findLocation;
+                }
             }
             else if (req !== '' && loc !== '') {
                 const findTitle = await this.userModel
@@ -161,14 +179,19 @@ let UsersService = class UsersService {
                     return uniqueArray;
                 }
                 const resultArray = mergeAndRemoveDuplicates(findTitle, findDescr, category, subcategory, findCat, findSubcat);
-                return resultArray;
+                if (Array.isArray(resultArray) && resultArray.length === 0) {
+                    throw new http_errors_1.NotFound('User not found');
+                }
+                else {
+                    return resultArray;
+                }
             }
             else {
-                throw new http_errors_1.NotFound('Post not found');
+                throw new http_errors_1.NotFound('User not found');
             }
         }
         catch (e) {
-            throw new http_errors_1.NotFound('Post not found');
+            throw new http_errors_1.NotFound('User not found');
         }
     }
     async findAllUsers() {
