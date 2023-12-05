@@ -103,7 +103,10 @@ export class Orders extends Model<Orders> {
     example: '100$',
     description: 'User price',
   })
-  @Prop({ type: String })
+  @Prop({
+    type: String,
+    default: 'За домовленістю',
+  })
   price: string;
 
   @ApiProperty({

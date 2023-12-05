@@ -123,7 +123,10 @@ __decorate([
         example: '100$',
         description: 'User price',
     }),
-    (0, mongoose_1.Prop)({ type: String }),
+    (0, mongoose_1.Prop)({
+        type: String,
+        default: 'За домовленістю',
+    }),
     __metadata("design:type", String)
 ], Orders.prototype, "price", void 0);
 __decorate([
