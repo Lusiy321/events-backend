@@ -65,19 +65,29 @@ export class OrdersService {
       );
       const order = await this.ordersModel.findById(createdOrder._id);
       const usersArr = await this.findUserByCategory(order);
+      console.log(usersArr);
+
+      // usersArr.map((arr) => {});
 
       for (const user of usersArr) {
-        if (user.tg_chat !== null || user.viber !== null) {
+        if (user.tg_chat !== null && user.location === order.location) {
           await this.mesengersService.sendNewTgOrder(user.tg_chat, order);
+        }
+      }
+
+      for (const user of usersArr) {
+        if (user.viber !== null && user.location === order.location) {
+          console.log(user.viber);
           await this.mesengersService.sendNewViberOrder(user.viber, order);
         }
-
-        // await this.twilioService.sendSMS(
-        //   order.phone,
-        //   `Your verification code Wechirka.com: ${order.sms}`,
-        // );
-        return await this.ordersModel.findById(createdOrder._id);
       }
+
+      await this.twilioService.sendSMS(
+        order.phone,
+        `Your verification code Wechirka.com: ${order.sms}`,
+      );
+
+      return await this.ordersModel.findById(createdOrder._id);
     } catch (e) {
       throw new BadRequest(e.message);
     }

@@ -103,6 +103,7 @@ let MesengersService = class MesengersService {
                 };
                 this.viber_bot.sendMessage({ id: res.userProfile.id }, new KeyboardMessage(MAIN_KEYBOARD));
                 const messageText = msg.text;
+                console.log(messageText);
                 const phoneNumber = parseInt(messageText);
                 const actionBody = msg.text;
                 const [action, phone, chatId] = actionBody.split(':');
@@ -204,58 +205,60 @@ let MesengersService = class MesengersService {
             if (user) {
                 this.tg_bot.sendMessage(chatId, 'Ви не являетесь замовником', optCont);
             }
-            const find = await this.ordersModel.find({ tg_chat: chatId }).exec();
-            if (Array.isArray(find) && find.length === 0) {
-                this.tg_bot.sendMessage(chatId, 'Ми не знайшли Ваших заявок, напевно ви не зарееструвались у чат боті (натисніть /start)', optCont);
-            }
             else {
-                find.map((finded) => {
-                    const msg = `Замовник: ${finded.name}.
+                const find = await this.ordersModel.find({ tg_chat: chatId }).exec();
+                if (Array.isArray(find) && find.length === 0) {
+                    this.tg_bot.sendMessage(chatId, 'Ми не знайшли Ваших заявок, напевно ви не зарееструвались у чат боті (натисніть /start)', optCont);
+                }
+                else {
+                    find.map((finded) => {
+                        const msg = `Замовник: ${finded.name}.
       Дата події: ${finded.date}.
       Категорія: ${finded.category[0].subcategories[0].name}.
       Вимоги замовника: ${finded.description}.
       Локація: ${finded.location}.
       Гонорар: ${finded.price}₴.
       Кількість відгуків: ${finded.approve_count}.`;
-                    if (finded.active === true) {
-                        const keyboard = {
-                            inline_keyboard: [
-                                [
-                                    {
-                                        text: 'Видалити',
-                                        callback_data: `delete:${finded._id}:${chatId}`,
-                                    },
-                                    {
-                                        text: 'Деактивувати',
-                                        callback_data: `deactive:${finded._id}:${chatId}`,
-                                    },
+                        if (finded.active === true) {
+                            const keyboard = {
+                                inline_keyboard: [
+                                    [
+                                        {
+                                            text: 'Видалити',
+                                            callback_data: `delete:${finded._id}:${chatId}`,
+                                        },
+                                        {
+                                            text: 'Деактивувати',
+                                            callback_data: `deactive:${finded._id}:${chatId}`,
+                                        },
+                                    ],
                                 ],
-                            ],
-                        };
-                        this.tg_bot.sendMessage(chatId, msg, {
-                            reply_markup: keyboard,
-                        });
-                    }
-                    else {
-                        const keyboard = {
-                            inline_keyboard: [
-                                [
-                                    {
-                                        text: 'Видалити',
-                                        callback_data: `delete:${finded._id}:${chatId}`,
-                                    },
-                                    {
-                                        text: 'Активувати',
-                                        callback_data: `active:${finded._id}:${chatId}`,
-                                    },
+                            };
+                            this.tg_bot.sendMessage(chatId, msg, {
+                                reply_markup: keyboard,
+                            });
+                        }
+                        else {
+                            const keyboard = {
+                                inline_keyboard: [
+                                    [
+                                        {
+                                            text: 'Видалити',
+                                            callback_data: `delete:${finded._id}:${chatId}`,
+                                        },
+                                        {
+                                            text: 'Активувати',
+                                            callback_data: `active:${finded._id}:${chatId}`,
+                                        },
+                                    ],
                                 ],
-                            ],
-                        };
-                        this.tg_bot.sendMessage(chatId, msg, {
-                            reply_markup: keyboard,
-                        });
-                    }
-                });
+                            };
+                            this.tg_bot.sendMessage(chatId, msg, {
+                                reply_markup: keyboard,
+                            });
+                        }
+                    });
+                }
             }
         });
         this.tg_bot.on('contact', async (msg) => {
@@ -474,7 +477,7 @@ let MesengersService = class MesengersService {
                 });
                 const msgOrder = `Виконавець ${user.firstName} готовий виконати ваше замовлення "${order.description}".
       Ви можете написати йому в телеграм @${user.telegram}, або зателефонувати по номеру ${user.phone}. \n
-      Посилання на профіль виконавця ${process.env.FRONT_LINK}artists/${user._id}. ${user.video[0]}`;
+      Посилання на профіль виконавця ${process.env.FRONT_LINK}artists/${user._id}. ${user.master_photo.url}`;
                 await this.sendMessage(order.tg_chat.toString(), msgOrder);
                 return true;
             }
@@ -510,6 +513,7 @@ let MesengersService = class MesengersService {
     }
     async sendNewTgOrder(chatId, order) {
         try {
+            console.log(chatId);
             const msg = `Доброго дня, з'явилось нове повідомлення за Вашим профілем. 
       Замовник: ${order.name}.
       Дата події: ${order.date}.
