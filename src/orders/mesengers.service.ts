@@ -15,7 +15,6 @@ const StickerMessage = require('viber-bot').Message.Sticker;
 const FileMessage = require('viber-bot').Message.File;
 const RichMediaMessage = require('viber-bot').Message.RichMedia;
 const KeyboardMessage = require('viber-bot').Message.Keyboard;
-import * as express from 'express';
 import { User } from 'src/users/users.model';
 import { Orders } from 'src/orders/order.model';
 const ngrok = require('ngrok');
@@ -64,6 +63,7 @@ export class MesengersService {
       avatar:
         'https://raw.githubusercontent.com/devrelv/drop/master/151-icon.png',
     });
+    this.startServer();
     // MSG ON BOT STARTED
     this.viber_bot.onSubscribe(async (response: any) => {
       say(
@@ -73,11 +73,17 @@ export class MesengersService {
     });
 
     function say(response: any, message: any) {
-      response.send(new TextMessage(message));
+      response.send(
+        new KeyboardMessage(MAIN_KEYBOARD),
+        new TextMessage(message),
+      );
     }
     //MAIN FUNCTION
     this.viber_bot.onTextMessage(/./, async (msg: any, res: any) => {
       try {
+        const userProfile = res.userProfile.name;
+        const userId = res.userProfile.id;
+
         const MAIN_KEYBOARD = {
           Type: 'keyboard',
           Revision: 1,
@@ -95,7 +101,7 @@ export class MesengersService {
             },
             {
               ActionType: 'reply',
-              ActionBody: `orders`,
+              ActionBody: `orders:${userProfile}:${userId}`,
               Text: 'Мої заявки (лише для замовників)',
               TextSize: 'regular',
               TextVAlign: 'middle',
@@ -109,17 +115,58 @@ export class MesengersService {
           new KeyboardMessage(MAIN_KEYBOARD),
         );
         const messageText = msg.text;
-        console.log(messageText);
+
         const phoneNumber = parseInt(messageText);
         const actionBody = msg.text;
+        console.log(actionBody);
         const [action, phone, chatId] = actionBody.split(':');
+
         switch (action) {
           case 'accept':
-            this.sendViberAgreement(phone, chatId);
+            await this.sendViberAgreement(phone, chatId);
             break;
 
           case 'disagree':
             say(res, 'Ви не погодились на пропозицію.');
+            break;
+          case 'orders':
+            await this.myOrdersList(chatId);
+            break;
+          case 'delete':
+            const delOrder = await this.ordersModel.findById(phone);
+            this.viber_bot.sendMessage({ id: chatId }, [
+              new TextMessage(
+                `Ви видалили замевлення: ${delOrder.description}.`,
+              ),
+              new KeyboardMessage(MAIN_KEYBOARD),
+            ]);
+            await this.ordersModel.findByIdAndRemove(phone);
+            break;
+          case 'active':
+            const actiOrder = await this.ordersModel.findById(phone);
+            await this.ordersModel.findByIdAndUpdate(actiOrder.id, {
+              active: true,
+            });
+            this.viber_bot.sendMessage({ id: chatId }, [
+              new TextMessage(
+                `Ви активували замевлення: ${actiOrder.description}.`,
+              ),
+              new KeyboardMessage(MAIN_KEYBOARD),
+            ]);
+            break;
+          case 'deactive':
+            const deactiOrder = await this.ordersModel.findById(phone);
+            await this.ordersModel.findByIdAndUpdate(deactiOrder.id, {
+              active: false,
+            });
+            this.viber_bot.sendMessage({ id: chatId }, [
+              new TextMessage(
+                `Ви деактивували замевлення: ${deactiOrder.description}.`,
+              ),
+              new KeyboardMessage(MAIN_KEYBOARD),
+            ]);
+            break;
+          default:
             break;
         }
 
@@ -492,6 +539,127 @@ export class MesengersService {
     }
   }
 
+  async myOrdersList(chatId: string) {
+    const user = await this.userModel.findOne({ viber: chatId }).exec();
+    if (user) {
+      this.viber_bot.sendMessage(
+        { id: chatId },
+        new TextMessage('Ви не являетесь замовником.'),
+      );
+    } else {
+      const find = await this.ordersModel.find({ viber: chatId }).exec();
+      if (Array.isArray(find) && find.length === 0) {
+        this.viber_bot.sendMessage(
+          { id: chatId },
+          new TextMessage(
+            'Ми не знайшли Ваших заявок, напевно ви не зарееструвались у чат боті. Будь ласка, відправте свій номер телефону у форматі 380981231122',
+          ),
+        );
+      } else {
+        find.map((finded: Orders) => {
+          const FIND_KEYBOARD = {
+            Type: 'keyboard',
+            Revision: 1,
+            ButtonsGroupColumns: 3,
+            ButtonsGroupRows: 1,
+            Buttons: [
+              {
+                ActionType: 'open-url',
+                ActionBody: 'https://www.wechirka.com',
+                Text: 'Перейти на наш сайт',
+                TextSize: 'regular',
+                TextVAlign: 'middle',
+                TextHAlign: 'center',
+                BgColor: '#4CAF50',
+              },
+              {
+                ActionType: 'reply',
+                ActionBody: `orders:${finded.name}:${finded.viber}`,
+                Text: 'Мої заявки (лише для замовників)',
+                TextSize: 'regular',
+                TextVAlign: 'middle',
+                TextHAlign: 'center',
+                BgColor: '#4CAF50',
+              },
+            ],
+          };
+          const msg = `Замовник: ${finded.name}.
+      Дата події: ${finded.date}.
+      Категорія: ${finded.category[0].subcategories[0].name}.
+      Вимоги замовника: ${finded.description}.
+      Локація: ${finded.location}.
+      Гонорар: ${finded.price}₴.
+      Кількість відгуків: ${finded.approve_count}.`;
+          if (finded.active === true) {
+            const KEYBOARD = {
+              Type: 'keyboard',
+              Revision: 1,
+              ButtonsGroupColumns: 3,
+              ButtonsGroupRows: 1,
+              Buttons: [
+                {
+                  ActionType: 'reply',
+                  ActionBody: `delete:${finded._id}:${finded.viber}`,
+                  Text: 'Видалити',
+                  TextSize: 'regular',
+                  TextVAlign: 'middle',
+                  TextHAlign: 'center',
+                  BgColor: '#4CAF50',
+                },
+                {
+                  ActionType: 'reply',
+                  ActionBody: `deactive:${finded._id}:${finded.viber}`,
+                  Text: 'Деактивувати',
+                  TextSize: 'regular',
+                  TextVAlign: 'middle',
+                  TextHAlign: 'center',
+                  BgColor: '#4CAF50',
+                },
+              ],
+            };
+            this.viber_bot.sendMessage({ id: chatId }, [
+              new TextMessage(msg),
+              new RichMediaMessage(KEYBOARD),
+              new KeyboardMessage(FIND_KEYBOARD),
+            ]);
+          } else {
+            const KEYBOARD = {
+              Type: 'keyboard',
+              Revision: 1,
+              ButtonsGroupColumns: 3,
+              ButtonsGroupRows: 1,
+              Buttons: [
+                {
+                  ActionType: 'reply',
+                  ActionBody: `delete:${finded._id}:${finded.viber}`,
+                  Text: 'Видалити',
+                  TextSize: 'regular',
+                  TextVAlign: 'middle',
+                  TextHAlign: 'center',
+                  BgColor: '#4CAF50',
+                },
+                {
+                  ActionType: 'reply',
+                  ActionBody: `active:${finded._id}:${finded.viber}`,
+                  Text: 'Aктивувати',
+                  TextSize: 'regular',
+                  TextVAlign: 'middle',
+                  TextHAlign: 'center',
+                  BgColor: '#4CAF50',
+                },
+              ],
+            };
+            this.viber_bot.sendMessage({ id: chatId }, [
+              new TextMessage(msg),
+              new RichMediaMessage(KEYBOARD),
+              new KeyboardMessage(FIND_KEYBOARD),
+            ]);
+          }
+        });
+      }
+    }
+  }
+
   startServer() {
     if (process.env.NOW_URL || process.env.HEROKU_URL) {
       const http = require('http');
@@ -587,7 +755,6 @@ export class MesengersService {
 
   async sendNewTgOrder(chatId: string, order: Orders) {
     try {
-      console.log(chatId);
       const msg = `Доброго дня, з'явилось нове повідомлення за Вашим профілем. 
       Замовник: ${order.name}.
       Дата події: ${order.date}.

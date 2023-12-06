@@ -86,11 +86,9 @@ let OrdersService = class OrdersService {
             }
             for (const user of usersArr) {
                 if (user.viber !== null && user.location === order.location) {
-                    console.log(user.viber);
                     await this.mesengersService.sendNewViberOrder(user.viber, order);
                 }
             }
-            await this.twilioService.sendSMS(order.phone, `Your verification code Wechirka.com: ${order.sms}`);
             return await this.ordersModel.findById(createdOrder._id);
         }
         catch (e) {
