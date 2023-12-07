@@ -22,4 +22,15 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: 'Vovan-123545', description: 'User password' }),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "password", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Volodymyr', description: 'User first name' }),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "firstName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: '+380987894556',
+        description: 'User phone number',
+    }),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "phone", void 0);
 //# sourceMappingURL=create.user.dto.js.map

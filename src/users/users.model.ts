@@ -22,14 +22,6 @@ export class User extends Model<User> {
   })
   firstName: string;
 
-  @ApiProperty({ example: 'Zelenskiy', description: 'User last name' })
-  @Prop({
-    type: String,
-    minlength: 2,
-    maxlength: 30,
-  })
-  lastName: string;
-
   @ApiProperty({ example: 'zelenskiy@gmail.com', description: 'User email' })
   @Prop({ type: String, required: [true, 'Email is required'] })
   email: string;
@@ -114,6 +106,7 @@ export class User extends Model<User> {
   })
   @Prop({
     type: String,
+    default: 'Місто не обрано',
   })
   location: string;
 
@@ -128,7 +121,7 @@ export class User extends Model<User> {
     type: Object,
     default: {
       publicId: '1',
-      url: process.env.MASTER,
+      url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kidn51ekkbiuqne4mbpl.jpg',
     },
   })
   master_photo: Photo;
@@ -144,7 +137,7 @@ export class User extends Model<User> {
     type: Object,
     default: {
       publicId: '1',
-      url: process.env.AVATAR,
+      url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kglf7c13u3aagffbdlmo.png',
     },
   })
   avatar: Photo;

@@ -11,25 +11,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateUserDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
+const verify_user_dto_1 = require("./verify.user.dto");
 class UpdateUserDto {
 }
 exports.UpdateUserDto = UpdateUserDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'fksldflk88789dksfjl', description: 'User ID' }),
-    __metadata("design:type", String)
-], UpdateUserDto.prototype, "id", void 0);
-__decorate([
     (0, swagger_1.ApiProperty)({ example: 'Volodymyr', description: 'User first name' }),
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "firstName", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Zelenskiy', description: 'User last name' }),
-    __metadata("design:type", String)
-], UpdateUserDto.prototype, "lastName", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Vovan-123545', description: 'User password' }),
-    __metadata("design:type", String)
-], UpdateUserDto.prototype, "password", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'My music work', description: 'User post title' }),
     __metadata("design:type", String)
@@ -46,10 +35,6 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: 'YourLogin', description: 'User telegram login' }),
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "telegram", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: '380984561225', description: 'User viber phone' }),
-    __metadata("design:type", String)
-], UpdateUserDto.prototype, "viber", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         example: '380984561225',
@@ -79,8 +64,34 @@ __decorate([
         },
         description: 'User master photo',
     }),
+    __metadata("design:type", Object)
+], UpdateUserDto.prototype, "avatar", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: {
+            publicId: '1',
+            url: 'https://',
+        },
+        description: 'User video',
+    }),
     __metadata("design:type", Array)
 ], UpdateUserDto.prototype, "video", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: [
+            {
+                publicId: '1',
+                url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kglf7c13u3aagffbdlmo.png',
+            },
+            {
+                publicId: '2',
+                url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kidn51ekkbiuqne4mbpl.jpg',
+            },
+        ],
+        description: 'User photo',
+    }),
+    __metadata("design:type", Array)
+], UpdateUserDto.prototype, "photo", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         example: [
@@ -100,7 +111,27 @@ __decorate([
     __metadata("design:type", Array)
 ], UpdateUserDto.prototype, "category", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'true', description: 'User status' }),
+    __metadata("design:type", Boolean)
+], UpdateUserDto.prototype, "isOnline", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({ example: '100$', description: 'Price' }),
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "price", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'true', description: 'User paid' }),
+    __metadata("design:type", Boolean)
+], UpdateUserDto.prototype, "paid", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'true', description: 'User trial period' }),
+    __metadata("design:type", Boolean)
+], UpdateUserDto.prototype, "trial", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'new', description: 'User moderate status' }),
+    __metadata("design:type", String)
+], UpdateUserDto.prototype, "verify", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'false', description: 'User ban status' }),
+    __metadata("design:type", Boolean)
+], UpdateUserDto.prototype, "ban", void 0);
 //# sourceMappingURL=update.user.dto.js.map

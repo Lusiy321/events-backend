@@ -2,16 +2,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Photo } from '../users.model';
 import { Categories } from './caterory.interface';
+import { verify } from './verify.user.dto';
 
 export class UpdateUserDto {
-  @ApiProperty({ example: 'fksldflk88789dksfjl', description: 'User ID' })
-  id: string;
   @ApiProperty({ example: 'Volodymyr', description: 'User first name' })
   readonly firstName: string;
-  @ApiProperty({ example: 'Zelenskiy', description: 'User last name' })
-  readonly lastName: string;
-  @ApiProperty({ example: 'Vovan-123545', description: 'User password' })
-  readonly password: string;
   @ApiProperty({ example: 'My music work', description: 'User post title' })
   readonly title: string;
   @ApiProperty({ example: 'I sing song', description: 'User post description' })
@@ -20,8 +15,6 @@ export class UpdateUserDto {
   readonly phone: string;
   @ApiProperty({ example: 'YourLogin', description: 'User telegram login' })
   readonly telegram: string;
-  @ApiProperty({ example: '380984561225', description: 'User viber phone' })
-  readonly viber: string;
   @ApiProperty({
     example: '380984561225',
     description: 'User whatsapp phone number',
@@ -44,7 +37,29 @@ export class UpdateUserDto {
     },
     description: 'User master photo',
   })
+  readonly avatar: Photo;
+  @ApiProperty({
+    example: {
+      publicId: '1',
+      url: 'https://',
+    },
+    description: 'User video',
+  })
   readonly video: Photo[];
+  @ApiProperty({
+    example: [
+      {
+        publicId: '1',
+        url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kglf7c13u3aagffbdlmo.png',
+      },
+      {
+        publicId: '2',
+        url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kidn51ekkbiuqne4mbpl.jpg',
+      },
+    ],
+    description: 'User photo',
+  })
+  readonly photo: Photo[];
   @ApiProperty({
     example: [
       {
@@ -61,6 +76,22 @@ export class UpdateUserDto {
     description: 'Category and subcategory',
   })
   readonly category: Categories[];
+  @ApiProperty({ example: 'true', description: 'User status' })
+  readonly isOnline: boolean;
   @ApiProperty({ example: '100$', description: 'Price' })
   readonly price: string;
+  @ApiProperty({ example: 'true', description: 'User paid' })
+  readonly paid: boolean;
+  @ApiProperty({ example: 'true', description: 'User trial period' })
+  readonly trial: boolean;
+  @ApiProperty({ example: 'new', description: 'User moderate status' })
+  readonly verify: verify;
+  @ApiProperty({ example: 'false', description: 'User ban status' })
+  readonly ban: boolean;
+}
+
+export interface search_result {
+  totalPages: number;
+  currentPage: number;
+  data: UpdateUserDto[];
 }

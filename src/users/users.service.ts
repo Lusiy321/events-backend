@@ -5,7 +5,7 @@ import { User, UserSchema } from './users.model';
 import { CreateUserDto } from './dto/create.user.dto';
 import { compareSync, hashSync } from 'bcrypt';
 import { Conflict, NotFound, BadRequest, Unauthorized } from 'http-errors';
-import { UpdateUserDto } from './dto/update.user.dto';
+import { UpdateUserDto, search_result } from './dto/update.user.dto';
 import { sign, verify, JwtPayload } from 'jsonwebtoken';
 import { PasswordUserDto } from './dto/password.user.dto';
 import * as sgMail from '@sendgrid/mail';
@@ -18,7 +18,7 @@ import { Subcategories } from './utils/subcategory.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { Categories, Subcategory } from './dto/caterory.interface';
 import { verifyEmailMsg } from './utils/email.schemas';
-import { first } from 'rxjs';
+import { mergeAndRemoveDuplicates, paginateArray } from './utils/parse.user';
 
 @Injectable()
 export class UsersService {
@@ -31,24 +31,80 @@ export class UsersService {
   }
   // USER
 
-  async searchUsers(query: any): Promise<User[]> {
-    const { req, loc } = query;
+  async searchUsers(query: any): Promise<search_result> {
+    const { req, loc, page, cat, subcat } = query;
     try {
-      if (!req && !loc) {
-        return this.userModel.find().exec();
+      const curentPage = page || 1;
+      const limit = 8;
+      const totalCount = await this.userModel.countDocuments();
+      const rows =
+        'firstName title description phone telegram whatsapp location master_photo avatar video photo category isOnline price verify';
+      const totalPages = Math.ceil(totalCount / limit);
+      const offset = (curentPage - 1) * limit;
+      // Если ничего не задано в строке
+      if (!req && !loc && !cat && !subcat) {
+        const result = await this.userModel
+          .find() // добавить поиск по verify
+          .select(rows)
+          .skip(offset)
+          .limit(limit)
+          .exec();
+        return {
+          totalPages: totalPages,
+          currentPage: curentPage,
+          data: result,
+        };
       }
 
-      const searchItem = req;
-      const regexReq = new RegExp(searchItem, 'i');
+      const regexReq = new RegExp(req, 'i');
       const regexLoc = new RegExp(loc, 'i');
-      if (searchItem === '' && loc === '') {
-        return this.userModel.find().exec();
+      // Если заданы пустые значения
+      if (
+        (req === '' && loc === '') ||
+        (!req && !loc) ||
+        (cat && !subcat) ||
+        (!cat && subcat)
+      ) {
+        const category = await this.userModel
+          .find({
+            category: {
+              $elemMatch: {
+                _id: cat,
+              },
+            },
+          })
+          .select(rows)
+          .exec();
+        const subcategory = await this.userModel
+          .find({
+            'category.subcategories': {
+              $elemMatch: {
+                id: subcat,
+              },
+            },
+          })
+          .select(rows)
+          .exec();
+        const resultArray = mergeAndRemoveDuplicates(category, subcategory);
+        if (Array.isArray(resultArray) && resultArray.length === 0) {
+          throw new NotFound('Users not found');
+        } else {
+          const result = paginateArray(resultArray, curentPage);
+          const totalPages = Math.ceil(resultArray.length / 8);
+          return {
+            totalPages: totalPages,
+            currentPage: curentPage,
+            data: result,
+          };
+        }
       }
+      // Если есть запрос без локации
       if ((req !== '' && loc === '') || !loc) {
         const findTitle = await this.userModel
           .find({
             title: { $regex: regexReq },
           })
+          .select(rows)
           .exec();
         const findCat = await this.userModel
           .find({
@@ -58,6 +114,7 @@ export class UsersService {
               },
             },
           })
+          .select(rows)
           .exec();
         const findSubcat = await this.userModel
           .find({
@@ -67,51 +124,48 @@ export class UsersService {
               },
             },
           })
+          .select(rows)
           .exec();
         const findDescr = await this.userModel
           .find({
             description: { $regex: regexReq },
             location: { $regex: regexLoc },
           })
+          .select(rows)
           .exec();
         const category = await this.userModel
           .find({
             category: {
               $elemMatch: {
-                _id: req,
+                _id: cat,
               },
             },
           })
+          .select(rows)
           .exec();
         const subcategory = await this.userModel
           .find({
             'category.subcategories': {
               $elemMatch: {
-                id: req,
+                id: subcat,
               },
             },
           })
+          .select(rows)
           .exec();
         const findLocation = await this.userModel
           .find({
             location: { $regex: regexReq },
           })
+          .select(rows)
           .exec();
         const findName = await this.userModel
           .find({
             firstName: { $regex: regexReq },
           })
+          .select(rows)
           .exec();
-        const findLastName = await this.userModel
-          .find({
-            lastName: { $regex: regexReq },
-          })
-          .exec();
-        function mergeAndRemoveDuplicates(...arrays: User[]) {
-          const mergedArray = [].concat(...arrays);
-          const uniqueArray = Array.from(new Set(mergedArray));
-          return uniqueArray;
-        }
+
         const resultArray = mergeAndRemoveDuplicates(
           findTitle,
           findDescr,
@@ -121,24 +175,65 @@ export class UsersService {
           findSubcat,
           findLocation,
           findName,
-          findLastName,
         );
         if (Array.isArray(resultArray) && resultArray.length === 0) {
-          throw new NotFound('User not found');
+          throw new NotFound('Users not found');
         } else {
-          return resultArray;
+          const result = paginateArray(resultArray, curentPage);
+          const totalPages = Math.ceil(resultArray.length / 8);
+          return {
+            totalPages: totalPages,
+            currentPage: curentPage,
+            data: result,
+          };
         }
+        //Если нет запроса, но есть локация
       } else if ((req === '' && loc !== '') || !req) {
         const findLocation = await this.userModel
           .find({
             location: { $regex: regexLoc },
           })
+          .select(rows)
+          .skip(offset)
+          .limit(limit)
+          .exec();
+        const category = await this.userModel
+          .find({
+            category: {
+              $elemMatch: {
+                _id: cat,
+              },
+            },
+          })
+          .select(rows)
+          .exec();
+        const subcategory = await this.userModel
+          .find({
+            'category.subcategories': {
+              $elemMatch: {
+                id: subcat,
+              },
+            },
+          })
+          .select(rows)
           .exec();
 
-        if (Array.isArray(findLocation) && findLocation.length === 0) {
+        const resultArray = mergeAndRemoveDuplicates(
+          category,
+          subcategory,
+          findLocation,
+        );
+
+        if (Array.isArray(resultArray) && findLocation.length === 0) {
           throw new NotFound('User not found');
         } else {
-          return findLocation;
+          const result = paginateArray(resultArray, curentPage);
+          const totalPages = Math.ceil(resultArray.length / 8);
+          return {
+            totalPages: totalPages,
+            currentPage: curentPage,
+            data: result,
+          };
         }
       } else if (req !== '' && loc !== '') {
         const findTitle = await this.userModel
@@ -146,6 +241,7 @@ export class UsersService {
             title: { $regex: regexReq },
             location: { $regex: regexLoc },
           })
+          .select(rows)
           .exec();
 
         const findDescr = await this.userModel
@@ -153,28 +249,31 @@ export class UsersService {
             description: { $regex: regexReq },
             location: { $regex: regexLoc },
           })
+          .select(rows)
           .exec();
 
         const category = await this.userModel
           .find({
             category: {
               $elemMatch: {
-                _id: req,
+                _id: cat,
               },
             },
             location: { $regex: regexLoc },
           })
+          .select(rows)
           .exec();
 
         const subcategory = await this.userModel
           .find({
             'category.subcategories': {
               $elemMatch: {
-                id: req,
+                id: subcat,
               },
             },
             location: { $regex: regexLoc },
           })
+          .select(rows)
           .exec();
         const findCat = await this.userModel
           .find({
@@ -185,6 +284,7 @@ export class UsersService {
             },
             location: { $regex: regexLoc },
           })
+          .select(rows)
           .exec();
         const findSubcat = await this.userModel
           .find({
@@ -195,25 +295,16 @@ export class UsersService {
             },
             location: { $regex: regexLoc },
           })
+          .select(rows)
           .exec();
         const findName = await this.userModel
           .find({
             firstName: { $regex: regexReq },
             location: { $regex: regexLoc },
           })
-          .exec();
-        const findLastName = await this.userModel
-          .find({
-            lastName: { $regex: regexReq },
-            location: { $regex: regexLoc },
-          })
+          .select(rows)
           .exec();
 
-        function mergeAndRemoveDuplicates(...arrays: any[]) {
-          const mergedArray = [].concat(...arrays);
-          const uniqueArray = Array.from(new Set(mergedArray));
-          return uniqueArray;
-        }
         const resultArray = mergeAndRemoveDuplicates(
           findTitle,
           findDescr,
@@ -222,12 +313,18 @@ export class UsersService {
           findCat,
           findSubcat,
           findName,
-          findLastName,
         );
+
         if (Array.isArray(resultArray) && resultArray.length === 0) {
           throw new NotFound('User not found');
         } else {
-          return resultArray;
+          const result = paginateArray(resultArray, curentPage);
+          const totalPages = Math.ceil(resultArray.length / 8);
+          return {
+            totalPages: totalPages,
+            currentPage: curentPage,
+            data: result,
+          };
         }
       } else {
         throw new NotFound('User not found');
@@ -239,7 +336,8 @@ export class UsersService {
 
   async findAllUsers(): Promise<User[]> {
     try {
-      const find = await this.userModel.find().exec();
+      const find = await this.userModel.find();
+
       return find;
     } catch (e) {
       throw new NotFound('User not found');
@@ -257,23 +355,27 @@ export class UsersService {
 
   async create(user: CreateUserDto): Promise<User> {
     try {
-      const { email } = user;
-      const lowerCaseEmail = email.toLowerCase();
+      const { email, password, phone, firstName } = user;
+      if (email && password && phone && firstName) {
+        const lowerCaseEmail = email.toLowerCase();
 
-      const registrationUser = await this.userModel.findOne({
-        email: lowerCaseEmail,
-      });
-      if (registrationUser) {
-        throw new Conflict(`User with ${email} in use`);
+        const registrationUser = await this.userModel.findOne({
+          email: lowerCaseEmail,
+        });
+        if (registrationUser) {
+          throw new Conflict(`User with ${email} in use`);
+        }
+
+        const createdUser = await this.userModel.create(user);
+        createdUser.setName(lowerCaseEmail);
+        createdUser.setPassword(password);
+        createdUser.save();
+        // const verificationLink = `${process.env.BACK_LINK}verify-email/${createdUser._id}`;
+        // await this.sendVerificationEmail(email, verificationLink);
+        return await this.userModel.findById(createdUser._id);
+      } else {
+        throw new BadRequest('Missing parameters');
       }
-
-      const createdUser = await this.userModel.create(user);
-      createdUser.setName(lowerCaseEmail);
-      createdUser.setPassword(user.password);
-      createdUser.save();
-      // const verificationLink = `${process.env.BACK_LINK}verify-email/${createdUser._id}`;
-      // await this.sendVerificationEmail(email, verificationLink);
-      return await this.userModel.findById(createdUser._id);
     } catch (e) {
       throw new BadRequest(e.message);
     }
@@ -445,12 +547,10 @@ export class UsersService {
   async update(user: UpdateUserDto, req: any): Promise<User> {
     const {
       firstName,
-      lastName,
       title,
       description,
       phone,
       telegram,
-      viber,
       whatsapp,
       location,
       master_photo,
@@ -466,12 +566,10 @@ export class UsersService {
     try {
       if (
         firstName ||
-        lastName ||
         title ||
         description ||
         phone ||
         telegram ||
-        viber ||
         whatsapp ||
         location ||
         master_photo ||
@@ -549,12 +647,10 @@ export class UsersService {
           { _id: findId.id },
           {
             firstName,
-            lastName,
             title,
             description,
             phone,
             telegram,
-            viber,
             whatsapp,
             location,
             master_photo,

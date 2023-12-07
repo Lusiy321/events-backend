@@ -32,7 +32,6 @@ export interface Photo {
 }
 export declare class User extends Model<User> {
     firstName: string;
-    lastName: string;
     email: string;
     password: string;
     title: string;

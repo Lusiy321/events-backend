@@ -15,7 +15,7 @@ export declare class UsersController {
     private readonly cloudinaryService;
     constructor(usersService: UsersService, cloudinaryService: CloudinaryService);
     create(user: CreateUserDto): Promise<User>;
-    searchUser(query: any): Promise<User[]>;
+    searchUser(query: any): Promise<any>;
     findUsers(): Promise<User[]>;
     findById(id: string): Promise<User>;
     findCat(): Promise<Category[]>;

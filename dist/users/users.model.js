@@ -27,15 +27,6 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "firstName", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Zelenskiy', description: 'User last name' }),
-    (0, mongoose_1.Prop)({
-        type: String,
-        minlength: 2,
-        maxlength: 30,
-    }),
-    __metadata("design:type", String)
-], User.prototype, "lastName", void 0);
-__decorate([
     (0, swagger_1.ApiProperty)({ example: 'zelenskiy@gmail.com', description: 'User email' }),
     (0, mongoose_1.Prop)({ type: String, required: [true, 'Email is required'] }),
     __metadata("design:type", String)
@@ -129,6 +120,7 @@ __decorate([
     }),
     (0, mongoose_1.Prop)({
         type: String,
+        default: 'Місто не обрано',
     }),
     __metadata("design:type", String)
 ], User.prototype, "location", void 0);
@@ -144,7 +136,7 @@ __decorate([
         type: Object,
         default: {
             publicId: '1',
-            url: process.env.MASTER,
+            url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kidn51ekkbiuqne4mbpl.jpg',
         },
     }),
     __metadata("design:type", Object)
@@ -161,7 +153,7 @@ __decorate([
         type: Object,
         default: {
             publicId: '1',
-            url: process.env.AVATAR,
+            url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kglf7c13u3aagffbdlmo.png',
         },
     }),
     __metadata("design:type", Object)

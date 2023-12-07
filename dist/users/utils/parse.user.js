@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseUser = void 0;
+exports.paginateArray = exports.mergeAndRemoveDuplicates = exports.parseUser = void 0;
 async function parseUser(user) {
     try {
         const parseUser = {
@@ -18,4 +18,18 @@ async function parseUser(user) {
     }
 }
 exports.parseUser = parseUser;
+function mergeAndRemoveDuplicates(...arrays) {
+    const mergedArray = [].concat(...arrays);
+    const uniqueArray = Array.from(new Set(mergedArray));
+    return uniqueArray;
+}
+exports.mergeAndRemoveDuplicates = mergeAndRemoveDuplicates;
+function paginateArray(array, page) {
+    const pageSize = 8;
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedArray = array.slice(startIndex, endIndex);
+    return paginatedArray;
+}
+exports.paginateArray = paginateArray;
 //# sourceMappingURL=parse.user.js.map

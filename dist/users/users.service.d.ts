@@ -1,6 +1,6 @@
 import { User } from './users.model';
 import { CreateUserDto } from './dto/create.user.dto';
-import { UpdateUserDto } from './dto/update.user.dto';
+import { UpdateUserDto, search_result } from './dto/update.user.dto';
 import { PasswordUserDto } from './dto/password.user.dto';
 import * as sgMail from '@sendgrid/mail';
 import { MailUserDto } from './dto/email.user.dto';
@@ -13,7 +13,7 @@ export declare class UsersService {
     private userModel;
     private categoryModel;
     constructor(userModel: User, categoryModel: Category);
-    searchUsers(query: any): Promise<User[]>;
+    searchUsers(query: any): Promise<search_result>;
     findAllUsers(): Promise<User[]>;
     findById(id: string): Promise<User>;
     create(user: CreateUserDto): Promise<User>;

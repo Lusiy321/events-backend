@@ -60,7 +60,7 @@ export class UsersController {
   })
   @ApiResponse({ status: 200, type: [User] })
   @Get('/')
-  async searchUser(@Query() query: any): Promise<User[]> {
+  async searchUser(@Query() query: any): Promise<any> {
     return this.usersService.searchUsers(query);
   }
 

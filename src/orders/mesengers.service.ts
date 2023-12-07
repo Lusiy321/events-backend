@@ -28,20 +28,20 @@ const MAIN_KEYBOARD = {
     {
       ActionType: 'open-url',
       ActionBody: 'https://www.wechirka.com',
-      Text: 'Перейти на наш сайт',
+      Text: '<font color="#FFFFFF" size="5">Перейти на наш сайт</font>',
       TextSize: 'regular',
       TextVAlign: 'middle',
       TextHAlign: 'center',
-      BgColor: '#4CAF50',
+      BgColor: '#094356',
     },
     {
       ActionType: 'reply',
       ActionBody: `orders`,
-      Text: 'Мої заявки (лише для замовників)',
+      Text: '<font color="#FFFFFF" size="5">Мої заявки (лише для замовників)</font>',
       TextSize: 'regular',
       TextVAlign: 'middle',
       TextHAlign: 'center',
-      BgColor: '#4CAF50',
+      BgColor: '#094356',
     },
   ],
 };
@@ -93,20 +93,20 @@ export class MesengersService {
             {
               ActionType: 'open-url',
               ActionBody: 'https://www.wechirka.com',
-              Text: 'Перейти на наш сайт',
-              TextSize: 'regular',
+              Text: '<font color="#FFFFFF" size="5">Перейти на наш сайт</font>',
+              TextSize: 'large',
               TextVAlign: 'middle',
               TextHAlign: 'center',
-              BgColor: '#4CAF50',
+              BgColor: '#094356',
             },
             {
               ActionType: 'reply',
               ActionBody: `orders:${userProfile}:${userId}`,
-              Text: 'Мої заявки (лише для замовників)',
-              TextSize: 'regular',
+              Text: '<font color="#FFFFFF" size="5">Мої заявки (лише для замовників)</font>',
+              TextSize: 'large',
               TextVAlign: 'middle',
               TextHAlign: 'center',
-              BgColor: '#4CAF50',
+              BgColor: '#094356',
             },
           ],
         };
@@ -118,7 +118,6 @@ export class MesengersService {
 
         const phoneNumber = parseInt(messageText);
         const actionBody = msg.text;
-        console.log(actionBody);
         const [action, phone, chatId] = actionBody.split(':');
 
         switch (action) {
@@ -466,20 +465,20 @@ export class MesengersService {
           {
             ActionType: 'reply',
             ActionBody: `accept:${order.phone}:${userId}`,
-            Text: 'Згоден',
+            Text: '<font color="#FFFFFF" size="5">Згоден</font>',
             TextSize: 'regular',
             TextVAlign: 'middle',
             TextHAlign: 'center',
-            BgColor: '#4CAF50',
+            BgColor: '#094356',
           },
           {
             ActionType: 'reply',
             ActionBody: 'disagree',
-            Text: 'Не згоден',
+            Text: '<font color="#FFFFFF" size="5">Не згоден</font>',
             TextSize: 'regular',
             TextVAlign: 'middle',
             TextHAlign: 'center',
-            BgColor: '#4CAF50',
+            BgColor: '#094356',
           },
         ],
       };
@@ -566,20 +565,20 @@ export class MesengersService {
               {
                 ActionType: 'open-url',
                 ActionBody: 'https://www.wechirka.com',
-                Text: 'Перейти на наш сайт',
+                Text: '<font color="#FFFFFF" size="5">Перейти на наш сайт</font>',
                 TextSize: 'regular',
                 TextVAlign: 'middle',
                 TextHAlign: 'center',
-                BgColor: '#4CAF50',
+                BgColor: '#094356',
               },
               {
                 ActionType: 'reply',
                 ActionBody: `orders:${finded.name}:${finded.viber}`,
-                Text: 'Мої заявки (лише для замовників)',
+                Text: '<font color="#FFFFFF" size="5">Мої заявки (лише для замовників)</font>',
                 TextSize: 'regular',
                 TextVAlign: 'middle',
                 TextHAlign: 'center',
-                BgColor: '#4CAF50',
+                BgColor: '#094356',
               },
             ],
           };
@@ -600,20 +599,20 @@ export class MesengersService {
                 {
                   ActionType: 'reply',
                   ActionBody: `delete:${finded._id}:${finded.viber}`,
-                  Text: 'Видалити',
+                  Text: '<font color="#FFFFFF" size="5">Видалити</font>',
                   TextSize: 'regular',
                   TextVAlign: 'middle',
                   TextHAlign: 'center',
-                  BgColor: '#4CAF50',
+                  BgColor: '#094356',
                 },
                 {
                   ActionType: 'reply',
                   ActionBody: `deactive:${finded._id}:${finded.viber}`,
-                  Text: 'Деактивувати',
+                  Text: '<font color="#FFFFFF" size="5">Деактивувати</font>',
                   TextSize: 'regular',
                   TextVAlign: 'middle',
                   TextHAlign: 'center',
-                  BgColor: '#4CAF50',
+                  BgColor: '#094356',
                 },
               ],
             };
@@ -632,20 +631,20 @@ export class MesengersService {
                 {
                   ActionType: 'reply',
                   ActionBody: `delete:${finded._id}:${finded.viber}`,
-                  Text: 'Видалити',
+                  Text: '<font color="#FFFFFF" size="5">Видалити</font>',
                   TextSize: 'regular',
                   TextVAlign: 'middle',
                   TextHAlign: 'center',
-                  BgColor: '#4CAF50',
+                  BgColor: '#094356',
                 },
                 {
                   ActionType: 'reply',
                   ActionBody: `active:${finded._id}:${finded.viber}`,
-                  Text: 'Aктивувати',
+                  Text: '<font color="#FFFFFF" size="5">Активувати</font>',
                   TextSize: 'regular',
                   TextVAlign: 'middle',
                   TextHAlign: 'center',
-                  BgColor: '#4CAF50',
+                  BgColor: '#094356',
                 },
               ],
             };
