@@ -296,6 +296,20 @@ __decorate([
     }),
     __metadata("design:type", Boolean)
 ], User.prototype, "ban", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: Number,
+        default: 0,
+    }),
+    __metadata("design:type", Number)
+], User.prototype, "agree_order", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: Number,
+        default: 0,
+    }),
+    __metadata("design:type", Number)
+], User.prototype, "disagree_order", void 0);
 exports.User = User = __decorate([
     (0, mongoose_1.Schema)({ versionKey: false, timestamps: true })
 ], User);

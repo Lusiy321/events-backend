@@ -269,6 +269,16 @@ export class User extends Model<User> {
     default: false,
   })
   ban: boolean;
+  @Prop({
+    type: Number,
+    default: 0,
+  })
+  agree_order: number;
+  @Prop({
+    type: Number,
+    default: 0,
+  })
+  disagree_order: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

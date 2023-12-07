@@ -17,16 +17,7 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const TelegramBot = require("node-telegram-bot-api");
 exports.ViberBot = require('viber-bot').Bot;
-const Keyboard = require('viber-bot').Keyboard;
-const BotEvents = require('viber-bot').Events;
 const TextMessage = require('viber-bot').Message.Text;
-const UrlMessage = require('viber-bot').Message.Url;
-const ContactMessage = require('viber-bot').Message.Contact;
-const PictureMessage = require('viber-bot').Message.Picture;
-const VideoMessage = require('viber-bot').Message.Video;
-const LocationMessage = require('viber-bot').Message.Location;
-const StickerMessage = require('viber-bot').Message.Sticker;
-const FileMessage = require('viber-bot').Message.File;
 const RichMediaMessage = require('viber-bot').Message.RichMedia;
 const KeyboardMessage = require('viber-bot').Message.Keyboard;
 const users_model_1 = require("../users/users.model");
@@ -114,6 +105,11 @@ let MesengersService = class MesengersService {
                         await this.sendViberAgreement(phone, chatId);
                         break;
                     case 'disagree':
+                        const user = await this.userModel.findOne({ viber: chatId });
+                        user.disagree_order += 1;
+                        await this.userModel.findByIdAndUpdate(user.id, {
+                            disagree_order: user.disagree_order,
+                        });
                         say(res, 'Ви не погодились на пропозицію.');
                         break;
                     case 'orders':
@@ -222,6 +218,12 @@ let MesengersService = class MesengersService {
                 keyboard: [
                     [
                         {
+                            text: 'Мої заявки (лише для замовників)',
+                            callback_data: '/orders',
+                        },
+                    ],
+                    [
+                        {
                             text: 'Відправити номер телефону',
                             request_contact: true,
                         },
@@ -323,12 +325,21 @@ let MesengersService = class MesengersService {
                 case 'accept':
                     const order = await this.sendTgAgreement(phone, chatId);
                     if (order === true) {
-                        const msg = `${query.message.text} Ви погодились на це замовлення \n`;
+                        const msg = `${query.message.text}: Ви погодились на це замовлення \n`;
                         this.tg_bot.editMessageText(msg, {
                             chat_id: chatId,
                             message_id: query.message.message_id,
                         });
                     }
+                    break;
+                case 'disagree':
+                    const orders = await this.ordersModel.findOne(phone);
+                    const user = await this.userModel.findOne({ tg_chat: chatId });
+                    user.disagree_order += 1;
+                    await this.userModel.findByIdAndUpdate(user.id, {
+                        disagree_order: user.disagree_order,
+                    });
+                    this.tg_bot.sendMessage(chatId, `Ви відмовились від виконання замовлення: ${orders.description}.`, optURL);
                     break;
                 case 'delete':
                     const delOrder = await this.ordersModel.findById(phone);
@@ -396,7 +407,7 @@ let MesengersService = class MesengersService {
                     },
                     {
                         ActionType: 'reply',
-                        ActionBody: 'disagree',
+                        ActionBody: `disagree:${order.phone}:${userId}`,
                         Text: '<font color="#FFFFFF" size="5">Не згоден</font>',
                         TextSize: 'regular',
                         TextVAlign: 'middle',
@@ -422,6 +433,10 @@ let MesengersService = class MesengersService {
             const { firstName, phone, _id } = user;
             if (viber !== null && active === true) {
                 const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"${order.description}".\n \nВ категорії:\n"${order.category[0].name} - ${order.category[0].subcategories[0].name}". \n \nОчікуйте на дзвінок або повідомлення`;
+                user.agree_order += 1;
+                await this.userModel.findByIdAndUpdate(user.id, {
+                    agree_order: user.agree_order,
+                });
                 this.viber_bot.sendMessage({ id: userChatId }, [
                     new TextMessage(msgTrue),
                     new KeyboardMessage(MAIN_KEYBOARD),
@@ -621,7 +636,11 @@ let MesengersService = class MesengersService {
             if (order.tg_chat !== null && order.active === true) {
                 const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"${order.description}".\n \nВ категорії:\n"${order.category[0].name} - ${order.category[0].subcategories[0].name}". \n \nОчікуйте на дзвінок або повідомлення`;
                 await this.sendMessage(chatId, msgTrue);
-                order.approve_count = +1;
+                order.approve_count += 1;
+                user.agree_order += 1;
+                await this.userModel.findByIdAndUpdate(user.id, {
+                    agree_order: user.agree_order,
+                });
                 await this.ordersModel.findByIdAndUpdate(order.id, {
                     approve_count: order.approve_count,
                 });
@@ -679,7 +698,7 @@ let MesengersService = class MesengersService {
                         },
                         {
                             text: 'Не цікаво',
-                            callback_data: `disagree:${chatId}`,
+                            callback_data: `disagree:${order.id}:${chatId}`,
                         },
                     ],
                     [
