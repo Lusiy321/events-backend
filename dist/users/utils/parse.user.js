@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.paginateArray = exports.mergeAndRemoveDuplicates = exports.parseUser = void 0;
+exports.rows = exports.paginateArray = exports.mergeAndRemoveDuplicates = exports.parseUser = void 0;
 async function parseUser(user) {
     try {
         const parseUser = {
@@ -32,4 +32,5 @@ function paginateArray(array, page) {
     return paginatedArray;
 }
 exports.paginateArray = paginateArray;
+exports.rows = 'firstName title description phone telegram whatsapp location master_photo avatar video photo category isOnline price verify';
 //# sourceMappingURL=parse.user.js.map

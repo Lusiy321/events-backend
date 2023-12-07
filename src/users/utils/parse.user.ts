@@ -33,3 +33,6 @@ export function paginateArray(array: UpdateUserDto[], page: any) {
 
   return paginatedArray;
 }
+
+export const rows =
+  'firstName title description phone telegram whatsapp location master_photo avatar video photo category isOnline price verify';

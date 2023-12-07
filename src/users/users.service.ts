@@ -18,7 +18,11 @@ import { Subcategories } from './utils/subcategory.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { Categories, Subcategory } from './dto/caterory.interface';
 import { verifyEmailMsg } from './utils/email.schemas';
-import { mergeAndRemoveDuplicates, paginateArray } from './utils/parse.user';
+import {
+  mergeAndRemoveDuplicates,
+  paginateArray,
+  rows,
+} from './utils/parse.user';
 
 @Injectable()
 export class UsersService {
@@ -37,8 +41,7 @@ export class UsersService {
       const curentPage = page || 1;
       const limit = 8;
       const totalCount = await this.userModel.countDocuments();
-      const rows =
-        'firstName title description phone telegram whatsapp location master_photo avatar video photo category isOnline price verify';
+
       const totalPages = Math.ceil(totalCount / limit);
       const offset = (curentPage - 1) * limit;
       // Если ничего не задано в строке
@@ -336,7 +339,7 @@ export class UsersService {
 
   async findAllUsers(): Promise<User[]> {
     try {
-      const find = await this.userModel.find();
+      const find = await this.userModel.find().select(rows);
 
       return find;
     } catch (e) {

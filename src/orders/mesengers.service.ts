@@ -52,9 +52,9 @@ export class MesengersService {
       authToken: process.env.VIBER_ACCESS_TOKEN,
       name: 'Wechirka',
       avatar:
-        'https://raw.githubusercontent.com/devrelv/drop/master/151-icon.png',
+        'https://res.cloudinary.com/dciy3u6un/image/upload/v1701947849/service/paanrsds5krezvpreog0.webp',
     });
-    this.startServer();
+
     // MSG ON BOT STARTED
     this.viber_bot.onSubscribe(async (response: any) => {
       say(
@@ -171,17 +171,23 @@ export class MesengersService {
             const { viber } = user;
             if (viber === null) {
               user.viber = res.userProfile.id;
-              user.save();
+              await this.userModel.findByIdAndUpdate(user.id, {
+                viber: user.viber,
+                verify: true,
+              });
               say(
                 res,
-                `Дякую, ${res.userProfile.name} теперь Вам будуть надходити сповіщення про нові пропозиції твоїй категорії.`,
+                `Дякую, ${res.userProfile.name} теперь Вам будуть надходити сповіщення про нові пропозиції у обраній категорії категорії.`,
               );
             } else {
               user.viber = null;
-              user.save();
+              await this.userModel.findByIdAndUpdate(user.id, {
+                viber: user.viber,
+                verify: true,
+              });
               say(
                 res,
-                `${res.userProfile.name} Ви відписалися від сповіщення про нові пропозиції твоїй категорії.`,
+                `${res.userProfile.name} Ви відписалися від сповіщення про нові пропозиції.`,
               );
             }
           }
@@ -254,12 +260,6 @@ export class MesengersService {
     const optCont = {
       reply_markup: {
         keyboard: [
-          [
-            {
-              text: 'Мої заявки (лише для замовників)',
-              callback_data: '/orders',
-            },
-          ],
           [
             {
               text: 'Відправити номер телефону',
@@ -351,7 +351,10 @@ export class MesengersService {
       const phoneNumber = msg.contact.phone_number;
       const user = await this.userModel.findOne({ phone: phoneNumber }).exec();
       if (user) {
-        await this.userModel.findByIdAndUpdate(user.id, { tg_chat: chatId });
+        await this.userModel.findByIdAndUpdate(user.id, {
+          tg_chat: chatId,
+          verify: true,
+        });
 
         this.tg_bot.sendMessage(
           chatId,
@@ -558,123 +561,129 @@ export class MesengersService {
   }
 
   async myOrdersList(chatId: string) {
-    const user = await this.userModel.findOne({ viber: chatId }).exec();
-    if (user) {
-      this.viber_bot.sendMessage(
-        { id: chatId },
-        new TextMessage('Ви не являетесь замовником.'),
-      );
-    } else {
-      const find = await this.ordersModel.find({ viber: chatId }).exec();
-      if (Array.isArray(find) && find.length === 0) {
+    try {
+      const user = await this.userModel.findOne({ viber: chatId }).exec();
+
+      if (user) {
         this.viber_bot.sendMessage(
           { id: chatId },
-          new TextMessage(
-            'Ми не знайшли Ваших заявок, напевно ви не зарееструвались у чат боті. Будь ласка, відправте свій номер телефону у форматі 380981231122',
-          ),
+          new TextMessage('Ви не являетесь замовником.'),
         );
       } else {
-        find.map((finded: Orders) => {
-          const FIND_KEYBOARD = {
-            Type: 'keyboard',
-            Revision: 1,
-            ButtonsGroupColumns: 3,
-            ButtonsGroupRows: 1,
-            Buttons: [
-              {
-                ActionType: 'open-url',
-                ActionBody: 'https://www.wechirka.com',
-                Text: '<font color="#FFFFFF" size="5">Перейти на наш сайт</font>',
-                TextSize: 'regular',
-                TextVAlign: 'middle',
-                TextHAlign: 'center',
-                BgColor: '#094356',
-              },
-              {
-                ActionType: 'reply',
-                ActionBody: `orders:${finded.name}:${finded.viber}`,
-                Text: '<font color="#FFFFFF" size="5">Мої заявки (лише для замовників)</font>',
-                TextSize: 'regular',
-                TextVAlign: 'middle',
-                TextHAlign: 'center',
-                BgColor: '#094356',
-              },
-            ],
-          };
-          const msg = `Замовник: ${finded.name}.
+        const find = await this.ordersModel.find({ viber: chatId }).exec();
+
+        if (Array.isArray(find) && find.length === 0) {
+          this.viber_bot.sendMessage(
+            { id: chatId },
+            new TextMessage(
+              'Ми не знайшли Ваших заявок, напевно ви не зарееструвались у чат боті. Будь ласка, відправте свій номер телефону у форматі 380981231122',
+            ),
+          );
+        } else {
+          find.map((finded: Orders) => {
+            const FIND_KEYBOARD = {
+              Type: 'keyboard',
+              Revision: 1,
+              ButtonsGroupColumns: 3,
+              ButtonsGroupRows: 1,
+              Buttons: [
+                {
+                  ActionType: 'open-url',
+                  ActionBody: 'https://www.wechirka.com',
+                  Text: '<font color="#FFFFFF" size="5">Перейти на наш сайт</font>',
+                  TextSize: 'regular',
+                  TextVAlign: 'middle',
+                  TextHAlign: 'center',
+                  BgColor: '#094356',
+                },
+                {
+                  ActionType: 'reply',
+                  ActionBody: `orders:${finded.name}:${finded.viber}`,
+                  Text: '<font color="#FFFFFF" size="5">Мої заявки (лише для замовників)</font>',
+                  TextSize: 'regular',
+                  TextVAlign: 'middle',
+                  TextHAlign: 'center',
+                  BgColor: '#094356',
+                },
+              ],
+            };
+            const msg = `Замовник: ${finded.name}.
       Дата події: ${finded.date}.
       Категорія: ${finded.category[0].subcategories[0].name}.
       Вимоги замовника: ${finded.description}.
       Локація: ${finded.location}.
       Гонорар: ${finded.price}₴.
       Кількість відгуків: ${finded.approve_count}.`;
-          if (finded.active === true) {
-            const KEYBOARD = {
-              Type: 'keyboard',
-              Revision: 1,
-              ButtonsGroupColumns: 3,
-              ButtonsGroupRows: 1,
-              Buttons: [
-                {
-                  ActionType: 'reply',
-                  ActionBody: `delete:${finded._id}:${finded.viber}`,
-                  Text: '<font color="#FFFFFF" size="5">Видалити</font>',
-                  TextSize: 'regular',
-                  TextVAlign: 'middle',
-                  TextHAlign: 'center',
-                  BgColor: '#094356',
-                },
-                {
-                  ActionType: 'reply',
-                  ActionBody: `deactive:${finded._id}:${finded.viber}`,
-                  Text: '<font color="#FFFFFF" size="5">Деактивувати</font>',
-                  TextSize: 'regular',
-                  TextVAlign: 'middle',
-                  TextHAlign: 'center',
-                  BgColor: '#094356',
-                },
-              ],
-            };
-            this.viber_bot.sendMessage({ id: chatId }, [
-              new TextMessage(msg),
-              new RichMediaMessage(KEYBOARD),
-              new KeyboardMessage(FIND_KEYBOARD),
-            ]);
-          } else {
-            const KEYBOARD = {
-              Type: 'keyboard',
-              Revision: 1,
-              ButtonsGroupColumns: 3,
-              ButtonsGroupRows: 1,
-              Buttons: [
-                {
-                  ActionType: 'reply',
-                  ActionBody: `delete:${finded._id}:${finded.viber}`,
-                  Text: '<font color="#FFFFFF" size="5">Видалити</font>',
-                  TextSize: 'regular',
-                  TextVAlign: 'middle',
-                  TextHAlign: 'center',
-                  BgColor: '#094356',
-                },
-                {
-                  ActionType: 'reply',
-                  ActionBody: `active:${finded._id}:${finded.viber}`,
-                  Text: '<font color="#FFFFFF" size="5">Активувати</font>',
-                  TextSize: 'regular',
-                  TextVAlign: 'middle',
-                  TextHAlign: 'center',
-                  BgColor: '#094356',
-                },
-              ],
-            };
-            this.viber_bot.sendMessage({ id: chatId }, [
-              new TextMessage(msg),
-              new RichMediaMessage(KEYBOARD),
-              new KeyboardMessage(FIND_KEYBOARD),
-            ]);
-          }
-        });
+            if (finded.active === true) {
+              const KEYBOARD = {
+                Type: 'keyboard',
+                Revision: 1,
+                ButtonsGroupColumns: 3,
+                ButtonsGroupRows: 1,
+                Buttons: [
+                  {
+                    ActionType: 'reply',
+                    ActionBody: `delete:${finded._id}:${finded.viber}`,
+                    Text: '<font color="#FFFFFF" size="5">Видалити</font>',
+                    TextSize: 'regular',
+                    TextVAlign: 'middle',
+                    TextHAlign: 'center',
+                    BgColor: '#094356',
+                  },
+                  {
+                    ActionType: 'reply',
+                    ActionBody: `deactive:${finded._id}:${finded.viber}`,
+                    Text: '<font color="#FFFFFF" size="5">Деактивувати</font>',
+                    TextSize: 'regular',
+                    TextVAlign: 'middle',
+                    TextHAlign: 'center',
+                    BgColor: '#094356',
+                  },
+                ],
+              };
+              this.viber_bot.sendMessage({ id: chatId }, [
+                new TextMessage(msg),
+                new RichMediaMessage(KEYBOARD),
+                new KeyboardMessage(FIND_KEYBOARD),
+              ]);
+            } else {
+              const KEYBOARD = {
+                Type: 'keyboard',
+                Revision: 1,
+                ButtonsGroupColumns: 3,
+                ButtonsGroupRows: 1,
+                Buttons: [
+                  {
+                    ActionType: 'reply',
+                    ActionBody: `delete:${finded._id}:${finded.viber}`,
+                    Text: '<font color="#FFFFFF" size="5">Видалити</font>',
+                    TextSize: 'regular',
+                    TextVAlign: 'middle',
+                    TextHAlign: 'center',
+                    BgColor: '#094356',
+                  },
+                  {
+                    ActionType: 'reply',
+                    ActionBody: `active:${finded._id}:${finded.viber}`,
+                    Text: '<font color="#FFFFFF" size="5">Активувати</font>',
+                    TextSize: 'regular',
+                    TextVAlign: 'middle',
+                    TextHAlign: 'center',
+                    BgColor: '#094356',
+                  },
+                ],
+              };
+              this.viber_bot.sendMessage({ id: chatId }, [
+                new TextMessage(msg),
+                new RichMediaMessage(KEYBOARD),
+                new KeyboardMessage(FIND_KEYBOARD),
+              ]);
+            }
+          });
+        }
       }
+    } catch (e) {
+      throw new Error(`Помилка надсилання повідомлення: ${e}`);
     }
   }
 

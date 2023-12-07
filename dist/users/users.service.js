@@ -36,13 +36,12 @@ let UsersService = class UsersService {
             const curentPage = page || 1;
             const limit = 8;
             const totalCount = await this.userModel.countDocuments();
-            const rows = 'firstName title description phone telegram whatsapp location master_photo avatar video photo category isOnline price verify';
             const totalPages = Math.ceil(totalCount / limit);
             const offset = (curentPage - 1) * limit;
             if (!req && !loc && !cat && !subcat) {
                 const result = await this.userModel
                     .find()
-                    .select(rows)
+                    .select(parse_user_1.rows)
                     .skip(offset)
                     .limit(limit)
                     .exec();
@@ -66,7 +65,7 @@ let UsersService = class UsersService {
                         },
                     },
                 })
-                    .select(rows)
+                    .select(parse_user_1.rows)
                     .exec();
                 const subcategory = await this.userModel
                     .find({
@@ -76,7 +75,7 @@ let UsersService = class UsersService {
                         },
                     },
                 })
-                    .select(rows)
+                    .select(parse_user_1.rows)
                     .exec();
                 const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(category, subcategory);
                 if (Array.isArray(resultArray) && resultArray.length === 0) {
@@ -97,7 +96,7 @@ let UsersService = class UsersService {
                     .find({
                     title: { $regex: regexReq },
                 })
-                    .select(rows)
+                    .select(parse_user_1.rows)
                     .exec();
                 const findCat = await this.userModel
                     .find({
@@ -107,7 +106,7 @@ let UsersService = class UsersService {
                         },
                     },
                 })
-                    .select(rows)
+                    .select(parse_user_1.rows)
                     .exec();
                 const findSubcat = await this.userModel
                     .find({
@@ -117,14 +116,14 @@ let UsersService = class UsersService {
                         },
                     },
                 })
-                    .select(rows)
+                    .select(parse_user_1.rows)
                     .exec();
                 const findDescr = await this.userModel
                     .find({
                     description: { $regex: regexReq },
                     location: { $regex: regexLoc },
                 })
-                    .select(rows)
+                    .select(parse_user_1.rows)
                     .exec();
                 const category = await this.userModel
                     .find({
@@ -134,7 +133,7 @@ let UsersService = class UsersService {
                         },
                     },
                 })
-                    .select(rows)
+                    .select(parse_user_1.rows)
                     .exec();
                 const subcategory = await this.userModel
                     .find({
@@ -144,19 +143,19 @@ let UsersService = class UsersService {
                         },
                     },
                 })
-                    .select(rows)
+                    .select(parse_user_1.rows)
                     .exec();
                 const findLocation = await this.userModel
                     .find({
                     location: { $regex: regexReq },
                 })
-                    .select(rows)
+                    .select(parse_user_1.rows)
                     .exec();
                 const findName = await this.userModel
                     .find({
                     firstName: { $regex: regexReq },
                 })
-                    .select(rows)
+                    .select(parse_user_1.rows)
                     .exec();
                 const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(findTitle, findDescr, category, subcategory, findCat, findSubcat, findLocation, findName);
                 if (Array.isArray(resultArray) && resultArray.length === 0) {
@@ -177,7 +176,7 @@ let UsersService = class UsersService {
                     .find({
                     location: { $regex: regexLoc },
                 })
-                    .select(rows)
+                    .select(parse_user_1.rows)
                     .skip(offset)
                     .limit(limit)
                     .exec();
@@ -189,7 +188,7 @@ let UsersService = class UsersService {
                         },
                     },
                 })
-                    .select(rows)
+                    .select(parse_user_1.rows)
                     .exec();
                 const subcategory = await this.userModel
                     .find({
@@ -199,7 +198,7 @@ let UsersService = class UsersService {
                         },
                     },
                 })
-                    .select(rows)
+                    .select(parse_user_1.rows)
                     .exec();
                 const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(category, subcategory, findLocation);
                 if (Array.isArray(resultArray) && findLocation.length === 0) {
@@ -221,14 +220,14 @@ let UsersService = class UsersService {
                     title: { $regex: regexReq },
                     location: { $regex: regexLoc },
                 })
-                    .select(rows)
+                    .select(parse_user_1.rows)
                     .exec();
                 const findDescr = await this.userModel
                     .find({
                     description: { $regex: regexReq },
                     location: { $regex: regexLoc },
                 })
-                    .select(rows)
+                    .select(parse_user_1.rows)
                     .exec();
                 const category = await this.userModel
                     .find({
@@ -239,7 +238,7 @@ let UsersService = class UsersService {
                     },
                     location: { $regex: regexLoc },
                 })
-                    .select(rows)
+                    .select(parse_user_1.rows)
                     .exec();
                 const subcategory = await this.userModel
                     .find({
@@ -250,7 +249,7 @@ let UsersService = class UsersService {
                     },
                     location: { $regex: regexLoc },
                 })
-                    .select(rows)
+                    .select(parse_user_1.rows)
                     .exec();
                 const findCat = await this.userModel
                     .find({
@@ -261,7 +260,7 @@ let UsersService = class UsersService {
                     },
                     location: { $regex: regexLoc },
                 })
-                    .select(rows)
+                    .select(parse_user_1.rows)
                     .exec();
                 const findSubcat = await this.userModel
                     .find({
@@ -272,14 +271,14 @@ let UsersService = class UsersService {
                     },
                     location: { $regex: regexLoc },
                 })
-                    .select(rows)
+                    .select(parse_user_1.rows)
                     .exec();
                 const findName = await this.userModel
                     .find({
                     firstName: { $regex: regexReq },
                     location: { $regex: regexLoc },
                 })
-                    .select(rows)
+                    .select(parse_user_1.rows)
                     .exec();
                 const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(findTitle, findDescr, category, subcategory, findCat, findSubcat, findName);
                 if (Array.isArray(resultArray) && resultArray.length === 0) {
@@ -305,7 +304,7 @@ let UsersService = class UsersService {
     }
     async findAllUsers() {
         try {
-            const find = await this.userModel.find();
+            const find = await this.userModel.find().select(parse_user_1.rows);
             return find;
         }
         catch (e) {

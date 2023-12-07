@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { MesengersService } from './orders/mesengers.service';
 
 async function start() {
   const PORT = process.env.PORT || 5000;
@@ -28,13 +29,16 @@ async function start() {
     .addServer(`https://events-4qv2.onrender.com`)
     .addServer(`https://events-show.cyclic.app`)
     .addServer(`http://localhost:${PORT}`)
-
     .build();
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
   await app.listen(PORT, () =>
     console.log(`Server started on port = http://localhost:${PORT}`),
   );
+  const mesengersService = app.get(MesengersService);
+
+  await mesengersService.startServer();
 }
 start();
