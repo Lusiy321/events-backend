@@ -83,7 +83,7 @@ let UsersService = class UsersService {
                 }
                 else {
                     const result = (0, parse_user_1.paginateArray)(resultArray, curentPage);
-                    const totalPages = Math.ceil(resultArray.length / 8);
+                    const totalPages = Math.ceil(resultArray.length / limit);
                     return {
                         totalPages: totalPages,
                         currentPage: curentPage,
@@ -163,7 +163,7 @@ let UsersService = class UsersService {
                 }
                 else {
                     const result = (0, parse_user_1.paginateArray)(resultArray, curentPage);
-                    const totalPages = Math.ceil(resultArray.length / 8);
+                    const totalPages = Math.ceil(resultArray.length / limit);
                     return {
                         totalPages: totalPages,
                         currentPage: curentPage,
@@ -206,7 +206,7 @@ let UsersService = class UsersService {
                 }
                 else {
                     const result = (0, parse_user_1.paginateArray)(resultArray, curentPage);
-                    const totalPages = Math.ceil(resultArray.length / 8);
+                    const totalPages = Math.ceil(resultArray.length / limit);
                     return {
                         totalPages: totalPages,
                         currentPage: curentPage,
@@ -286,16 +286,13 @@ let UsersService = class UsersService {
                 }
                 else {
                     const result = (0, parse_user_1.paginateArray)(resultArray, curentPage);
-                    const totalPages = Math.ceil(resultArray.length / 8);
+                    const totalPages = Math.ceil(resultArray.length / limit);
                     return {
                         totalPages: totalPages,
                         currentPage: curentPage,
                         data: result,
                     };
                 }
-            }
-            else {
-                throw new http_errors_1.NotFound('User not found');
             }
         }
         catch (e) {
@@ -313,7 +310,7 @@ let UsersService = class UsersService {
     }
     async findById(id) {
         try {
-            const find = await this.userModel.findById(id).exec();
+            const find = await this.userModel.findById(id).select(parse_user_1.rows).exec();
             return find;
         }
         catch (e) {
@@ -331,11 +328,16 @@ let UsersService = class UsersService {
                 if (registrationUser) {
                     throw new http_errors_1.Conflict(`User with ${email} in use`);
                 }
-                const createdUser = await this.userModel.create(user);
+                const trialEnds = new Date();
+                trialEnds.setMonth(trialEnds.getMonth() + 2);
+                const createdUser = await this.userModel.create(Object.assign(Object.assign({}, user), { trial: true, trialEnds }));
                 createdUser.setName(lowerCaseEmail);
                 createdUser.setPassword(password);
                 createdUser.save();
-                return await this.userModel.findById(createdUser._id);
+                return await this.userModel
+                    .findById(createdUser._id)
+                    .select(parse_user_1.rows)
+                    .exec();
             }
             else {
                 throw new http_errors_1.BadRequest('Missing parameters');
@@ -343,6 +345,20 @@ let UsersService = class UsersService {
         }
         catch (e) {
             throw new http_errors_1.BadRequest(e.message);
+        }
+    }
+    async checkTrialStatus(id) {
+        const user = await this.userModel.findById(id).select('-password').exec();
+        if (!user) {
+            throw new http_errors_1.NotFound('User not found');
+        }
+        if (user.trial && user.trialEnds > new Date()) {
+            return true;
+        }
+        else {
+            user.trial = false;
+            await user.save();
+            return false;
         }
     }
     async sendVerificationEmail(email, verificationLink) {
@@ -391,7 +407,7 @@ let UsersService = class UsersService {
       </div>`,
                 };
                 await sgMail.send(msg);
-                return await this.userModel.findById(user._id);
+                return await this.userModel.findById(user._id).select(parse_user_1.rows).exec();
             }
             throw new http_errors_1.BadRequest('Password is not avaible');
         }
@@ -477,8 +493,12 @@ let UsersService = class UsersService {
             if (!authUser || !authUser.comparePassword(password)) {
                 throw new http_errors_1.Unauthorized(`Email or password is wrong`);
             }
+            await this.checkTrialStatus(authUser._id);
             await this.createToken(authUser);
-            return await this.userModel.findOne({ email: lowerCaseEmail });
+            return await this.userModel
+                .findOne({ email: lowerCaseEmail })
+                .select('-password')
+                .exec();
         }
         catch (e) {
             throw new http_errors_1.BadRequest(e.message);
@@ -491,7 +511,10 @@ let UsersService = class UsersService {
         }
         try {
             await this.userModel.findByIdAndUpdate({ _id: user.id }, { token: null });
-            return await this.userModel.findById({ _id: user.id });
+            return await this.userModel
+                .findById({ _id: user.id })
+                .select('-password')
+                .exec();
         }
         catch (e) {
             throw new http_errors_1.BadRequest(e.message);
@@ -569,8 +592,10 @@ let UsersService = class UsersService {
                     master_photo,
                     price,
                 });
-                const userUpdate = this.userModel.findById({ _id: findId.id });
-                return userUpdate;
+                return await this.userModel
+                    .findById({ _id: findId.id })
+                    .select(parse_user_1.rows)
+                    .exec();
             }
         }
         catch (e) {
@@ -588,7 +613,10 @@ let UsersService = class UsersService {
             await this.userModel.findByIdAndUpdate({ _id: user.id }, {
                 $set: { video: newArr },
             });
-            return await this.userModel.findById({ _id: user.id });
+            return await this.userModel
+                .findById({ _id: user.id })
+                .select(parse_user_1.rows)
+                .exec();
         }
         catch (e) {
             throw new http_errors_1.BadRequest(e.message);
@@ -621,7 +649,10 @@ let UsersService = class UsersService {
             else {
                 const SECRET_KEY = process.env.SECRET_KEY;
                 const findId = (0, jsonwebtoken_1.verify)(token, SECRET_KEY);
-                const user = await this.userModel.findById({ _id: findId.id });
+                const user = await this.userModel
+                    .findById({ _id: findId.id })
+                    .select('-password')
+                    .exec();
                 return user;
             }
         }
@@ -636,9 +667,12 @@ let UsersService = class UsersService {
         const SECRET_KEY = process.env.SECRET_KEY;
         const token = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY, { expiresIn: '10m' });
         await this.userModel.findByIdAndUpdate(authUser._id, { token });
-        const authentificationUser = await this.userModel.findById({
+        const authentificationUser = await this.userModel
+            .findById({
             _id: authUser._id,
-        });
+        })
+            .select('-password')
+            .exec();
         return authentificationUser;
     }
     async refreshAccessToken(req) {
@@ -658,9 +692,12 @@ let UsersService = class UsersService {
             };
             const tokenRef = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY, { expiresIn: '24h' });
             await this.userModel.findByIdAndUpdate(user._id, { token: tokenRef });
-            const authentificationUser = await this.userModel.findById({
+            const authentificationUser = await this.userModel
+                .findById({
                 _id: user.id,
-            });
+            })
+                .select('-password')
+                .exec();
             return authentificationUser;
         }
         catch (error) {
@@ -679,7 +716,10 @@ let UsersService = class UsersService {
             }
             const createdCategory = await this.categoryModel.create(category);
             createdCategory.save();
-            return await this.categoryModel.findById(createdCategory._id);
+            return await this.categoryModel
+                .findById(createdCategory._id)
+                .select(parse_user_1.rows)
+                .exec();
         }
         catch (e) {
             throw new http_errors_1.BadRequest(e.message);
@@ -704,7 +744,7 @@ let UsersService = class UsersService {
             findCategory.subcategories.push(result);
             arrCategory.push(findCategory);
             await this.userModel.updateOne({ _id: userID }, { $set: { category: arrCategory } });
-            return await this.userModel.findById(userID);
+            return await this.userModel.findById(userID).select(parse_user_1.rows).exec();
         }
         catch (e) {
             throw new http_errors_1.NotFound('Category not found');
@@ -734,7 +774,10 @@ let UsersService = class UsersService {
     }
     async findUserCategory(id) {
         try {
-            const find = await this.userModel.find({ 'category._id': id }).exec();
+            const find = await this.userModel
+                .find({ 'category._id': id })
+                .select(parse_user_1.rows)
+                .exec();
             if (Array.isArray(find) && find.length === 0) {
                 return new http_errors_1.NotFound('User not found');
             }
@@ -748,6 +791,7 @@ let UsersService = class UsersService {
         try {
             const find = await this.userModel
                 .find({ 'category.subcategories.id': id })
+                .select(parse_user_1.rows)
                 .exec();
             if (Array.isArray(find) && find.length === 0) {
                 return new http_errors_1.NotFound('User not found');

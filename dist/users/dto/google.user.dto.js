@@ -19,10 +19,6 @@ __decorate([
     __metadata("design:type", String)
 ], GoogleUserDto.prototype, "firstName", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Zelenskiy', description: 'User last name' }),
-    __metadata("design:type", String)
-], GoogleUserDto.prototype, "lastName", void 0);
-__decorate([
     (0, swagger_1.ApiProperty)({ example: 'zelenskiy@gmail.com', description: 'User email' }),
     __metadata("design:type", String)
 ], GoogleUserDto.prototype, "email", void 0);
@@ -30,10 +26,6 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: 'Vovan-123545', description: 'User password' }),
     __metadata("design:type", String)
 ], GoogleUserDto.prototype, "password", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: 'https://', description: 'User avatar' }),
-    __metadata("design:type", String)
-], GoogleUserDto.prototype, "master_photo", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         example: 'I1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0N2EzN',
@@ -43,6 +35,6 @@ __decorate([
 ], GoogleUserDto.prototype, "googleId", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'true', description: 'User email verify' }),
-    __metadata("design:type", String)
-], GoogleUserDto.prototype, "verify", void 0);
+    __metadata("design:type", Boolean)
+], GoogleUserDto.prototype, "verify_google", void 0);
 //# sourceMappingURL=google.user.dto.js.map

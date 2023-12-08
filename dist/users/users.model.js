@@ -310,6 +310,13 @@ __decorate([
     }),
     __metadata("design:type", Number)
 ], User.prototype, "disagree_order", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: Date,
+        default: 0,
+    }),
+    __metadata("design:type", Date)
+], User.prototype, "trialEnds", void 0);
 exports.User = User = __decorate([
     (0, mongoose_1.Schema)({ versionKey: false, timestamps: true })
 ], User);

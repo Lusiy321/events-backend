@@ -57,6 +57,7 @@ export declare class User extends Model<User> {
     ban: boolean;
     agree_order: number;
     disagree_order: number;
+    trialEnds: Date;
 }
 export declare const UserSchema: import("mongoose").Schema<User, Model<User, any, any, any, import("mongoose").Document<unknown, any, User> & User & {
     _id: import("mongoose").Types.ObjectId;

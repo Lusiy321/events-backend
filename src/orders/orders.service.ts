@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Orders } from './order.model';
 import { InjectModel } from '@nestjs/mongoose';
-import { Conflict, NotFound, BadRequest, Unauthorized } from 'http-errors';
+import { NotFound, BadRequest } from 'http-errors';
 import { CreateOrderDto } from './dto/create.order.dto';
 import { TwilioService } from './twilio.service';
 import { User } from 'src/users/users.model';
@@ -63,30 +63,15 @@ export class OrdersService {
         { _id: createdOrder._id },
         { sms: verificationCode },
       );
+
       const order = await this.ordersModel.findById(createdOrder._id);
-      const usersArr = await this.findUserByCategory(order);
-      console.log(usersArr);
-
-      // usersArr.map((arr) => {});
-
-      for (const user of usersArr) {
-        if (user.tg_chat !== null && user.location === order.location) {
-          await this.mesengersService.sendNewTgOrder(user.tg_chat, order);
-        }
-      }
-
-      for (const user of usersArr) {
-        if (user.viber !== null && user.location === order.location) {
-          await this.mesengersService.sendNewViberOrder(user.viber, order);
-        }
-      }
-
+      // const phone = '+' + order.phone;
       // await this.twilioService.sendSMS(
-      //   order.phone,
+      //   phone,
       //   `Your verification code Wechirka.com: ${order.sms}`,
       // );
 
-      return await this.ordersModel.findById(createdOrder._id);
+      return order;
     } catch (e) {
       throw new BadRequest(e.message);
     }
@@ -94,14 +79,52 @@ export class OrdersService {
 
   async verifyOrder(code: string) {
     try {
-      const user = await this.ordersModel.findOne({ sms: code });
-      if (user) {
-        user.verify = true;
-        user.save();
-        return await this.ordersModel.findOne({ id: user.id });
+      const order = await this.ordersModel.findOne({ sms: code });
+      if (order) {
+        order.verify = true;
+        const updatedOrder = await this.ordersModel.findByIdAndUpdate(
+          { _id: order._id },
+          { verify: true },
+        );
+
+        const usersArr = await this.findUserByCategory(order);
+
+        for (const user of usersArr) {
+          if (user.tg_chat !== null && user.location === order.location) {
+            const check = await this.checkTrialStatus(user._id);
+            if (check === true || user.paid === true) {
+              await this.mesengersService.sendNewTgOrder(user.tg_chat, order);
+            }
+          }
+        }
+
+        for (const user of usersArr) {
+          if (user.viber !== null && user.location === order.location) {
+            const check = await this.checkTrialStatus(user._id);
+            if (check === true || user.paid === true) {
+              await this.mesengersService.sendNewViberOrder(user.viber, order);
+            }
+          }
+        }
+        return updatedOrder;
       }
     } catch (e) {
       throw new BadRequest(e.message);
+    }
+  }
+
+  async checkTrialStatus(id: string): Promise<boolean> {
+    const user = await this.userModel.findById(id);
+    if (!user) {
+      throw new NotFound('User not found');
+    }
+
+    if (user.trial && user.trialEnds > new Date()) {
+      return true;
+    } else {
+      user.trial = false;
+      await user.save();
+      return false;
     }
   }
 

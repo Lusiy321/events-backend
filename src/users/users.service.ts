@@ -14,7 +14,6 @@ import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
 import { GoogleUserDto } from './dto/google.user.dto';
 import { Category } from './category.model';
 import { CreateCategoryDto } from './dto/create.category.dto';
-import { Subcategories } from './utils/subcategory.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { Categories, Subcategory } from './dto/caterory.interface';
 import { verifyEmailMsg } from './utils/email.schemas';
@@ -93,7 +92,7 @@ export class UsersService {
           throw new NotFound('Users not found');
         } else {
           const result = paginateArray(resultArray, curentPage);
-          const totalPages = Math.ceil(resultArray.length / 8);
+          const totalPages = Math.ceil(resultArray.length / limit);
           return {
             totalPages: totalPages,
             currentPage: curentPage,
@@ -183,7 +182,7 @@ export class UsersService {
           throw new NotFound('Users not found');
         } else {
           const result = paginateArray(resultArray, curentPage);
-          const totalPages = Math.ceil(resultArray.length / 8);
+          const totalPages = Math.ceil(resultArray.length / limit);
           return {
             totalPages: totalPages,
             currentPage: curentPage,
@@ -231,7 +230,7 @@ export class UsersService {
           throw new NotFound('User not found');
         } else {
           const result = paginateArray(resultArray, curentPage);
-          const totalPages = Math.ceil(resultArray.length / 8);
+          const totalPages = Math.ceil(resultArray.length / limit);
           return {
             totalPages: totalPages,
             currentPage: curentPage,
@@ -322,15 +321,13 @@ export class UsersService {
           throw new NotFound('User not found');
         } else {
           const result = paginateArray(resultArray, curentPage);
-          const totalPages = Math.ceil(resultArray.length / 8);
+          const totalPages = Math.ceil(resultArray.length / limit);
           return {
             totalPages: totalPages,
             currentPage: curentPage,
             data: result,
           };
         }
-      } else {
-        throw new NotFound('User not found');
       }
     } catch (e) {
       throw new NotFound('User not found');
@@ -349,7 +346,7 @@ export class UsersService {
 
   async findById(id: string): Promise<User> {
     try {
-      const find = await this.userModel.findById(id).exec();
+      const find = await this.userModel.findById(id).select(rows).exec();
       return find;
     } catch (e) {
       throw new NotFound('User not found');
@@ -368,19 +365,44 @@ export class UsersService {
         if (registrationUser) {
           throw new Conflict(`User with ${email} in use`);
         }
+        const trialEnds = new Date();
+        trialEnds.setMonth(trialEnds.getMonth() + 2);
 
-        const createdUser = await this.userModel.create(user);
+        const createdUser = await this.userModel.create({
+          ...user,
+          trial: true,
+          trialEnds,
+        });
         createdUser.setName(lowerCaseEmail);
         createdUser.setPassword(password);
         createdUser.save();
+
         // const verificationLink = `${process.env.BACK_LINK}verify-email/${createdUser._id}`;
         // await this.sendVerificationEmail(email, verificationLink);
-        return await this.userModel.findById(createdUser._id);
+        return await this.userModel
+          .findById(createdUser._id)
+          .select(rows)
+          .exec();
       } else {
         throw new BadRequest('Missing parameters');
       }
     } catch (e) {
       throw new BadRequest(e.message);
+    }
+  }
+
+  async checkTrialStatus(id: string): Promise<boolean> {
+    const user = await this.userModel.findById(id).select('-password').exec();
+    if (!user) {
+      throw new NotFound('User not found');
+    }
+
+    if (user.trial && user.trialEnds > new Date()) {
+      return true;
+    } else {
+      user.trial = false;
+      await user.save();
+      return false;
     }
   }
 
@@ -434,7 +456,7 @@ export class UsersService {
       </div>`,
         };
         await sgMail.send(msg);
-        return await this.userModel.findById(user._id);
+        return await this.userModel.findById(user._id).select(rows).exec();
       }
       throw new BadRequest('Password is not avaible');
     } catch (e) {
@@ -527,8 +549,12 @@ export class UsersService {
       if (!authUser || !authUser.comparePassword(password)) {
         throw new Unauthorized(`Email or password is wrong`);
       }
+      await this.checkTrialStatus(authUser._id);
       await this.createToken(authUser);
-      return await this.userModel.findOne({ email: lowerCaseEmail });
+      return await this.userModel
+        .findOne({ email: lowerCaseEmail })
+        .select('-password')
+        .exec();
     } catch (e) {
       throw new BadRequest(e.message);
     }
@@ -541,7 +567,10 @@ export class UsersService {
     }
     try {
       await this.userModel.findByIdAndUpdate({ _id: user.id }, { token: null });
-      return await this.userModel.findById({ _id: user.id });
+      return await this.userModel
+        .findById({ _id: user.id })
+        .select('-password')
+        .exec();
     } catch (e) {
       throw new BadRequest(e.message);
     }
@@ -660,8 +689,11 @@ export class UsersService {
             price,
           },
         );
-        const userUpdate = this.userModel.findById({ _id: findId.id });
-        return userUpdate;
+
+        return await this.userModel
+          .findById({ _id: findId.id })
+          .select(rows)
+          .exec();
       }
     } catch (e) {
       throw new BadRequest(e.message);
@@ -682,7 +714,10 @@ export class UsersService {
           $set: { video: newArr },
         },
       );
-      return await this.userModel.findById({ _id: user.id });
+      return await this.userModel
+        .findById({ _id: user.id })
+        .select(rows)
+        .exec();
     } catch (e) {
       throw new BadRequest(e.message);
     }
@@ -718,7 +753,10 @@ export class UsersService {
       } else {
         const SECRET_KEY = process.env.SECRET_KEY;
         const findId = verify(token, SECRET_KEY) as JwtPayload;
-        const user = await this.userModel.findById({ _id: findId.id });
+        const user = await this.userModel
+          .findById({ _id: findId.id })
+          .select('-password')
+          .exec();
         return user;
       }
     } catch (e) {
@@ -733,9 +771,12 @@ export class UsersService {
     const SECRET_KEY = process.env.SECRET_KEY;
     const token = sign(payload, SECRET_KEY, { expiresIn: '10m' });
     await this.userModel.findByIdAndUpdate(authUser._id, { token });
-    const authentificationUser = await this.userModel.findById({
-      _id: authUser._id,
-    });
+    const authentificationUser = await this.userModel
+      .findById({
+        _id: authUser._id,
+      })
+      .select('-password')
+      .exec();
     return authentificationUser;
   }
 
@@ -759,9 +800,12 @@ export class UsersService {
       };
       const tokenRef = sign(payload, SECRET_KEY, { expiresIn: '24h' });
       await this.userModel.findByIdAndUpdate(user._id, { token: tokenRef });
-      const authentificationUser = await this.userModel.findById({
-        _id: user.id,
-      });
+      const authentificationUser = await this.userModel
+        .findById({
+          _id: user.id,
+        })
+        .select('-password')
+        .exec();
       return authentificationUser;
     } catch (error) {
       throw new BadRequest('Invalid refresh token');
@@ -783,7 +827,10 @@ export class UsersService {
       const createdCategory = await this.categoryModel.create(category);
       createdCategory.save();
 
-      return await this.categoryModel.findById(createdCategory._id);
+      return await this.categoryModel
+        .findById(createdCategory._id)
+        .select(rows)
+        .exec();
     } catch (e) {
       throw new BadRequest(e.message);
     }
@@ -816,14 +863,14 @@ export class UsersService {
         { _id: userID },
         { $set: { category: arrCategory } },
       );
-      return await this.userModel.findById(userID);
+      return await this.userModel.findById(userID).select(rows).exec();
     } catch (e) {
       throw new NotFound('Category not found');
     }
   }
   async addSubcategory(
     catId: string,
-    subCategory: Subcategories,
+    subCategory: Subcategory,
   ): Promise<Category> {
     try {
       const find = await this.categoryModel.findById(catId).exec();
@@ -851,7 +898,10 @@ export class UsersService {
 
   async findUserCategory(id: string) {
     try {
-      const find = await this.userModel.find({ 'category._id': id }).exec();
+      const find = await this.userModel
+        .find({ 'category._id': id })
+        .select(rows)
+        .exec();
       if (Array.isArray(find) && find.length === 0) {
         return new NotFound('User not found');
       }
@@ -865,6 +915,7 @@ export class UsersService {
     try {
       const find = await this.userModel
         .find({ 'category.subcategories.id': id })
+        .select(rows)
         .exec();
       if (Array.isArray(find) && find.length === 0) {
         return new NotFound('User not found');

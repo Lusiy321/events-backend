@@ -15,5 +15,6 @@ export declare class OrdersService {
     generateSixDigitNumber(): Promise<number>;
     create(orderObj: CreateOrderDto): Promise<Orders>;
     verifyOrder(code: string): Promise<any>;
+    checkTrialStatus(id: string): Promise<boolean>;
     findUserByCategory(order: Orders): Promise<any>;
 }

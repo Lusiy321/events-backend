@@ -279,6 +279,11 @@ export class User extends Model<User> {
     default: 0,
   })
   disagree_order: number;
+  @Prop({
+    type: Date,
+    default: 0,
+  })
+  trialEnds: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

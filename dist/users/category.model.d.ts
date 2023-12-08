@@ -23,11 +23,11 @@
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
 import { Model } from 'mongoose';
-import { Subcategories } from './utils/subcategory.interface';
+import { Subcategory } from './dto/caterory.interface';
 export type CategoryDocument = Category & Document;
 export declare class Category extends Model<Category> {
     name: string;
-    subcategories: Array<Subcategories>;
+    subcategories: Array<Subcategory>;
 }
 export declare const CategorySchema: import("mongoose").Schema<Category, Model<Category, any, any, any, import("mongoose").Document<unknown, any, Category> & Category & {
     _id: import("mongoose").Types.ObjectId;

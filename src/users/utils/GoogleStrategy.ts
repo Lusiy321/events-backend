@@ -20,10 +20,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       email: profile.emails[0].value,
       password: profile.id + accessToken,
       firstName: profile.name.givenName,
-      lastName: profile.name.familyName,
-      master_photo: profile.photos[0].value,
       googleId: profile.id,
-      verify: profile.emails[0].verified,
+      verify_google: Boolean(profile.emails[0].verified),
     });
     user.save();
     return user || null;

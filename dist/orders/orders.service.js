@@ -77,19 +77,7 @@ let OrdersService = class OrdersService {
             const createdOrder = await this.ordersModel.create(params);
             await this.ordersModel.findByIdAndUpdate({ _id: createdOrder._id }, { sms: verificationCode });
             const order = await this.ordersModel.findById(createdOrder._id);
-            const usersArr = await this.findUserByCategory(order);
-            console.log(usersArr);
-            for (const user of usersArr) {
-                if (user.tg_chat !== null && user.location === order.location) {
-                    await this.mesengersService.sendNewTgOrder(user.tg_chat, order);
-                }
-            }
-            for (const user of usersArr) {
-                if (user.viber !== null && user.location === order.location) {
-                    await this.mesengersService.sendNewViberOrder(user.viber, order);
-                }
-            }
-            return await this.ordersModel.findById(createdOrder._id);
+            return order;
         }
         catch (e) {
             throw new http_errors_1.BadRequest(e.message);
@@ -97,15 +85,46 @@ let OrdersService = class OrdersService {
     }
     async verifyOrder(code) {
         try {
-            const user = await this.ordersModel.findOne({ sms: code });
-            if (user) {
-                user.verify = true;
-                user.save();
-                return await this.ordersModel.findOne({ id: user.id });
+            const order = await this.ordersModel.findOne({ sms: code });
+            if (order) {
+                order.verify = true;
+                const updatedOrder = await this.ordersModel.findByIdAndUpdate({ _id: order._id }, { verify: true });
+                const usersArr = await this.findUserByCategory(order);
+                for (const user of usersArr) {
+                    if (user.tg_chat !== null && user.location === order.location) {
+                        const check = await this.checkTrialStatus(user._id);
+                        if (check === true || user.paid === true) {
+                            await this.mesengersService.sendNewTgOrder(user.tg_chat, order);
+                        }
+                    }
+                }
+                for (const user of usersArr) {
+                    if (user.viber !== null && user.location === order.location) {
+                        const check = await this.checkTrialStatus(user._id);
+                        if (check === true || user.paid === true) {
+                            await this.mesengersService.sendNewViberOrder(user.viber, order);
+                        }
+                    }
+                }
+                return updatedOrder;
             }
         }
         catch (e) {
             throw new http_errors_1.BadRequest(e.message);
+        }
+    }
+    async checkTrialStatus(id) {
+        const user = await this.userModel.findById(id);
+        if (!user) {
+            throw new http_errors_1.NotFound('User not found');
+        }
+        if (user.trial && user.trialEnds > new Date()) {
+            return true;
+        }
+        else {
+            user.trial = false;
+            await user.save();
+            return false;
         }
     }
     async findUserByCategory(order) {
