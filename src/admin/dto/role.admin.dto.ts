@@ -13,3 +13,5 @@ export class RoleAdminDto {
   @ApiProperty({ example: 'moderator', description: 'admin role' })
   readonly role: role;
 }
+
+export const admSelect = '-password -createdAt -updatedAt';

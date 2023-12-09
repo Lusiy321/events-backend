@@ -12,6 +12,7 @@ import { Orders } from 'src/orders/order.model';
 import { VerifyUserDto } from 'src/users/dto/verify.user.dto';
 import { UpdateUserAdmDto } from './dto/update.user.adm.dto';
 import { LoginAdminDto } from './dto/login.admin.dto';
+import { admSelect } from './dto/role.admin.dto';
 
 @Injectable()
 export class AdminService {
@@ -45,7 +46,7 @@ export class AdminService {
         created.setPassword(admin.password);
         created.save();
 
-        return await this.adminModel.findById(created._id);
+        return await this.adminModel.findById(created._id).select(admSelect);
       } else {
         throw new BadRequest('You are not superadmin');
       }
@@ -65,7 +66,9 @@ export class AdminService {
         throw new Unauthorized(`Username or password is wrong`);
       }
       await this.createToken(authUser);
-      return await this.adminModel.findOne({ username: lowerCase });
+      return await this.adminModel
+        .findOne({ username: lowerCase })
+        .select(admSelect);
     } catch (e) {
       throw new BadRequest(e.message);
     }
@@ -81,7 +84,10 @@ export class AdminService {
         { _id: admin.id },
         { token: null },
       );
-      return await this.adminModel.findById({ _id: admin.id });
+      return await this.adminModel
+        .findById({ _id: admin.id })
+        .select(admSelect)
+        .exec();
     } catch (e) {
       throw new BadRequest(e.message);
     }
@@ -94,7 +100,7 @@ export class AdminService {
     // }
     try {
       // if (findSuper.role === 'superadmin' || findSuper.role === 'admin') {
-      const find = await this.adminModel.find().exec();
+      const find = await this.adminModel.find().select(admSelect).exec();
       return find;
       // } else {
       //   throw new BadRequest('You are not admin');
@@ -111,7 +117,7 @@ export class AdminService {
     // }
     try {
       // if (findSuper.role === 'superadmin' || findSuper.role === 'admin') {
-      const find = await this.adminModel.findById(id).exec();
+      const find = await this.adminModel.findById(id).select(admSelect).exec();
       return find;
       // } else {
       //   throw new BadRequest('You are not admin');

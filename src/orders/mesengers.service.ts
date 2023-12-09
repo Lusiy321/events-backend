@@ -687,6 +687,21 @@ export class MesengersService {
     }
   }
 
+  async sendMessagesToAllViberUsers(msg: string) {
+    const allOrders = await this.ordersModel.find({}).select('viber').exec();
+    const allUsers = await this.userModel.find({}).select('viber').exec();
+
+    const allViberUsers = allOrders.concat(allUsers);
+    allViberUsers.map((user: any) => {
+      if (user.viber !== null) {
+        this.viber_bot.sendMessage({ id: user.viber }, [
+          new TextMessage(msg),
+          new KeyboardMessage(MAIN_KEYBOARD),
+        ]);
+      }
+    });
+  }
+
   startServer() {
     if (process.env.NOW_URL || process.env.HEROKU_URL) {
       const http = require('http');
@@ -731,6 +746,17 @@ export class MesengersService {
     } catch (error) {
       throw new Error(`Помилка надсилання повідомлення: ${error}`);
     }
+  }
+
+  async sendMessagesToAllTgUsers(msg: string) {
+    const allOrders = await this.ordersModel.find({}).select('tg_chat').exec();
+    const allUsers = await this.userModel.find({}).select('tg_chat').exec();
+    const allTgUsers = allOrders.concat(allUsers);
+    allTgUsers.map((user: any) => {
+      if (user.tg_chat !== null) {
+        this.sendMessage(user.tg_chat.toString(), msg);
+      }
+    });
   }
 
   async sendTgAgreement(phone: string, chatId: string) {

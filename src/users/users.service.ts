@@ -49,6 +49,7 @@ export class UsersService {
           .find() // добавить поиск по verify
           .select(rows)
           .skip(offset)
+          .sort({ createdAt: -1 })
           .limit(limit)
           .exec();
         return {
