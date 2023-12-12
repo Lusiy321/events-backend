@@ -7,6 +7,11 @@ import { TwilioService } from './twilio.service';
 import { User } from 'src/users/users.model';
 import { Categories } from 'src/users/dto/caterory.interface';
 import { MesengersService } from 'src/orders/mesengers.service';
+import {
+  mergeAndRemoveDuplicates,
+  paginateArray,
+  rows,
+} from 'src/users/utils/parse.user';
 
 @Injectable()
 export class OrdersService {
@@ -160,5 +165,289 @@ export class OrdersService {
       .exec();
 
     return subcategory;
+  }
+
+  async searchOrders(query: any): Promise<any> {
+    const { req, loc, page, cat, subcat } = query;
+    try {
+      const curentPage = page || 1;
+      const limit = 8;
+      const totalCount = await this.ordersModel.countDocuments();
+
+      const totalPages = Math.ceil(totalCount / limit);
+      const offset = (curentPage - 1) * limit;
+      // Если ничего не задано в строке
+      if (!req && !loc && !cat && !subcat) {
+        const result = await this.ordersModel
+          .find() // добавить поиск по
+          .select(rows)
+          .skip(offset)
+          .sort({ createdAt: -1 })
+          .limit(limit)
+          .exec();
+        return {
+          totalPages: totalPages,
+          currentPage: curentPage,
+          data: result,
+        };
+      }
+
+      const regexReq = new RegExp(req, 'i');
+      const regexLoc = new RegExp(loc, 'i');
+      // Если заданы пустые значения
+      if (
+        (req === '' && loc === '') ||
+        (!req && !loc) ||
+        (cat && !subcat) ||
+        (!cat && subcat)
+      ) {
+        const category = await this.ordersModel
+          .find({
+            category: {
+              $elemMatch: {
+                _id: cat,
+              },
+            },
+          })
+          .select(rows)
+          .exec();
+        const subcategory = await this.ordersModel
+          .find({
+            'category.subcategories': {
+              $elemMatch: {
+                id: subcat,
+              },
+            },
+          })
+          .select(rows)
+          .exec();
+        const resultArray = mergeAndRemoveDuplicates(category, subcategory);
+        if (Array.isArray(resultArray) && resultArray.length === 0) {
+          throw new NotFound('Orders not found');
+        } else {
+          const result = paginateArray(resultArray, curentPage);
+          const totalPages = Math.ceil(resultArray.length / limit);
+          return {
+            totalPages: totalPages,
+            currentPage: curentPage,
+            data: result,
+          };
+        }
+      }
+      // Если есть запрос без локации
+      if ((req !== '' && loc === '') || !loc) {
+        const findCat = await this.ordersModel
+          .find({
+            category: {
+              $elemMatch: {
+                name: { $regex: regexReq },
+              },
+            },
+          })
+          .select(rows)
+          .exec();
+        const findSubcat = await this.ordersModel
+          .find({
+            'category.subcategories': {
+              $elemMatch: {
+                name: { $regex: regexReq },
+              },
+            },
+          })
+          .select(rows)
+          .exec();
+        const findDescr = await this.ordersModel
+          .find({
+            description: { $regex: regexReq },
+          })
+          .select(rows)
+          .exec();
+        const category = await this.ordersModel
+          .find({
+            category: {
+              $elemMatch: {
+                _id: cat,
+              },
+            },
+          })
+          .select(rows)
+          .exec();
+        const subcategory = await this.ordersModel
+          .find({
+            'category.subcategories': {
+              $elemMatch: {
+                id: subcat,
+              },
+            },
+          })
+          .select(rows)
+          .exec();
+        const findLocation = await this.ordersModel
+          .find({
+            location: { $regex: regexReq },
+          })
+          .select(rows)
+          .exec();
+        const findName = await this.ordersModel
+          .find({
+            name: { $regex: regexReq },
+          })
+          .select(rows)
+          .exec();
+
+        const resultArray = mergeAndRemoveDuplicates(
+          findDescr,
+          category,
+          subcategory,
+          findCat,
+          findSubcat,
+          findLocation,
+          findName,
+        );
+        if (Array.isArray(resultArray) && resultArray.length === 0) {
+          throw new NotFound('Orders not found');
+        } else {
+          const result = paginateArray(resultArray, curentPage);
+          const totalPages = Math.ceil(resultArray.length / limit);
+          return {
+            totalPages: totalPages,
+            currentPage: curentPage,
+            data: result,
+          };
+        }
+        //Если нет запроса, но есть локация
+      } else if ((req === '' && loc !== '') || !req) {
+        const findLocation = await this.ordersModel
+          .find({
+            location: { $regex: regexLoc },
+          })
+          .select(rows)
+          .skip(offset)
+          .limit(limit)
+          .exec();
+        const category = await this.ordersModel
+          .find({
+            category: {
+              $elemMatch: {
+                _id: cat,
+              },
+            },
+          })
+          .select(rows)
+          .exec();
+        const subcategory = await this.ordersModel
+          .find({
+            'category.subcategories': {
+              $elemMatch: {
+                id: subcat,
+              },
+            },
+          })
+          .select(rows)
+          .exec();
+
+        const resultArray = mergeAndRemoveDuplicates(
+          category,
+          subcategory,
+          findLocation,
+        );
+
+        if (Array.isArray(resultArray) && findLocation.length === 0) {
+          throw new NotFound('Orders not found');
+        } else {
+          const result = paginateArray(resultArray, curentPage);
+          const totalPages = Math.ceil(resultArray.length / limit);
+          return {
+            totalPages: totalPages,
+            currentPage: curentPage,
+            data: result,
+          };
+        }
+      } else if (req !== '' && loc !== '') {
+        const findDescr = await this.ordersModel
+          .find({
+            description: { $regex: regexReq },
+            location: { $regex: regexLoc },
+          })
+          .select(rows)
+          .exec();
+
+        const category = await this.ordersModel
+          .find({
+            category: {
+              $elemMatch: {
+                _id: cat,
+              },
+            },
+            location: { $regex: regexLoc },
+          })
+          .select(rows)
+          .exec();
+
+        const subcategory = await this.ordersModel
+          .find({
+            'category.subcategories': {
+              $elemMatch: {
+                id: subcat,
+              },
+            },
+            location: { $regex: regexLoc },
+          })
+          .select(rows)
+          .exec();
+        const findCat = await this.ordersModel
+          .find({
+            category: {
+              $elemMatch: {
+                name: { $regex: regexReq },
+              },
+            },
+            location: { $regex: regexLoc },
+          })
+          .select(rows)
+          .exec();
+        const findSubcat = await this.ordersModel
+          .find({
+            'category.subcategories': {
+              $elemMatch: {
+                name: { $regex: regexReq },
+              },
+            },
+            location: { $regex: regexLoc },
+          })
+          .select(rows)
+          .exec();
+        const findName = await this.ordersModel
+          .find({
+            name: { $regex: regexReq },
+            location: { $regex: regexLoc },
+          })
+          .select(rows)
+          .exec();
+
+        const resultArray = mergeAndRemoveDuplicates(
+          findDescr,
+          category,
+          subcategory,
+          findCat,
+          findSubcat,
+          findName,
+        );
+
+        if (Array.isArray(resultArray) && resultArray.length === 0) {
+          throw new NotFound('Orders not found');
+        } else {
+          const result = paginateArray(resultArray, curentPage);
+          const totalPages = Math.ceil(resultArray.length / limit);
+          return {
+            totalPages: totalPages,
+            currentPage: curentPage,
+            data: result,
+          };
+        }
+      }
+    } catch (e) {
+      throw new NotFound('Orders not found');
+    }
   }
 }

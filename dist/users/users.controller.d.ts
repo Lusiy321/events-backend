@@ -7,7 +7,6 @@ import { PasswordUserDto } from './dto/password.user.dto';
 import { MailUserDto } from './dto/email.user.dto';
 import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
 import { Category } from './category.model';
-import { CreateCategoryDto } from './dto/create.category.dto';
 import { CloudinaryService } from './cloudinary.service';
 import { DelUserMediaDto } from './dto/delete.user.dto';
 export declare class UsersController {
@@ -29,10 +28,6 @@ export declare class UsersController {
     deleteAvatarImage(req: any): Promise<User>;
     googleLogin(): Promise<void>;
     googleAuthRedirect(res: any, req: any): Promise<any>;
-    createCat(category: CreateCategoryDto): Promise<Category>;
-    addSubcategory(id: string, subCategory: CreateCategoryDto): Promise<Category>;
-    findCategoryId(id: string): Promise<User[]>;
-    findSubcategoryId(id: string): Promise<User[]>;
     refresh(request: any): Promise<User>;
     cangePwd(request: any, password: PasswordUserDto): Promise<User>;
     forgotPwd(email: MailUserDto): Promise<[import("@sendgrid/mail").ClientResponse, {}]>;

@@ -28,6 +28,15 @@ export class OrdersController {
     private ordersModel: Orders,
   ) {}
 
+  @ApiOperation({
+    summary: 'Search orders from query ( ?req=музикант&loc=Київ )',
+  })
+  @ApiResponse({ status: 200, type: [Orders] })
+  @Get('/')
+  async searchUser(@Query() query: any): Promise<any> {
+    return this.ordersService.searchOrders(query);
+  }
+
   @ApiOperation({ summary: 'Get all orders' })
   @ApiResponse({ status: 200, type: Orders })
   @Get('/find')
@@ -49,7 +58,7 @@ export class OrdersController {
     return this.ordersService.create(user);
   }
 
-  @ApiOperation({ summary: 'BOT' })
+  @ApiOperation({ summary: 'Redirect to viber bot page BOT' })
   @ApiResponse({ status: 200, type: Orders })
   @Get('/bot')
   async bot(@Res() res: any) {
@@ -63,8 +72,9 @@ export class OrdersController {
   async sendVerificationCode(@Param('phone') phoneNumber: string) {
     const user = await this.ordersModel.findOne({ phone: phoneNumber });
     try {
+      const phone = '+' + phoneNumber;
       await this.twilioService.sendSMS(
-        phoneNumber,
+        phone,
         `Your verification code: ${user.sms}`,
       );
     } catch (e) {
@@ -82,7 +92,7 @@ export class OrdersController {
     return await this.ordersModel.findOne({ sms: code });
   }
 
-  @ApiOperation({ summary: 'Get all orders' })
+  @ApiOperation({ summary: 'Get all user orders' })
   @ApiResponse({ status: 200, type: Orders })
   @Get('/find/:phone')
   async findPhoneUser(@Param('phone') phone: string): Promise<Orders> {

@@ -25,7 +25,6 @@ const password_user_dto_1 = require("./dto/password.user.dto");
 const email_user_dto_1 = require("./dto/email.user.dto");
 const updatePassword_user_dto_1 = require("./dto/updatePassword.user.dto");
 const category_model_1 = require("./category.model");
-const create_category_dto_1 = require("./dto/create.category.dto");
 const platform_express_1 = require("@nestjs/platform-express");
 const cloudinary_service_1 = require("./cloudinary.service");
 const multer_1 = require("multer");
@@ -90,18 +89,6 @@ let UsersController = class UsersController {
         const userId = req.user.id;
         const user = await this.usersService.findById(userId);
         return res.redirect(`${process.env.FRONT_LINK}?token=${user.token}`);
-    }
-    async createCat(category) {
-        return this.usersService.createCategory(category);
-    }
-    async addSubcategory(id, subCategory) {
-        return this.usersService.addSubcategory(id, subCategory);
-    }
-    async findCategoryId(id) {
-        return this.usersService.findUserCategory(id);
-    }
-    async findSubcategoryId(id) {
-        return this.usersService.findUserSubcategory(id);
     }
     async refresh(request) {
         return await this.usersService.refreshAccessToken(request);
@@ -296,45 +283,6 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "googleAuthRedirect", null);
-__decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Создание категории в БД с категориями' }),
-    (0, swagger_1.ApiResponse)({ status: 200, type: category_model_1.Category }),
-    (0, common_1.HttpCode)(200),
-    (0, common_1.Post)('/category/add'),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_category_dto_1.CreateCategoryDto]),
-    __metadata("design:returntype", Promise)
-], UsersController.prototype, "createCat", null);
-__decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Добавление подкатегории в БД с категориями' }),
-    (0, swagger_1.ApiResponse)({ status: 200, type: category_model_1.Category }),
-    (0, common_1.HttpCode)(200),
-    (0, common_1.Post)('/subcategories/:id'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, create_category_dto_1.CreateCategoryDto]),
-    __metadata("design:returntype", Promise)
-], UsersController.prototype, "addSubcategory", null);
-__decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Сортировка по категориям пользователей' }),
-    (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
-    (0, common_1.Get)('/findCategory/:id'),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], UsersController.prototype, "findCategoryId", null);
-__decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Сортировка по подкатегориям пользователей' }),
-    (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
-    (0, common_1.Get)('/findSubcategory/:id'),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], UsersController.prototype, "findSubcategoryId", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Refresh Access Token' }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),

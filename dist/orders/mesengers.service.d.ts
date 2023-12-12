@@ -11,8 +11,10 @@ export declare class MesengersService {
     sendNewViberOrder(userId: string, order: Orders): Promise<void>;
     sendViberAgreement(orderPhone: string, userChatId: string): Promise<boolean>;
     myOrdersList(chatId: string): Promise<void>;
+    sendMessagesToAllViberUsers(msg: string): Promise<void>;
     startServer(): any;
     sendMessage(chatId: string, msg: string): Promise<TelegramBot.Message>;
+    sendMessagesToAllTgUsers(msg: string): Promise<void>;
     sendTgAgreement(phone: string, chatId: string): Promise<boolean>;
     sendNewTgOrder(chatId: string, order: Orders): Promise<TelegramBot.Message>;
 }

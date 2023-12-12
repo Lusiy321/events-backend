@@ -21,6 +21,8 @@ const admin_model_1 = require("./admin.model");
 const create_admin_dto_1 = require("./dto/create.admin.dto");
 const verify_user_dto_1 = require("../users/dto/verify.user.dto");
 const update_user_adm_dto_1 = require("./dto/update.user.adm.dto");
+const create_category_dto_1 = require("../users/dto/create.category.dto");
+const category_model_1 = require("../users/category.model");
 let AdminController = class AdminController {
     constructor(adminService) {
         this.adminService = adminService;
@@ -54,6 +56,18 @@ let AdminController = class AdminController {
     }
     async setBan(id, request) {
         return this.adminService.banUser(id, request);
+    }
+    async createCat(category, request) {
+        return this.adminService.createCategory(request, category);
+    }
+    async addSubcategory(id, subCategory, request) {
+        return this.adminService.addSubcategory(request, id, subCategory);
+    }
+    async findCategoryId(id, request) {
+        return this.adminService.findUserCategory(request, id);
+    }
+    async findSubcategoryId(id, request) {
+        return this.adminService.findUserSubcategory(request, id);
     }
 };
 exports.AdminController = AdminController;
@@ -174,6 +188,53 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "setBan", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Создание категории в БД с категориями' }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: category_model_1.Category }),
+    (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
+    (0, common_1.HttpCode)(200),
+    (0, common_1.Post)('/category/add'),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_category_dto_1.CreateCategoryDto, Object]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "createCat", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Добавление подкатегории в БД с категориями' }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: category_model_1.Category }),
+    (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
+    (0, common_1.HttpCode)(200),
+    (0, common_1.Post)('/subcategories/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, create_category_dto_1.CreateCategoryDto, Object]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "addSubcategory", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Сортировка по категориям пользователей' }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
+    (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
+    (0, common_1.Get)('/findCategory/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "findCategoryId", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Сортировка по подкатегориям пользователей' }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
+    (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
+    (0, common_1.Get)('/findSubcategory/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "findSubcategoryId", null);
 exports.AdminController = AdminController = __decorate([
     (0, swagger_1.ApiTags)('Admin'),
     (0, common_1.Controller)('admin'),

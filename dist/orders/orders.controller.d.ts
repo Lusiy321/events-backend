@@ -7,6 +7,7 @@ export declare class OrdersController {
     private readonly twilioService;
     private ordersModel;
     constructor(ordersService: OrdersService, twilioService: TwilioService, ordersModel: Orders);
+    searchUser(query: any): Promise<any>;
     findOrders(): Promise<Orders[]>;
     findIdOrders(id: string): Promise<Orders>;
     create(user: CreateOrderDto): Promise<Orders>;

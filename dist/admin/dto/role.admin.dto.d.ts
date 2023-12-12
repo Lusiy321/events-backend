@@ -8,3 +8,4 @@ export declare enum role {
 export declare class RoleAdminDto {
     readonly role: role;
 }
+export declare const admSelect = "-password -createdAt -updatedAt";

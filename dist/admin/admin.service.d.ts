@@ -5,11 +5,15 @@ import { Orders } from 'src/orders/order.model';
 import { VerifyUserDto } from 'src/users/dto/verify.user.dto';
 import { UpdateUserAdmDto } from './dto/update.user.adm.dto';
 import { LoginAdminDto } from './dto/login.admin.dto';
+import { CreateCategoryDto } from 'src/users/dto/create.category.dto';
+import { Category } from 'src/users/category.model';
+import { Subcategory } from 'src/users/dto/caterory.interface';
 export declare class AdminService {
     private adminModel;
     private userModel;
     private ordersModel;
-    constructor(adminModel: Admin, userModel: User, ordersModel: Orders);
+    private categoryModel;
+    constructor(adminModel: Admin, userModel: User, ordersModel: Orders, categoryModel: Category);
     createAdmin(admin: CreateAdminDto, req: any): Promise<Admin>;
     login(user: LoginAdminDto): Promise<Admin>;
     logout(req: any): Promise<Admin>;
@@ -24,4 +28,8 @@ export declare class AdminService {
         _id: string;
     }): Promise<any>;
     refreshAccessToken(req: any): Promise<Admin>;
+    createCategory(req: any, category: CreateCategoryDto): Promise<Category>;
+    addSubcategory(req: any, catId: string, subCategory: Subcategory): Promise<Category>;
+    findUserCategory(req: any, id: string): Promise<any>;
+    findUserSubcategory(req: any, id: string): Promise<any>;
 }

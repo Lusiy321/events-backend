@@ -15,6 +15,7 @@ const admin_service_1 = require("./admin.service");
 const jwt_1 = require("@nestjs/jwt");
 const users_model_1 = require("../users/users.model");
 const order_model_1 = require("../orders/order.model");
+const category_model_1 = require("../users/category.model");
 let AdminModule = class AdminModule {
 };
 exports.AdminModule = AdminModule;
@@ -27,11 +28,8 @@ exports.AdminModule = AdminModule = __decorate([
             }),
             mongoose_1.MongooseModule.forFeature([
                 { name: admin_model_1.Admin.name, schema: admin_model_1.AdminSchema, collection: 'admins' },
-            ]),
-            mongoose_1.MongooseModule.forFeature([
+                { name: category_model_1.Category.name, schema: category_model_1.CategorySchema, collection: 'categories' },
                 { name: users_model_1.User.name, schema: users_model_1.UserSchema, collection: 'users' },
-            ]),
-            mongoose_1.MongooseModule.forFeature([
                 { name: order_model_1.Orders.name, schema: order_model_1.OrderSchema, collection: 'orders' },
             ]),
         ],

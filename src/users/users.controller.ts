@@ -219,39 +219,6 @@ export class UsersController {
     return res.redirect(`${process.env.FRONT_LINK}?token=${user.token}`);
   }
 
-  @ApiOperation({ summary: 'Создание категории в БД с категориями' })
-  @ApiResponse({ status: 200, type: Category })
-  @HttpCode(200)
-  @Post('/category/add')
-  async createCat(@Body() category: CreateCategoryDto): Promise<Category> {
-    return this.usersService.createCategory(category);
-  }
-
-  @ApiOperation({ summary: 'Добавление подкатегории в БД с категориями' })
-  @ApiResponse({ status: 200, type: Category })
-  @HttpCode(200)
-  @Post('/subcategories/:id')
-  async addSubcategory(
-    @Param('id') id: string,
-    @Body() subCategory: CreateCategoryDto,
-  ): Promise<Category> {
-    return this.usersService.addSubcategory(id, subCategory);
-  }
-
-  @ApiOperation({ summary: 'Сортировка по категориям пользователей' })
-  @ApiResponse({ status: 200, type: User })
-  @Get('/findCategory/:id')
-  async findCategoryId(@Param('id') id: string): Promise<User[]> {
-    return this.usersService.findUserCategory(id);
-  }
-
-  @ApiOperation({ summary: 'Сортировка по подкатегориям пользователей' })
-  @ApiResponse({ status: 200, type: User })
-  @Get('/findSubcategory/:id')
-  async findSubcategoryId(@Param('id') id: string): Promise<User[]> {
-    return this.usersService.findUserSubcategory(id);
-  }
-
   @ApiOperation({ summary: 'Refresh Access Token' })
   @ApiBearerAuth('BearerAuthMethod')
   @Patch('refresh')

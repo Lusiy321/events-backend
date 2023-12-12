@@ -27,6 +27,9 @@ let OrdersController = class OrdersController {
         this.twilioService = twilioService;
         this.ordersModel = ordersModel;
     }
+    async searchUser(query) {
+        return this.ordersService.searchOrders(query);
+    }
     async findOrders() {
         return this.ordersService.findAllOrders();
     }
@@ -42,7 +45,8 @@ let OrdersController = class OrdersController {
     async sendVerificationCode(phoneNumber) {
         const user = await this.ordersModel.findOne({ phone: phoneNumber });
         try {
-            await this.twilioService.sendSMS(phoneNumber, `Your verification code: ${user.sms}`);
+            const phone = '+' + phoneNumber;
+            await this.twilioService.sendSMS(phone, `Your verification code: ${user.sms}`);
         }
         catch (e) {
             throw new http_errors_1.BadRequest(e.message);
@@ -58,6 +62,17 @@ let OrdersController = class OrdersController {
     }
 };
 exports.OrdersController = OrdersController;
+__decorate([
+    (0, swagger_1.ApiOperation)({
+        summary: 'Search orders from query ( ?req=музикант&loc=Київ )',
+    }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: [order_model_1.Orders] }),
+    (0, common_1.Get)('/'),
+    __param(0, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], OrdersController.prototype, "searchUser", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Get all orders' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: order_model_1.Orders }),
@@ -85,7 +100,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "create", null);
 __decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'BOT' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Redirect to viber bot page BOT' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: order_model_1.Orders }),
     (0, common_1.Get)('/bot'),
     __param(0, (0, common_1.Res)()),
@@ -114,7 +129,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "verifyBySms", null);
 __decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Get all orders' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all user orders' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: order_model_1.Orders }),
     (0, common_1.Get)('/find/:phone'),
     __param(0, (0, common_1.Param)('phone')),

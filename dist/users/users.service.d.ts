@@ -7,8 +7,6 @@ import { MailUserDto } from './dto/email.user.dto';
 import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
 import { GoogleUserDto } from './dto/google.user.dto';
 import { Category } from './category.model';
-import { CreateCategoryDto } from './dto/create.category.dto';
-import { Subcategory } from './dto/caterory.interface';
 export declare class UsersService {
     private userModel;
     private categoryModel;
@@ -34,10 +32,5 @@ export declare class UsersService {
         _id: string;
     }): Promise<any>;
     refreshAccessToken(req: any): Promise<User>;
-    createCategory(category: CreateCategoryDto): Promise<Category>;
-    addUsercategory(userID: string, categoryID: string, subcategoryID: string): Promise<User>;
-    addSubcategory(catId: string, subCategory: Subcategory): Promise<Category>;
     findCategory(): Promise<Category[]>;
-    findUserCategory(id: string): Promise<any>;
-    findUserSubcategory(id: string): Promise<any>;
 }

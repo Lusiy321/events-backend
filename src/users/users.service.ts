@@ -13,7 +13,6 @@ import { MailUserDto } from './dto/email.user.dto';
 import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
 import { GoogleUserDto } from './dto/google.user.dto';
 import { Category } from './category.model';
-import { CreateCategoryDto } from './dto/create.category.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { Categories, Subcategory } from './dto/caterory.interface';
 import { verifyEmailMsg } from './utils/email.schemas';
@@ -813,114 +812,10 @@ export class UsersService {
     }
   }
   // CATEGORY
-  async createCategory(category: CreateCategoryDto): Promise<Category> {
-    try {
-      const { name } = category;
-      const lowerCaseEmail = name.toLowerCase();
-
-      const registrationCategory = await this.categoryModel.findOne({
-        name: lowerCaseEmail,
-      });
-      if (registrationCategory) {
-        throw new Conflict(`Category ${name} exist`);
-      }
-
-      const createdCategory = await this.categoryModel.create(category);
-      createdCategory.save();
-
-      return await this.categoryModel
-        .findById(createdCategory._id)
-        .select(rows)
-        .exec();
-    } catch (e) {
-      throw new BadRequest(e.message);
-    }
-  }
-  async addUsercategory(
-    userID: string,
-    categoryID: string,
-    subcategoryID: string,
-  ): Promise<User> {
-    try {
-      const findUser = await this.userModel.findById(userID).exec();
-      const arrCategory = findUser.category;
-      const findCategory = await this.categoryModel.findById(categoryID).exec();
-      const arrSubcategory = findCategory.subcategories;
-
-      function searchById(arr: Array<any>, id: string) {
-        for (let i = 0; i < arr.length; i++) {
-          if (arr[i].id === id) {
-            return arr[i];
-          }
-        }
-        return null;
-      }
-      const result = searchById(arrSubcategory, subcategoryID);
-      findCategory.subcategories = [];
-      findCategory.subcategories.push(result);
-      arrCategory.push(findCategory);
-
-      await this.userModel.updateOne(
-        { _id: userID },
-        { $set: { category: arrCategory } },
-      );
-      return await this.userModel.findById(userID).select(rows).exec();
-    } catch (e) {
-      throw new NotFound('Category not found');
-    }
-  }
-  async addSubcategory(
-    catId: string,
-    subCategory: Subcategory,
-  ): Promise<Category> {
-    try {
-      const find = await this.categoryModel.findById(catId).exec();
-      const arr = find.subcategories;
-      subCategory.id = uuidv4();
-      arr.push(subCategory);
-      await this.categoryModel.updateOne(
-        { _id: catId },
-        { $set: { subcategories: arr } },
-      );
-      return await this.categoryModel.findById(catId);
-    } catch (e) {
-      throw new NotFound('Category not found');
-    }
-  }
 
   async findCategory(): Promise<Category[]> {
     try {
       const find = await this.categoryModel.find().exec();
-      return find;
-    } catch (e) {
-      throw new NotFound('User not found');
-    }
-  }
-
-  async findUserCategory(id: string) {
-    try {
-      const find = await this.userModel
-        .find({ 'category._id': id })
-        .select(rows)
-        .exec();
-      if (Array.isArray(find) && find.length === 0) {
-        return new NotFound('User not found');
-      }
-      return find;
-    } catch (e) {
-      throw new NotFound('User not found');
-    }
-  }
-
-  async findUserSubcategory(id: string) {
-    try {
-      const find = await this.userModel
-        .find({ 'category.subcategories.id': id })
-        .select(rows)
-        .exec();
-      if (Array.isArray(find) && find.length === 0) {
-        return new NotFound('User not found');
-      }
       return find;
     } catch (e) {
       throw new NotFound('User not found');

@@ -21,7 +21,6 @@ const http_errors_1 = require("http-errors");
 const jsonwebtoken_1 = require("jsonwebtoken");
 const sgMail = require("@sendgrid/mail");
 const category_model_1 = require("./category.model");
-const uuid_1 = require("uuid");
 const email_schemas_1 = require("./utils/email.schemas");
 const parse_user_1 = require("./utils/parse.user");
 let UsersService = class UsersService {
@@ -43,6 +42,7 @@ let UsersService = class UsersService {
                     .find()
                     .select(parse_user_1.rows)
                     .skip(offset)
+                    .sort({ createdAt: -1 })
                     .limit(limit)
                     .exec();
                 return {
@@ -704,98 +704,9 @@ let UsersService = class UsersService {
             throw new http_errors_1.BadRequest('Invalid refresh token');
         }
     }
-    async createCategory(category) {
-        try {
-            const { name } = category;
-            const lowerCaseEmail = name.toLowerCase();
-            const registrationCategory = await this.categoryModel.findOne({
-                name: lowerCaseEmail,
-            });
-            if (registrationCategory) {
-                throw new http_errors_1.Conflict(`Category ${name} exist`);
-            }
-            const createdCategory = await this.categoryModel.create(category);
-            createdCategory.save();
-            return await this.categoryModel
-                .findById(createdCategory._id)
-                .select(parse_user_1.rows)
-                .exec();
-        }
-        catch (e) {
-            throw new http_errors_1.BadRequest(e.message);
-        }
-    }
-    async addUsercategory(userID, categoryID, subcategoryID) {
-        try {
-            const findUser = await this.userModel.findById(userID).exec();
-            const arrCategory = findUser.category;
-            const findCategory = await this.categoryModel.findById(categoryID).exec();
-            const arrSubcategory = findCategory.subcategories;
-            function searchById(arr, id) {
-                for (let i = 0; i < arr.length; i++) {
-                    if (arr[i].id === id) {
-                        return arr[i];
-                    }
-                }
-                return null;
-            }
-            const result = searchById(arrSubcategory, subcategoryID);
-            findCategory.subcategories = [];
-            findCategory.subcategories.push(result);
-            arrCategory.push(findCategory);
-            await this.userModel.updateOne({ _id: userID }, { $set: { category: arrCategory } });
-            return await this.userModel.findById(userID).select(parse_user_1.rows).exec();
-        }
-        catch (e) {
-            throw new http_errors_1.NotFound('Category not found');
-        }
-    }
-    async addSubcategory(catId, subCategory) {
-        try {
-            const find = await this.categoryModel.findById(catId).exec();
-            const arr = find.subcategories;
-            subCategory.id = (0, uuid_1.v4)();
-            arr.push(subCategory);
-            await this.categoryModel.updateOne({ _id: catId }, { $set: { subcategories: arr } });
-            return await this.categoryModel.findById(catId);
-        }
-        catch (e) {
-            throw new http_errors_1.NotFound('Category not found');
-        }
-    }
     async findCategory() {
         try {
             const find = await this.categoryModel.find().exec();
-            return find;
-        }
-        catch (e) {
-            throw new http_errors_1.NotFound('User not found');
-        }
-    }
-    async findUserCategory(id) {
-        try {
-            const find = await this.userModel
-                .find({ 'category._id': id })
-                .select(parse_user_1.rows)
-                .exec();
-            if (Array.isArray(find) && find.length === 0) {
-                return new http_errors_1.NotFound('User not found');
-            }
-            return find;
-        }
-        catch (e) {
-            throw new http_errors_1.NotFound('User not found');
-        }
-    }
-    async findUserSubcategory(id) {
-        try {
-            const find = await this.userModel
-                .find({ 'category.subcategories.id': id })
-                .select(parse_user_1.rows)
-                .exec();
-            if (Array.isArray(find) && find.length === 0) {
-                return new http_errors_1.NotFound('User not found');
-            }
             return find;
         }
         catch (e) {

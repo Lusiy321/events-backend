@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { User, UserSchema } from 'src/users/users.model';
 import { OrderSchema, Orders } from 'src/orders/order.model';
 import { UsersService } from 'src/users/users.service';
+import { Category, CategorySchema } from 'src/users/category.model';
 
 @Module({
   imports: [
@@ -16,11 +17,8 @@ import { UsersService } from 'src/users/users.service';
     }),
     MongooseModule.forFeature([
       { name: Admin.name, schema: AdminSchema, collection: 'admins' },
-    ]),
-    MongooseModule.forFeature([
+      { name: Category.name, schema: CategorySchema, collection: 'categories' },
       { name: User.name, schema: UserSchema, collection: 'users' },
-    ]),
-    MongooseModule.forFeature([
       { name: Orders.name, schema: OrderSchema, collection: 'orders' },
     ]),
   ],

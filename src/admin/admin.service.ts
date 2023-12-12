@@ -6,13 +6,17 @@ import { compareSync, hashSync } from 'bcrypt';
 import { sign, verify, JwtPayload } from 'jsonwebtoken';
 import { CreateAdminDto } from './dto/create.admin.dto';
 import { Admin, AdminSchema } from './admin.model';
-import { UpdateUserDto } from 'src/users/dto/update.user.dto';
+import { v4 as uuidv4 } from 'uuid';
 import { User } from 'src/users/users.model';
 import { Orders } from 'src/orders/order.model';
 import { VerifyUserDto } from 'src/users/dto/verify.user.dto';
 import { UpdateUserAdmDto } from './dto/update.user.adm.dto';
 import { LoginAdminDto } from './dto/login.admin.dto';
 import { admSelect } from './dto/role.admin.dto';
+import { CreateCategoryDto } from 'src/users/dto/create.category.dto';
+import { Category } from 'src/users/category.model';
+import { rows } from 'src/users/utils/parse.user';
+import { Subcategory } from 'src/users/dto/caterory.interface';
 
 @Injectable()
 export class AdminService {
@@ -23,6 +27,7 @@ export class AdminService {
     private userModel: User,
     @InjectModel(Orders.name)
     private ordersModel: Orders,
+    @InjectModel(Category.name) private categoryModel: Category,
   ) {}
 
   // ADMINS
@@ -337,6 +342,121 @@ export class AdminService {
       return authentificationUser;
     } catch (error) {
       throw new BadRequest('Invalid refresh token');
+    }
+  }
+
+  // CATEGORY
+  // создание категории в базе данных
+  async createCategory(
+    req: any,
+    category: CreateCategoryDto,
+  ): Promise<Category> {
+    try {
+      const admin = await this.findToken(req);
+      if (!admin) {
+        throw new Unauthorized('jwt expired');
+      } else if (admin.role === 'admin' || admin.role === 'superadmin') {
+        const { name } = category;
+        const lowerCaseEmail = name.toLowerCase();
+
+        const registrationCategory = await this.categoryModel.findOne({
+          name: lowerCaseEmail,
+        });
+        if (registrationCategory) {
+          throw new Conflict(`Category ${name} exist`);
+        }
+
+        const createdCategory = await this.categoryModel.create(category);
+        createdCategory.save();
+
+        return await this.categoryModel
+          .findById(createdCategory._id)
+          .select(rows)
+          .exec();
+      } else {
+        throw new BadRequest('You are not admin');
+      }
+    } catch (e) {
+      throw new BadRequest(e.message);
+    }
+  }
+  // Добавление подкатегории в существующую категорию
+  async addSubcategory(
+    req: any,
+    catId: string,
+    subCategory: Subcategory,
+  ): Promise<Category> {
+    try {
+      const admin = await this.findToken(req);
+      if (!admin) {
+        throw new Unauthorized('jwt expired');
+      } else if (admin.role === 'admin' || admin.role === 'superadmin') {
+        const find = await this.categoryModel.findById(catId).exec();
+        const arr = find.subcategories;
+        subCategory.id = uuidv4();
+        arr.push(subCategory);
+        await this.categoryModel.updateOne(
+          { _id: catId },
+          { $set: { subcategories: arr } },
+        );
+        return await this.categoryModel.findById(catId);
+      } else {
+        throw new BadRequest('You are not admin');
+      }
+    } catch (e) {
+      throw new NotFound('Category not found');
+    }
+  }
+  // поиск пользователей по категории
+  async findUserCategory(req: any, id: string) {
+    try {
+      const admin = await this.findToken(req);
+      if (!admin) {
+        throw new Unauthorized('jwt expired');
+      } else if (
+        admin.role === 'admin' ||
+        admin.role === 'moderator' ||
+        admin.role === 'superadmin'
+      ) {
+        const find = await this.userModel
+          .find({ 'category._id': id })
+          .select(rows)
+          .exec();
+        if (Array.isArray(find) && find.length === 0) {
+          return new NotFound('User not found');
+        }
+        return find;
+      } else {
+        throw new BadRequest('You are not admin');
+      }
+    } catch (e) {
+      throw new NotFound('User not found');
+    }
+  }
+
+  async findUserSubcategory(req: any, id: string) {
+    try {
+      const admin = await this.findToken(req);
+      if (!admin) {
+        throw new Unauthorized('jwt expired');
+      } else if (
+        admin.role === 'admin' ||
+        admin.role === 'moderator' ||
+        admin.role === 'superadmin'
+      ) {
+        const find = await this.userModel
+          .find({ 'category.subcategories.id': id })
+          .select(rows)
+          .exec();
+        if (Array.isArray(find) && find.length === 0) {
+          return new NotFound('User not found');
+        }
+        return find;
+      } else {
+        throw new BadRequest('You are not admin');
+      }
+    } catch (e) {
+      throw new NotFound('User not found');
     }
   }
 }

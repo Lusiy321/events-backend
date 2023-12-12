@@ -17,4 +17,5 @@ export declare class OrdersService {
     verifyOrder(code: string): Promise<any>;
     checkTrialStatus(id: string): Promise<boolean>;
     findUserByCategory(order: Orders): Promise<any>;
+    searchOrders(query: any): Promise<any>;
 }

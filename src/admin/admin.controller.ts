@@ -22,6 +22,8 @@ import { Admin } from './admin.model';
 import { CreateAdminDto } from './dto/create.admin.dto';
 import { VerifyUserDto } from 'src/users/dto/verify.user.dto';
 import { UpdateUserAdmDto } from './dto/update.user.adm.dto';
+import { CreateCategoryDto } from 'src/users/dto/create.category.dto';
+import { Category } from 'src/users/category.model';
 
 @ApiTags('Admin')
 @Controller('admin')
@@ -126,5 +128,52 @@ export class AdminController {
   @Patch('/ban/:Id')
   async setBan(@Param('Id') id: string, @Req() request: any): Promise<User> {
     return this.adminService.banUser(id, request);
+  }
+
+  @ApiOperation({ summary: 'Создание категории в БД с категориями' })
+  @ApiResponse({ status: 200, type: Category })
+  @ApiBearerAuth('BearerAuthMethod')
+  @HttpCode(200)
+  @Post('/category/add')
+  async createCat(
+    @Body() category: CreateCategoryDto,
+    @Req() request: any,
+  ): Promise<Category> {
+    return this.adminService.createCategory(request, category);
+  }
+
+  @ApiOperation({ summary: 'Добавление подкатегории в БД с категориями' })
+  @ApiResponse({ status: 200, type: Category })
+  @ApiBearerAuth('BearerAuthMethod')
+  @HttpCode(200)
+  @Post('/subcategories/:id')
+  async addSubcategory(
+    @Param('id') id: string,
+    @Body() subCategory: CreateCategoryDto,
+    @Req() request: any,
+  ): Promise<Category> {
+    return this.adminService.addSubcategory(request, id, subCategory);
+  }
+
+  @ApiOperation({ summary: 'Сортировка по категориям пользователей' })
+  @ApiResponse({ status: 200, type: User })
+  @ApiBearerAuth('BearerAuthMethod')
+  @Get('/findCategory/:id')
+  async findCategoryId(
+    @Param('id') id: string,
+    @Req() request: any,
+  ): Promise<User[]> {
+    return this.adminService.findUserCategory(request, id);
+  }
+
+  @ApiOperation({ summary: 'Сортировка по подкатегориям пользователей' })
+  @ApiResponse({ status: 200, type: User })
+  @ApiBearerAuth('BearerAuthMethod')
+  @Get('/findSubcategory/:id')
+  async findSubcategoryId(
+    @Param('id') id: string,
+    @Req() request: any,
+  ): Promise<User[]> {
+    return this.adminService.findUserSubcategory(request, id);
   }
 }

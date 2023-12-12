@@ -24,7 +24,6 @@ async function start() {
         bearerFormat: 'JWT',
     }, 'BearerAuthMethod')
         .addServer(`https://events-4qv2.onrender.com`)
-        .addServer(`https://events-show.cyclic.app`)
         .addServer(`http://localhost:${PORT}`)
         .build();
     const document = swagger_1.SwaggerModule.createDocument(app, config);

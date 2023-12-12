@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RoleAdminDto = exports.role = void 0;
+exports.admSelect = exports.RoleAdminDto = exports.role = void 0;
 const swagger_1 = require("@nestjs/swagger");
 var role;
 (function (role) {
@@ -26,4 +26,5 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: 'moderator', description: 'admin role' }),
     __metadata("design:type", String)
 ], RoleAdminDto.prototype, "role", void 0);
+exports.admSelect = '-password -createdAt -updatedAt';
 //# sourceMappingURL=role.admin.dto.js.map

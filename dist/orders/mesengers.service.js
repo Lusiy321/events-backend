@@ -597,6 +597,19 @@ let MesengersService = class MesengersService {
             throw new Error(`Помилка надсилання повідомлення: ${e}`);
         }
     }
+    async sendMessagesToAllViberUsers(msg) {
+        const allOrders = await this.ordersModel.find({}).select('viber').exec();
+        const allUsers = await this.userModel.find({}).select('viber').exec();
+        const allViberUsers = allOrders.concat(allUsers);
+        allViberUsers.map((user) => {
+            if (user.viber !== null) {
+                this.viber_bot.sendMessage({ id: user.viber }, [
+                    new TextMessage(msg),
+                    new KeyboardMessage(MAIN_KEYBOARD),
+                ]);
+            }
+        });
+    }
     startServer() {
         if (process.env.NOW_URL || process.env.HEROKU_URL) {
             const http = require('http');
@@ -635,6 +648,16 @@ let MesengersService = class MesengersService {
         catch (error) {
             throw new Error(`Помилка надсилання повідомлення: ${error}`);
         }
+    }
+    async sendMessagesToAllTgUsers(msg) {
+        const allOrders = await this.ordersModel.find({}).select('tg_chat').exec();
+        const allUsers = await this.userModel.find({}).select('tg_chat').exec();
+        const allTgUsers = allOrders.concat(allUsers);
+        allTgUsers.map((user) => {
+            if (user.tg_chat !== null) {
+                this.sendMessage(user.tg_chat.toString(), msg);
+            }
+        });
     }
     async sendTgAgreement(phone, chatId) {
         try {

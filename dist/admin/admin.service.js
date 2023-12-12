@@ -30,13 +30,18 @@ const http_errors_1 = require("http-errors");
 const bcrypt_1 = require("bcrypt");
 const jsonwebtoken_1 = require("jsonwebtoken");
 const admin_model_1 = require("./admin.model");
+const uuid_1 = require("uuid");
 const users_model_1 = require("../users/users.model");
 const order_model_1 = require("../orders/order.model");
+const role_admin_dto_1 = require("./dto/role.admin.dto");
+const category_model_1 = require("../users/category.model");
+const parse_user_1 = require("../users/utils/parse.user");
 let AdminService = class AdminService {
-    constructor(adminModel, userModel, ordersModel) {
+    constructor(adminModel, userModel, ordersModel, categoryModel) {
         this.adminModel = adminModel;
         this.userModel = userModel;
         this.ordersModel = ordersModel;
+        this.categoryModel = categoryModel;
     }
     async createAdmin(admin, req) {
         const findSuper = await this.findToken(req);
@@ -55,7 +60,7 @@ let AdminService = class AdminService {
                 const created = await this.adminModel.create(admin);
                 created.setPassword(admin.password);
                 created.save();
-                return await this.adminModel.findById(created._id);
+                return await this.adminModel.findById(created._id).select(role_admin_dto_1.admSelect);
             }
             else {
                 throw new http_errors_1.BadRequest('You are not superadmin');
@@ -76,7 +81,9 @@ let AdminService = class AdminService {
                 throw new http_errors_1.Unauthorized(`Username or password is wrong`);
             }
             await this.createToken(authUser);
-            return await this.adminModel.findOne({ username: lowerCase });
+            return await this.adminModel
+                .findOne({ username: lowerCase })
+                .select(role_admin_dto_1.admSelect);
         }
         catch (e) {
             throw new http_errors_1.BadRequest(e.message);
@@ -89,7 +96,10 @@ let AdminService = class AdminService {
         }
         try {
             await this.adminModel.findByIdAndUpdate({ _id: admin.id }, { token: null });
-            return await this.adminModel.findById({ _id: admin.id });
+            return await this.adminModel
+                .findById({ _id: admin.id })
+                .select(role_admin_dto_1.admSelect)
+                .exec();
         }
         catch (e) {
             throw new http_errors_1.BadRequest(e.message);
@@ -97,7 +107,7 @@ let AdminService = class AdminService {
     }
     async findAllAdmins(req) {
         try {
-            const find = await this.adminModel.find().exec();
+            const find = await this.adminModel.find().select(role_admin_dto_1.admSelect).exec();
             return find;
         }
         catch (e) {
@@ -106,7 +116,7 @@ let AdminService = class AdminService {
     }
     async findAdminById(id, req) {
         try {
-            const find = await this.adminModel.findById(id).exec();
+            const find = await this.adminModel.findById(id).select(role_admin_dto_1.admSelect).exec();
             return find;
         }
         catch (e) {
@@ -303,6 +313,110 @@ let AdminService = class AdminService {
             throw new http_errors_1.BadRequest('Invalid refresh token');
         }
     }
+    async createCategory(req, category) {
+        try {
+            const admin = await this.findToken(req);
+            if (!admin) {
+                throw new http_errors_1.Unauthorized('jwt expired');
+            }
+            else if (admin.role === 'admin' || admin.role === 'superadmin') {
+                const { name } = category;
+                const lowerCaseEmail = name.toLowerCase();
+                const registrationCategory = await this.categoryModel.findOne({
+                    name: lowerCaseEmail,
+                });
+                if (registrationCategory) {
+                    throw new http_errors_1.Conflict(`Category ${name} exist`);
+                }
+                const createdCategory = await this.categoryModel.create(category);
+                createdCategory.save();
+                return await this.categoryModel
+                    .findById(createdCategory._id)
+                    .select(parse_user_1.rows)
+                    .exec();
+            }
+            else {
+                throw new http_errors_1.BadRequest('You are not admin');
+            }
+        }
+        catch (e) {
+            throw new http_errors_1.BadRequest(e.message);
+        }
+    }
+    async addSubcategory(req, catId, subCategory) {
+        try {
+            const admin = await this.findToken(req);
+            if (!admin) {
+                throw new http_errors_1.Unauthorized('jwt expired');
+            }
+            else if (admin.role === 'admin' || admin.role === 'superadmin') {
+                const find = await this.categoryModel.findById(catId).exec();
+                const arr = find.subcategories;
+                subCategory.id = (0, uuid_1.v4)();
+                arr.push(subCategory);
+                await this.categoryModel.updateOne({ _id: catId }, { $set: { subcategories: arr } });
+                return await this.categoryModel.findById(catId);
+            }
+            else {
+                throw new http_errors_1.BadRequest('You are not admin');
+            }
+        }
+        catch (e) {
+            throw new http_errors_1.NotFound('Category not found');
+        }
+    }
+    async findUserCategory(req, id) {
+        try {
+            const admin = await this.findToken(req);
+            if (!admin) {
+                throw new http_errors_1.Unauthorized('jwt expired');
+            }
+            else if (admin.role === 'admin' ||
+                admin.role === 'moderator' ||
+                admin.role === 'superadmin') {
+                const find = await this.userModel
+                    .find({ 'category._id': id })
+                    .select(parse_user_1.rows)
+                    .exec();
+                if (Array.isArray(find) && find.length === 0) {
+                    return new http_errors_1.NotFound('User not found');
+                }
+                return find;
+            }
+            else {
+                throw new http_errors_1.BadRequest('You are not admin');
+            }
+        }
+        catch (e) {
+            throw new http_errors_1.NotFound('User not found');
+        }
+    }
+    async findUserSubcategory(req, id) {
+        try {
+            const admin = await this.findToken(req);
+            if (!admin) {
+                throw new http_errors_1.Unauthorized('jwt expired');
+            }
+            else if (admin.role === 'admin' ||
+                admin.role === 'moderator' ||
+                admin.role === 'superadmin') {
+                const find = await this.userModel
+                    .find({ 'category.subcategories.id': id })
+                    .select(parse_user_1.rows)
+                    .exec();
+                if (Array.isArray(find) && find.length === 0) {
+                    return new http_errors_1.NotFound('User not found');
+                }
+                return find;
+            }
+            else {
+                throw new http_errors_1.BadRequest('You are not admin');
+            }
+        }
+        catch (e) {
+            throw new http_errors_1.NotFound('User not found');
+        }
+    }
 };
 exports.AdminService = AdminService;
 exports.AdminService = AdminService = __decorate([
@@ -310,9 +424,11 @@ exports.AdminService = AdminService = __decorate([
     __param(0, (0, mongoose_1.InjectModel)(admin_model_1.Admin.name)),
     __param(1, (0, mongoose_1.InjectModel)(users_model_1.User.name)),
     __param(2, (0, mongoose_1.InjectModel)(order_model_1.Orders.name)),
+    __param(3, (0, mongoose_1.InjectModel)(category_model_1.Category.name)),
     __metadata("design:paramtypes", [admin_model_1.Admin,
         users_model_1.User,
-        order_model_1.Orders])
+        order_model_1.Orders,
+        category_model_1.Category])
 ], AdminService);
 admin_model_1.AdminSchema.methods.setPassword = async function (password) {
     return (this.password = (0, bcrypt_1.hashSync)(password, 10));
