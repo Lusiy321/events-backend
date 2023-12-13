@@ -48,6 +48,8 @@ export class UsersController {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
+  [x: string]: any;
+
   @ApiOperation({ summary: 'Create User' })
   @ApiResponse({ status: 201, type: User })
   @Post('/')
@@ -205,7 +207,7 @@ export class UsersController {
   @ApiResponse({ status: 200, type: GoogleUserDto })
   @Get('google/login')
   @UseGuards(GoogleAuthGuard)
-  async googleLogin() {
+  googleLogin() {
     return;
   }
 

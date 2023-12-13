@@ -418,24 +418,19 @@ let UsersService = class UsersService {
     async validateUser(details) {
         const user = await this.userModel.findOne({ googleId: details.googleId });
         try {
-            if (user === null) {
+            if (!user) {
                 const newUser = await this.userModel.create(details);
-                newUser.save();
                 const userUpdateToken = await this.userModel.findOne({
                     email: details.email,
                 });
                 await this.userModel.createToken(userUpdateToken);
-                return await this.userModel.findById({
-                    _id: userUpdateToken._id,
-                });
+                return await this.userModel.findById({ _id: userUpdateToken._id });
             }
             await this.userModel.createToken(user);
-            return await this.userModel.findOne({
-                _id: user.id,
-            });
+            return await this.userModel.findOne({ _id: user.id });
         }
         catch (e) {
-            throw new http_errors_1.NotFound('User not found');
+            throw new Error('Error validating user');
         }
     }
     async restorePassword(email) {

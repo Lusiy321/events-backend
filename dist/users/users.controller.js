@@ -82,7 +82,7 @@ let UsersController = class UsersController {
         await this.cloudinaryService.deleteAvatarImage(user);
         return await this.usersService.findById(user.id);
     }
-    async googleLogin() {
+    googleLogin() {
         return;
     }
     async googleAuthRedirect(res, req) {
@@ -270,7 +270,7 @@ __decorate([
     (0, common_1.UseGuards)(Guards_1.GoogleAuthGuard),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
+    __metadata("design:returntype", void 0)
 ], UsersController.prototype, "googleLogin", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Google Authentication' }),

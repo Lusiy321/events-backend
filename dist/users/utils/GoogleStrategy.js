@@ -24,16 +24,21 @@ let GoogleStrategy = class GoogleStrategy extends (0, passport_1.PassportStrateg
         });
         this.userService = userService;
     }
-    async validate(accessToken, profile) {
-        const user = await this.userService.validateUser({
-            email: profile.emails[0].value,
-            password: profile.id + accessToken,
-            firstName: profile.name.givenName,
-            googleId: profile.id,
-            verify_google: Boolean(profile.emails[0].verified),
-        });
-        user.save();
-        return user || null;
+    async validate(accessToken, refreshToken, profile) {
+        try {
+            const user = await this.userService.validateUser({
+                email: profile.emails[0].value,
+                password: profile.id + accessToken,
+                firstName: profile.name.givenName,
+                googleId: profile.id,
+                verify_google: Boolean(profile.emails[0].verified),
+            });
+            await user.save();
+            return user || null;
+        }
+        catch (e) {
+            console.log(e);
+        }
     }
 };
 exports.GoogleStrategy = GoogleStrategy;

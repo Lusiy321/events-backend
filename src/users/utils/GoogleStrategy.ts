@@ -15,15 +15,19 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     });
   }
 
-  async validate(accessToken: string, profile: Profile) {
-    const user = await this.userService.validateUser({
-      email: profile.emails[0].value,
-      password: profile.id + accessToken,
-      firstName: profile.name.givenName,
-      googleId: profile.id,
-      verify_google: Boolean(profile.emails[0].verified),
-    });
-    user.save();
-    return user || null;
+  async validate(accessToken: string, refreshToken: string, profile: Profile) {
+    try {
+      const user = await this.userService.validateUser({
+        email: profile.emails[0].value,
+        password: profile.id + accessToken,
+        firstName: profile.name.givenName,
+        googleId: profile.id,
+        verify_google: Boolean(profile.emails[0].verified),
+      });
+      await user.save();
+      return user || null;
+    } catch (e) {
+      console.log(e);
+    }
   }
 }

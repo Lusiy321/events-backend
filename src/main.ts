@@ -4,13 +4,23 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { MesengersService } from './orders/mesengers.service';
+import * as session from 'express-session';
 
 async function start() {
   const PORT = process.env.PORT || 5000;
   const app = await NestFactory.create(AppModule, new ExpressAdapter(express), {
     cors: true,
   });
-
+  app.use(
+    session({
+      secret: process.env.GOOGLE_CLIENT_SECRET,
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        maxAge: 60000,
+      },
+    }),
+  );
   app.enableCors();
   const config = new DocumentBuilder()
     .setTitle('Event and Show server')

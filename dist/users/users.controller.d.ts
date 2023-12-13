@@ -13,6 +13,7 @@ export declare class UsersController {
     private readonly usersService;
     private readonly cloudinaryService;
     constructor(usersService: UsersService, cloudinaryService: CloudinaryService);
+    [x: string]: any;
     create(user: CreateUserDto): Promise<User>;
     searchUser(query: any): Promise<any>;
     findUsers(): Promise<User[]>;
@@ -26,7 +27,7 @@ export declare class UsersController {
     deleteImage(id: DelUserMediaDto, req: any): Promise<User>;
     deleteVideo(id: string, req: any): Promise<User>;
     deleteAvatarImage(req: any): Promise<User>;
-    googleLogin(): Promise<void>;
+    googleLogin(): void;
     googleAuthRedirect(res: any, req: any): Promise<any>;
     refresh(request: any): Promise<User>;
     cangePwd(request: any, password: PasswordUserDto): Promise<User>;
