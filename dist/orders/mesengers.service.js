@@ -301,7 +301,10 @@ let MesengersService = class MesengersService {
             const chatId = msg.chat.id;
             const phoneNumber = msg.contact.phone_number;
             const user = await this.userModel.findOne({ phone: phoneNumber }).exec();
-            if (user) {
+            const order = await this.ordersModel
+                .findOne({ phone: phoneNumber })
+                .exec();
+            if (user.tg_chat === null) {
                 await this.userModel.findByIdAndUpdate(user.id, {
                     tg_chat: chatId,
                     verify: true,
@@ -309,10 +312,7 @@ let MesengersService = class MesengersService {
                 this.tg_bot.sendMessage(chatId, `Дякую, ${msg.from.first_name} тепер Вам будуть надходити повідомлення про нові пропозиції в твоїй категорії. Щоб вимкнути оповіщення виберіть "Меню" та натисніть /stop`, optURL);
             }
             else {
-                const order = await this.ordersModel
-                    .findOne({ phone: phoneNumber })
-                    .exec();
-                if (order) {
+                if (order.tg_chat === null) {
                     await this.ordersModel.findByIdAndUpdate(order.id, {
                         tg_chat: chatId,
                     });

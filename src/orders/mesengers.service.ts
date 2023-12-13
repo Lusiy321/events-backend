@@ -354,7 +354,10 @@ export class MesengersService {
       const chatId = msg.chat.id;
       const phoneNumber = msg.contact.phone_number;
       const user = await this.userModel.findOne({ phone: phoneNumber }).exec();
-      if (user) {
+      const order = await this.ordersModel
+        .findOne({ phone: phoneNumber })
+        .exec();
+      if (user.tg_chat === null) {
         await this.userModel.findByIdAndUpdate(user.id, {
           tg_chat: chatId,
           verify: true,
@@ -366,10 +369,7 @@ export class MesengersService {
           optURL,
         );
       } else {
-        const order = await this.ordersModel
-          .findOne({ phone: phoneNumber })
-          .exec();
-        if (order) {
+        if (order.tg_chat === null) {
           await this.ordersModel.findByIdAndUpdate(order.id, {
             tg_chat: chatId,
           });
