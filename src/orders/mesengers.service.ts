@@ -286,7 +286,7 @@ export class MesengersService {
       const chatId = msg.chat.id;
       const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
       const find = await this.ordersModel.find({ tg_chat: chatId }).exec();
-      if (user.phone !== find.phone) {
+      if (user.tg_chat !== find.tg_chat) {
         this.tg_bot.sendMessage(
           chatId,
           'Ви не зареєстровані як замовник',
