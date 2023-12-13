@@ -43,15 +43,23 @@ let OrdersController = class OrdersController {
         return res.redirect('viber://pa?chatURI=wechirka', 200);
     }
     async sendVerificationCode(phoneNumber) {
-        const user = await this.ordersModel.findOne({ phone: phoneNumber });
         try {
-            const phone = '+' + phoneNumber;
-            await this.twilioService.sendSMS(phone, `Your verification code: ${user.sms}`);
+            const user = await this.ordersModel.findOne({ phone: phoneNumber });
+            if (user.verify === false) {
+                const phone = '+' + phoneNumber;
+                await this.twilioService.sendSMS(phone, `Your verification code: ${user.sms}`);
+                return user;
+            }
+            else if (user.verify === true) {
+                throw new http_errors_1.Conflict('User is verified');
+            }
+            else {
+                throw new http_errors_1.NotFound('User not found');
+            }
         }
         catch (e) {
             throw new http_errors_1.BadRequest(e.message);
         }
-        return await this.ordersModel.findOne({ phone: phoneNumber });
     }
     async verifyBySms(code) {
         await this.ordersService.verifyOrder(code);
@@ -131,7 +139,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Get all user orders' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: order_model_1.Orders }),
-    (0, common_1.Get)('/find/:phone'),
+    (0, common_1.Get)('/phone/:phone'),
     __param(0, (0, common_1.Param)('phone')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),

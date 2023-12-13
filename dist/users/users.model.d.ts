@@ -52,7 +52,7 @@ export declare class User extends Model<User> {
     trial: boolean;
     price: string;
     token: string;
-    verify: verify;
+    verified: verify;
     googleId: string;
     ban: boolean;
     agree_order: number;

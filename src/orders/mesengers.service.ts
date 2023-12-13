@@ -281,18 +281,22 @@ export class MesengersService {
         optCont,
       );
     });
-
+    // Написать функцию "Активные ордеры в моей категории"
     this.tg_bot.onText(/\/orders/, async (msg) => {
       const chatId = msg.chat.id;
       const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
-      if (user) {
-        this.tg_bot.sendMessage(chatId, 'Ви не являетесь замовником', optCont);
+      const find = await this.ordersModel.find({ tg_chat: chatId }).exec();
+      if (user.phone !== find.phone) {
+        this.tg_bot.sendMessage(
+          chatId,
+          'Ви не зареєстровані як замовник',
+          optCont,
+        );
       } else {
-        const find = await this.ordersModel.find({ tg_chat: chatId }).exec();
         if (Array.isArray(find) && find.length === 0) {
           this.tg_bot.sendMessage(
             chatId,
-            'Ми не знайшли Ваших заявок, напевно ви не зарееструвались у чат боті (натисніть /start)',
+            'Ми не знайшли Ваших заявок, напевно ви не зареєструвались у чат боті (натисніть /start)',
             optCont,
           );
         } else {

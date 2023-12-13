@@ -70,17 +70,23 @@ export class OrdersController {
   @HttpCode(200)
   @Post('/send-code/:phone')
   async sendVerificationCode(@Param('phone') phoneNumber: string) {
-    const user = await this.ordersModel.findOne({ phone: phoneNumber });
     try {
-      const phone = '+' + phoneNumber;
-      await this.twilioService.sendSMS(
-        phone,
-        `Your verification code: ${user.sms}`,
-      );
+      const user = await this.ordersModel.findOne({ phone: phoneNumber });
+      if (user.verify === false) {
+        const phone = '+' + phoneNumber;
+        await this.twilioService.sendSMS(
+          phone,
+          `Your verification code: ${user.sms}`,
+        );
+        return user;
+      } else if (user.verify === true) {
+        throw new Conflict('User is verified');
+      } else {
+        throw new NotFound('User not found');
+      }
     } catch (e) {
       throw new BadRequest(e.message);
     }
-    return await this.ordersModel.findOne({ phone: phoneNumber });
   }
 
   @ApiOperation({ summary: 'Verivy sms order' })
@@ -94,8 +100,8 @@ export class OrdersController {
 
   @ApiOperation({ summary: 'Get all user orders' })
   @ApiResponse({ status: 200, type: Orders })
-  @Get('/find/:phone')
-  async findPhoneUser(@Param('phone') phone: string): Promise<Orders> {
+  @Get('/phone/:phone')
+  async findPhoneUser(@Param('phone') phone: string): Promise<Orders[]> {
     return this.ordersService.findOrderByPhone(phone);
   }
 }

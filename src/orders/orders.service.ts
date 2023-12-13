@@ -42,7 +42,7 @@ export class OrdersService {
     }
   }
 
-  async findOrderByPhone(phone: string): Promise<Orders> {
+  async findOrderByPhone(phone: string): Promise<Orders[]> {
     try {
       const find = await this.ordersModel.findOne({ phone: phone }).exec();
       return find;
@@ -83,39 +83,38 @@ export class OrdersService {
   }
 
   async verifyOrder(code: string) {
-    try {
-      const order = await this.ordersModel.findOne({ sms: code });
-      if (order) {
-        order.verify = true;
-        const updatedOrder = await this.ordersModel.findByIdAndUpdate(
-          { _id: order._id },
-          { verify: true },
-        );
+    // try {
+    const order = await this.ordersModel.findOne({ sms: code });
+    if (order.verify === false) {
+      const updatedOrder = await this.ordersModel.findByIdAndUpdate(
+        { _id: order._id },
+        { verify: true },
+      );
 
-        const usersArr = await this.findUserByCategory(order);
+      const usersArr = await this.findUserByCategory(order);
 
-        for (const user of usersArr) {
-          if (user.tg_chat !== null && user.location === order.location) {
-            const check = await this.checkTrialStatus(user._id);
-            if (check === true || user.paid === true) {
-              await this.mesengersService.sendNewTgOrder(user.tg_chat, order);
-            }
+      for (const user of usersArr) {
+        if (user.tg_chat !== null && user.location === order.location) {
+          const check = await this.checkTrialStatus(user._id);
+          if (check === true || user.paid === true) {
+            await this.mesengersService.sendNewTgOrder(user.tg_chat, order);
           }
         }
-
-        for (const user of usersArr) {
-          if (user.viber !== null && user.location === order.location) {
-            const check = await this.checkTrialStatus(user._id);
-            if (check === true || user.paid === true) {
-              await this.mesengersService.sendNewViberOrder(user.viber, order);
-            }
-          }
-        }
-        return updatedOrder;
       }
-    } catch (e) {
-      throw new BadRequest(e.message);
+
+      for (const user of usersArr) {
+        if (user.viber !== null && user.location === order.location) {
+          const check = await this.checkTrialStatus(user._id);
+          if (check === true || user.paid === true) {
+            await this.mesengersService.sendNewViberOrder(user.viber, order);
+          }
+        }
+      }
+      return updatedOrder;
     }
+    // } catch (e) {
+    //   throw new BadRequest(e.message);
+    // }
   }
 
   async checkTrialStatus(id: string): Promise<boolean> {

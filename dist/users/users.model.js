@@ -279,7 +279,7 @@ __decorate([
         default: 'new',
     }),
     __metadata("design:type", String)
-], User.prototype, "verify", void 0);
+], User.prototype, "verified", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         example: 'wVl3VGGX675UCqOFrLx-1xNH-GObq9v7GbZj0s',

@@ -11,7 +11,7 @@ export declare class OrdersService {
     constructor(twilioService: TwilioService, mesengersService: MesengersService, ordersModel: Orders, userModel: User);
     findAllOrders(): Promise<Orders[]>;
     findOrderById(id: string): Promise<Orders>;
-    findOrderByPhone(phone: string): Promise<Orders>;
+    findOrderByPhone(phone: string): Promise<Orders[]>;
     generateSixDigitNumber(): Promise<number>;
     create(orderObj: CreateOrderDto): Promise<Orders>;
     verifyOrder(code: string): Promise<any>;

@@ -14,5 +14,5 @@ export declare class OrdersController {
     bot(res: any): Promise<any>;
     sendVerificationCode(phoneNumber: string): Promise<any>;
     verifyBySms(code: string): Promise<Orders>;
-    findPhoneUser(phone: string): Promise<Orders>;
+    findPhoneUser(phone: string): Promise<Orders[]>;
 }

@@ -254,7 +254,7 @@ export class User extends Model<User> {
     enum: ['new', 'approve', 'rejected'],
     default: 'new',
   })
-  verify: verify;
+  verified: verify;
 
   @ApiProperty({
     example: 'wVl3VGGX675UCqOFrLx-1xNH-GObq9v7GbZj0s',
