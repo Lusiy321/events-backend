@@ -147,44 +147,44 @@ let MesengersService = class MesengersService {
                 }
                 if (!isNaN(phoneNumber) && phoneNumber.toString().length === 12) {
                     const user = await this.userModel.findOne({ phone: phoneNumber });
-                    if (user) {
-                        const { viber } = user;
-                        if (viber === null) {
-                            user.viber = res.userProfile.id;
-                            await this.userModel.findByIdAndUpdate(user.id, {
-                                viber: user.viber,
-                                verify: true,
-                            });
-                            say(res, `Дякую, ${res.userProfile.name} теперь Вам будуть надходити сповіщення про нові пропозиції у обраній категорії категорії.`);
-                        }
-                        else {
-                            user.viber = null;
-                            await this.userModel.findByIdAndUpdate(user.id, {
-                                viber: user.viber,
-                                verify: true,
-                            });
-                            say(res, `${res.userProfile.name} Ви відписалися від сповіщення про нові пропозиції.`);
-                        }
-                    }
-                    if (!user) {
-                        const order = await this.ordersModel.findOne({
-                            phone: phoneNumber,
+                    const order = await this.ordersModel.findOne({
+                        phone: phoneNumber,
+                    });
+                    if (user && user.viber === null) {
+                        user.viber = res.userProfile.id;
+                        await this.userModel.findByIdAndUpdate(user.id, {
+                            viber: user.viber,
+                            verify: true,
                         });
-                        if (!order) {
-                            say(res, `${res.userProfile.name}, Ми не знайшли Ваш номер в базі`);
+                        say(res, `Дякую, ${res.userProfile.name} теперь Вам будуть надходити сповіщення про нові пропозиції у обраній категорії категорії.`);
+                    }
+                    if (user && user.viber === res.userProfile.id) {
+                        user.viber = null;
+                        await this.userModel.findByIdAndUpdate(user.id, {
+                            viber: user.viber,
+                            verify: true,
+                        });
+                        say(res, `${res.userProfile.name} Ви відписалися від сповіщення про нові пропозиції.`);
+                    }
+                    if (!order) {
+                        say(res, `${res.userProfile.name}, Ми не знайшли Ваш номер в базі`);
+                    }
+                    else {
+                        const { viber } = order;
+                        if (viber === null) {
+                            order.viber = res.userProfile.id;
+                            await this.ordersModel.findByIdAndUpdate(order.id, {
+                                viber: order.viber,
+                                veryfy: true,
+                            });
+                            say(res, `Дякую, ${res.userProfile.name} теперь Вам будуть надходити сповіщення про нові пропозиції твоїй категорії.`);
                         }
-                        else {
-                            const { viber } = order;
-                            if (viber === null) {
-                                order.viber = res.userProfile.id;
-                                order.save();
-                                say(res, `Дякую, ${res.userProfile.name} теперь Вам будуть надходити сповіщення про нові пропозиції твоїй категорії.`);
-                            }
-                            else if (viber === res.userProfile.id) {
-                                order.viber = null;
-                                order.save();
-                                say(res, `${res.userProfile.name}, Ви відписалися від сповіщення про нові пропозиції у обраній категорії.`);
-                            }
+                        else if (viber === res.userProfile.id) {
+                            order.viber = null;
+                            await this.ordersModel.findByIdAndUpdate(order.id, {
+                                viber: order.viber,
+                            });
+                            say(res, `${res.userProfile.name}, Ви відписалися від сповіщення про нові пропозиції у обраній категорії.`);
                         }
                     }
                 }
@@ -239,7 +239,7 @@ let MesengersService = class MesengersService {
             const chatId = msg.chat.id;
             const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
             const find = await this.ordersModel.find({ tg_chat: chatId }).exec();
-            if (user.phone !== find.phone) {
+            if (user.tg_chat !== find[0].tg_chat) {
                 this.tg_bot.sendMessage(chatId, 'Ви не зареєстровані як замовник', optCont);
             }
             else {
@@ -480,11 +480,11 @@ let MesengersService = class MesengersService {
     async myOrdersList(chatId) {
         try {
             const user = await this.userModel.findOne({ viber: chatId }).exec();
-            if (user) {
+            const find = await this.ordersModel.find({ viber: chatId }).exec();
+            if (user.viber !== find[0].viber) {
                 this.viber_bot.sendMessage({ id: chatId }, new TextMessage('Ви не являетесь замовником.'));
             }
             else {
-                const find = await this.ordersModel.find({ viber: chatId }).exec();
                 if (Array.isArray(find) && find.length === 0) {
                     this.viber_bot.sendMessage({ id: chatId }, new TextMessage('Ми не знайшли Ваших заявок, напевно ви не зарееструвались у чат боті. Будь ласка, відправте свій номер телефону у форматі 380981231122'));
                 }
