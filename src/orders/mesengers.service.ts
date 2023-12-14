@@ -170,32 +170,45 @@ export class MesengersService {
           const order = await this.ordersModel.findOne({
             phone: phoneNumber,
           });
-          if (user && user.viber === null) {
-            user.viber = res.userProfile.id;
-            await this.userModel.findByIdAndUpdate(user.id, {
-              viber: user.viber,
-              verify: true,
-            });
-            say(
-              res,
-              `Дякую, ${res.userProfile.name} теперь Вам будуть надходити сповіщення про нові пропозиції у обраній категорії категорії.`,
-            );
-          }
-          if (user && user.viber === res.userProfile.id) {
-            user.viber = null;
-            await this.userModel.findByIdAndUpdate(user.id, {
-              viber: user.viber,
-              verify: true,
-            });
-            say(
-              res,
-              `${res.userProfile.name} Ви відписалися від сповіщення про нові пропозиції.`,
-            );
-          }
 
-          if (!order) {
-            say(res, `${res.userProfile.name}, Ми не знайшли Ваш номер в базі`);
-          } else {
+          if (user && user.viber === null) {
+            try {
+              user.viber = res.userProfile.id;
+
+              const updated = await this.userModel.findByIdAndUpdate(
+                { _id: user.id },
+                {
+                  viber: res.userProfile.id,
+                },
+              );
+              await updated.save();
+
+              this.viber_bot.sendMessage({ id: res.userProfile.id }, [
+                new TextMessage(
+                  `Дякую, ${res.userProfile.name} теперь Вам будуть надходити сповіщення про нові пропозиції у обраній категорії категорії.`,
+                ),
+                new KeyboardMessage(MAIN_KEYBOARD),
+              ]);
+              return updated;
+            } catch (error) {
+              console.error('Error while sending message:', error);
+            }
+          } else if (user && user.viber === res.userProfile.id) {
+            const updated = await this.userModel.findByIdAndUpdate(
+              { _id: user.id },
+              {
+                viber: null,
+              },
+            );
+            await updated.save();
+            this.viber_bot.sendMessage({ id: res.userProfile.id }, [
+              new TextMessage(
+                `${res.userProfile.name} Ви відписалися від сповіщення про нові пропозиції.`,
+              ),
+              new KeyboardMessage(MAIN_KEYBOARD),
+            ]);
+            return updated;
+          } else if (order) {
             const { viber } = order;
             if (viber === null) {
               order.viber = res.userProfile.id;

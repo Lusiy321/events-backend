@@ -74,11 +74,24 @@ let CloudinaryService = class CloudinaryService {
                     }
                     else {
                         const updatedPhotos = user.photo.filter((item) => item.publicId !== photoId);
-                        await this.userModel.findByIdAndUpdate({ _id: user.id }, {
-                            $set: {
-                                photo: updatedPhotos,
-                            },
-                        });
+                        if (updatedPhotos.length === 0) {
+                            await this.userModel.findByIdAndUpdate({ _id: user.id }, {
+                                $set: {
+                                    master_photo: {
+                                        publicId: '1',
+                                        url: process.env.MASTER,
+                                    },
+                                },
+                            });
+                        }
+                        else {
+                            await this.userModel.findByIdAndUpdate({ _id: user.id }, {
+                                $set: {
+                                    photo: updatedPhotos,
+                                    master_photo: updatedPhotos[0],
+                                },
+                            });
+                        }
                         resolve();
                     }
                 });

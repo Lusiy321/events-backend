@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export enum verify {
   new = 'new',
-  aprove = 'approve',
+  approve = 'approve',
   rejected = 'rejected',
 }
 

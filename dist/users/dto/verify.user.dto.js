@@ -14,7 +14,7 @@ const swagger_1 = require("@nestjs/swagger");
 var verify;
 (function (verify) {
     verify["new"] = "new";
-    verify["aprove"] = "approve";
+    verify["approve"] = "approve";
     verify["rejected"] = "rejected";
 })(verify || (exports.verify = verify = {}));
 class VerifyUserDto {
