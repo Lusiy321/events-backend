@@ -403,7 +403,7 @@ let UsersService = class UsersService {
                     html: `<div class="container">
           <h1>Your Password Has Been Changed</h1>
           <p>Click on the link below to go to your personal account:</p>
-          <p><a href="${process.env.FRONT_LINK}/profile">Go to your account</a></p>
+          <p><a href="${process.env.FRONT_LINK}/auth/login">Go to your account</a></p>
       </div>`,
                 };
                 await sgMail.send(msg);

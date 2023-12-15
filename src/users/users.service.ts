@@ -452,7 +452,7 @@ export class UsersService {
           html: `<div class="container">
           <h1>Your Password Has Been Changed</h1>
           <p>Click on the link below to go to your personal account:</p>
-          <p><a href="${process.env.FRONT_LINK}/profile">Go to your account</a></p>
+          <p><a href="${process.env.FRONT_LINK}/auth/login">Go to your account</a></p>
       </div>`,
         };
         await sgMail.send(msg);
@@ -488,6 +488,7 @@ export class UsersService {
     const restoreMail: User = await this.userModel.findOne(email);
     try {
       if (restoreMail) {
+        // сделать генератор дефолтного пароля
         const msg: any = {
           to: restoreMail.email,
           from: 'lusiy321@gmail.com',

@@ -22,7 +22,10 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         password: profile.id + accessToken,
         firstName: profile.name.givenName,
         googleId: profile.id,
-        verify_google: Boolean(profile.emails[0].verified),
+        avatar: {
+          publicId: '1',
+          url: profile._json.picture,
+        },
       });
       await user.save();
       return user || null;

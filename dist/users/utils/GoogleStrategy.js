@@ -31,7 +31,10 @@ let GoogleStrategy = class GoogleStrategy extends (0, passport_1.PassportStrateg
                 password: profile.id + accessToken,
                 firstName: profile.name.givenName,
                 googleId: profile.id,
-                verify_google: Boolean(profile.emails[0].verified),
+                avatar: {
+                    publicId: '1',
+                    url: profile._json.picture,
+                },
             });
             await user.save();
             return user || null;

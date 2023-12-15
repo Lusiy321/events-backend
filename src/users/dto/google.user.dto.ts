@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
+import { Photo } from '../users.model';
 
 export class GoogleUserDto {
   @ApiProperty({ example: 'Volodymyr', description: 'User first name' })
@@ -16,7 +17,12 @@ export class GoogleUserDto {
     description: 'Google ID',
   })
   readonly googleId: string;
-
-  @ApiProperty({ example: 'true', description: 'User email verify' })
-  readonly verify_google: boolean;
+  @ApiProperty({
+    example: {
+      publicId: '1',
+      url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kglf7c13u3aagffbdlmo.png',
+    },
+    description: 'User master photo',
+  })
+  readonly avatar: Photo;
 }

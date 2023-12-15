@@ -34,7 +34,13 @@ __decorate([
     __metadata("design:type", String)
 ], GoogleUserDto.prototype, "googleId", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'true', description: 'User email verify' }),
-    __metadata("design:type", Boolean)
-], GoogleUserDto.prototype, "verify_google", void 0);
+    (0, swagger_1.ApiProperty)({
+        example: {
+            publicId: '1',
+            url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kglf7c13u3aagffbdlmo.png',
+        },
+        description: 'User master photo',
+    }),
+    __metadata("design:type", Object)
+], GoogleUserDto.prototype, "avatar", void 0);
 //# sourceMappingURL=google.user.dto.js.map
