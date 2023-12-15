@@ -310,7 +310,7 @@ let UsersService = class UsersService {
     }
     async findById(id) {
         try {
-            const find = await this.userModel.findById(id).select(parse_user_1.rows).exec();
+            const find = await this.userModel.findById(id).select('-password').exec();
             return find;
         }
         catch (e) {

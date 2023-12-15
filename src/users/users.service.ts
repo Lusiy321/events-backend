@@ -346,7 +346,7 @@ export class UsersService {
 
   async findById(id: string): Promise<User> {
     try {
-      const find = await this.userModel.findById(id).select(rows).exec();
+      const find = await this.userModel.findById(id).select('-password').exec();
       return find;
     } catch (e) {
       throw new NotFound('User not found');
