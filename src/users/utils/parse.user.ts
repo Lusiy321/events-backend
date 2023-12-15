@@ -35,4 +35,4 @@ export function paginateArray(array: UpdateUserDto[], page: any) {
 }
 
 export const rows =
-  'firstName title description phone telegram whatsapp location master_photo avatar video photo category isOnline price verify';
+  'firstName email title description phone telegram whatsapp location master_photo avatar video photo category isOnline price verify';

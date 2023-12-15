@@ -32,5 +32,5 @@ function paginateArray(array, page) {
     return paginatedArray;
 }
 exports.paginateArray = paginateArray;
-exports.rows = 'firstName title description phone telegram whatsapp location master_photo avatar video photo category isOnline price verify';
+exports.rows = 'firstName email title description phone telegram whatsapp location master_photo avatar video photo category isOnline price verify';
 //# sourceMappingURL=parse.user.js.map

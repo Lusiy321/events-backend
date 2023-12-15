@@ -419,14 +419,14 @@ let UsersService = class UsersService {
         const user = await this.userModel.findOne({ googleId: details.googleId });
         try {
             if (!user) {
-                const newUser = await this.userModel.create(details);
+                await this.userModel.create(details);
                 const userUpdateToken = await this.userModel.findOne({
                     email: details.email,
                 });
-                await this.userModel.createToken(userUpdateToken);
+                await this.createToken(userUpdateToken);
                 return await this.userModel.findById({ _id: userUpdateToken._id });
             }
-            await this.userModel.createToken(user);
+            await this.createToken(user);
             return await this.userModel.findOne({ _id: user.id });
         }
         catch (e) {
