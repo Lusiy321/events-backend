@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
-import { Photo } from '../users.model';
+import { Photo, Social } from '../users.model';
 import { Categories } from './caterory.interface';
 import { verify } from './verify.user.dto';
 
@@ -76,6 +76,11 @@ export class UpdateUserDto {
     description: 'Category and subcategory',
   })
   readonly category: Categories[];
+  @ApiProperty({
+    example: 'https://www.instagram.com/herlastsightband/',
+    description: 'User social links',
+  })
+  readonly social: Social;
   @ApiProperty({ example: 'true', description: 'User status' })
   readonly isOnline: boolean;
   @ApiProperty({ example: '100$', description: 'Price' })

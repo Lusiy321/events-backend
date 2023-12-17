@@ -30,6 +30,7 @@ const cloudinary_service_1 = require("./cloudinary.service");
 const multer_1 = require("multer");
 const path = require("path");
 const delete_user_dto_1 = require("./dto/delete.user.dto");
+const GuardFacebook_1 = require("./utils/GuardFacebook");
 let UsersController = class UsersController {
     constructor(usersService, cloudinaryService) {
         this.usersService = usersService;
@@ -90,6 +91,14 @@ let UsersController = class UsersController {
         const user = await this.usersService.findById(userId);
         return res.redirect(`${process.env.FRONT_LINK}?token=${user.token}`);
     }
+    facebookLogin() {
+        return;
+    }
+    async facebookAuthRedirect(res, req) {
+        const userId = req.user.id;
+        const user = await this.usersService.findById(userId);
+        return res.redirect(`${process.env.FRONT_LINK}?token=${user.token}`);
+    }
     async refresh(request) {
         return await this.usersService.refreshAccessToken(request);
     }
@@ -105,6 +114,9 @@ let UsersController = class UsersController {
     async verifyEmail(id, res) {
         await this.usersService.verifyUserEmail(id);
         return res.redirect(`https://show-git-main-smirnypavel.vercel.app`);
+    }
+    callback(data) {
+        return console.log(data);
     }
 };
 exports.UsersController = UsersController;
@@ -284,6 +296,22 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "googleAuthRedirect", null);
 __decorate([
+    (0, common_1.Get)('facebook/login'),
+    (0, common_1.UseGuards)(GuardFacebook_1.FacebookAuthGuard),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "facebookLogin", null);
+__decorate([
+    (0, common_1.Get)('facebook/redirect'),
+    (0, common_1.UseGuards)(GuardFacebook_1.FacebookAuthGuard),
+    __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "facebookAuthRedirect", null);
+__decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Refresh Access Token' }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
     (0, common_1.Patch)('refresh'),
@@ -333,6 +361,13 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "verifyEmail", null);
+__decorate([
+    (0, common_1.Post)('payment/callback'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Object)
+], UsersController.prototype, "callback", null);
 exports.UsersController = UsersController = __decorate([
     (0, swagger_1.ApiTags)('User'),
     (0, common_1.Controller)('users'),

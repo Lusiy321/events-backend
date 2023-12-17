@@ -7,11 +7,6 @@ import { verify } from './dto/verify.user.dto';
 
 export type UserDocument = User & Document;
 
-export interface Photo {
-  publicId: string;
-  url: string;
-}
-
 @Schema({ versionKey: false, timestamps: true })
 export class User extends Model<User> {
   @ApiProperty({ example: 'Volodymyr', description: 'User first name' })
@@ -242,6 +237,13 @@ export class User extends Model<User> {
   price: string;
 
   @ApiProperty({
+    example: 'https://www.instagram.com/herlastsightband/',
+    description: 'User social links',
+  })
+  @Prop({ type: String })
+  social: Social;
+
+  @ApiProperty({
     example:
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0N2EzNzhiNGU4MTk3ODYzMzkwMTUyYSIsImlhdCI6MTY4NTczMTIxNCwiZXhwIjoxNjg1ODE3NjE0fQ.rxH3-wVl3VGGX675UCqOFrLx-1xNH-GObq9v7GbZj0s',
     description: 'JWT token',
@@ -262,6 +264,13 @@ export class User extends Model<User> {
   })
   @Prop({ type: String })
   googleId: string;
+
+  @ApiProperty({
+    example: 'wVl3VGGX675UCqOFrLx-1xNH-GObq9v7GbZj0s',
+    description: 'facebook ID',
+  })
+  @Prop({ type: String })
+  facebookId: string;
 
   @ApiProperty({ example: 'false', description: 'User ban status' })
   @Prop({
@@ -287,3 +296,21 @@ export class User extends Model<User> {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+export interface Photo {
+  publicId: string;
+  url: string;
+}
+
+export interface Social {
+  Instagram?: string;
+  Facebook?: string;
+  Youtube?: string;
+  TikTok?: string;
+  Vimeo?: string;
+  SoundCloud?: string;
+  Spotify?: string;
+  AppleMusic?: string;
+  Deezer?: string;
+  WebSite?: string;
+}

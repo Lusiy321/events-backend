@@ -266,6 +266,14 @@ __decorate([
 ], User.prototype, "price", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
+        example: 'https://www.instagram.com/herlastsightband/',
+        description: 'User social links',
+    }),
+    (0, mongoose_1.Prop)({ type: String }),
+    __metadata("design:type", Object)
+], User.prototype, "social", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
         example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0N2EzNzhiNGU4MTk3ODYzMzkwMTUyYSIsImlhdCI6MTY4NTczMTIxNCwiZXhwIjoxNjg1ODE3NjE0fQ.rxH3-wVl3VGGX675UCqOFrLx-1xNH-GObq9v7GbZj0s',
         description: 'JWT token',
     }),
@@ -288,6 +296,14 @@ __decorate([
     (0, mongoose_1.Prop)({ type: String }),
     __metadata("design:type", String)
 ], User.prototype, "googleId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'wVl3VGGX675UCqOFrLx-1xNH-GObq9v7GbZj0s',
+        description: 'facebook ID',
+    }),
+    (0, mongoose_1.Prop)({ type: String }),
+    __metadata("design:type", String)
+], User.prototype, "facebookId", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'false', description: 'User ban status' }),
     (0, mongoose_1.Prop)({

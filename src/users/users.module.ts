@@ -10,6 +10,7 @@ import { Category, CategorySchema } from './category.model';
 import { CloudinaryService } from './cloudinary.service';
 import { ConfigService } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
+import { FacebookStrategy } from './utils/FacebookStrategy';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { MulterModule } from '@nestjs/platform-express';
   ],
   providers: [
     GoogleStrategy,
+    FacebookStrategy,
     SessionSerializer,
     { provide: 'USER_SERVICE', useClass: UsersService },
     UsersService,

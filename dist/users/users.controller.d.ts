@@ -29,9 +29,12 @@ export declare class UsersController {
     deleteAvatarImage(req: any): Promise<User>;
     googleLogin(): void;
     googleAuthRedirect(res: any, req: any): Promise<any>;
+    facebookLogin(): void;
+    facebookAuthRedirect(res: any, req: any): Promise<any>;
     refresh(request: any): Promise<User>;
     cangePwd(request: any, password: PasswordUserDto): Promise<User>;
     forgotPwd(email: MailUserDto): Promise<[import("@sendgrid/mail").ClientResponse, {}]>;
     setUpdatePsw(id: string, password: UpdatePasswordUserDto): Promise<User>;
     verifyEmail(id: string, res: any): Promise<any>;
+    callback(data: any): any;
 }

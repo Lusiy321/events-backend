@@ -32,13 +32,12 @@ import { PasswordUserDto } from './dto/password.user.dto';
 import { MailUserDto } from './dto/email.user.dto';
 import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
 import { Category } from './category.model';
-import { CreateCategoryDto } from './dto/create.category.dto';
-import { STATUS_CODES } from 'http';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from './cloudinary.service';
 import { diskStorage } from 'multer';
 import * as path from 'path';
 import { DelUserMediaDto } from './dto/delete.user.dto';
+import { FacebookAuthGuard } from './utils/GuardFacebook';
 
 @ApiTags('User')
 @Controller('users')
@@ -221,6 +220,20 @@ export class UsersController {
     return res.redirect(`${process.env.FRONT_LINK}?token=${user.token}`);
   }
 
+  @Get('facebook/login')
+  @UseGuards(FacebookAuthGuard)
+  facebookLogin() {
+    return;
+  }
+
+  @Get('facebook/redirect')
+  @UseGuards(FacebookAuthGuard)
+  async facebookAuthRedirect(@Res() res: any, @Req() req: any) {
+    const userId = req.user.id;
+    const user = await this.usersService.findById(userId);
+    return res.redirect(`${process.env.FRONT_LINK}?token=${user.token}`);
+  }
+
   @ApiOperation({ summary: 'Refresh Access Token' })
   @ApiBearerAuth('BearerAuthMethod')
   @Patch('refresh')
@@ -260,5 +273,10 @@ export class UsersController {
   async verifyEmail(@Param('Id') id: string, @Res() res: any) {
     await this.usersService.verifyUserEmail(id);
     return res.redirect(`https://show-git-main-smirnypavel.vercel.app`);
+  }
+
+  @Post('payment/callback')
+  callback(@Body() data: any): any {
+    return console.log(data);
   }
 }

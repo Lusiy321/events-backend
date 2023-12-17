@@ -111,6 +111,13 @@ __decorate([
     __metadata("design:type", Array)
 ], UpdateUserDto.prototype, "category", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'https://www.instagram.com/herlastsightband/',
+        description: 'User social links',
+    }),
+    __metadata("design:type", Object)
+], UpdateUserDto.prototype, "social", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({ example: 'true', description: 'User status' }),
     __metadata("design:type", Boolean)
 ], UpdateUserDto.prototype, "isOnline", void 0);

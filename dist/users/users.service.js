@@ -433,16 +433,45 @@ let UsersService = class UsersService {
             throw new Error('Error validating user');
         }
     }
+    async validateFacebook(details) {
+        const user = await this.userModel.findOne({ googleId: details.googleId });
+        try {
+            if (!user) {
+                await this.userModel.create(details);
+                const userUpdateToken = await this.userModel.findOne({
+                    email: details.email,
+                });
+                await this.createToken(userUpdateToken);
+                return await this.userModel.findById({ _id: userUpdateToken._id });
+            }
+            await this.createToken(user);
+            return await this.userModel.findOne({ _id: user.id });
+        }
+        catch (e) {
+            throw new Error('Error validating user');
+        }
+    }
     async restorePassword(email) {
         const restoreMail = await this.userModel.findOne(email);
         try {
             if (restoreMail) {
+                function generatePassword() {
+                    const length = 8;
+                    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+=-';
+                    let password = '';
+                    for (let i = 0, n = charset.length; i < length; ++i) {
+                        password += charset[Math.floor(Math.random() * n)];
+                    }
+                    return password;
+                }
+                const newPassword = generatePassword();
                 const msg = {
                     to: restoreMail.email,
                     from: 'lusiy321@gmail.com',
                     subject: 'Change your password on swep.com',
                     html: `<div class="container">
           <h1>Your Password Has Been Changed</h1>
+          <p>Your new password: ${newPassword}</p>
           <p>Click on the link below to go to your personal account:</p>
           <p><a href="${process.env.FRONT_LINK}profile">Go to your account</a></p>
       </div>`,
@@ -516,7 +545,7 @@ let UsersService = class UsersService {
         }
     }
     async update(user, req) {
-        const { firstName, title, description, phone, telegram, whatsapp, location, master_photo, video, category, price, } = user;
+        const { firstName, social, title, description, phone, telegram, whatsapp, location, master_photo, video, category, price, } = user;
         const findId = await this.findToken(req);
         if (!findId) {
             throw new http_errors_1.Unauthorized('jwt expired');
@@ -532,7 +561,8 @@ let UsersService = class UsersService {
                 master_photo ||
                 video ||
                 category ||
-                price) {
+                price ||
+                social) {
                 if (category) {
                     const findUser = await this.userModel.findById(findId.id).exec();
                     const arrCategory = findUser.category;
@@ -586,6 +616,7 @@ let UsersService = class UsersService {
                     location,
                     master_photo,
                     price,
+                    social,
                 });
                 return await this.userModel
                     .findById({ _id: findId.id })

@@ -1,0 +1,1 @@
+//# sourceMappingURL=liqpay.js.map

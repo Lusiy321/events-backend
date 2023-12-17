@@ -19,6 +19,7 @@ const category_model_1 = require("./category.model");
 const cloudinary_service_1 = require("./cloudinary.service");
 const config_1 = require("@nestjs/config");
 const platform_express_1 = require("@nestjs/platform-express");
+const FacebookStrategy_1 = require("./utils/FacebookStrategy");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;
@@ -39,6 +40,7 @@ exports.UsersModule = UsersModule = __decorate([
         ],
         providers: [
             GoogleStrategy_1.GoogleStrategy,
+            FacebookStrategy_1.FacebookStrategy,
             Serializer_1.SessionSerializer,
             { provide: 'USER_SERVICE', useClass: users_service_1.UsersService },
             users_service_1.UsersService,

@@ -1,4 +1,4 @@
-import { Photo } from '../users.model';
+import { Photo, Social } from '../users.model';
 import { Categories } from './caterory.interface';
 import { verify } from './verify.user.dto';
 export declare class UpdateUserDto {
@@ -14,6 +14,7 @@ export declare class UpdateUserDto {
     readonly video: Photo[];
     readonly photo: Photo[];
     readonly category: Categories[];
+    readonly social: Social;
     readonly isOnline: boolean;
     readonly price: string;
     readonly paid: boolean;

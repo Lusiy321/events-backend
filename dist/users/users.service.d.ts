@@ -20,6 +20,7 @@ export declare class UsersService {
     verifyUserEmail(id: any): Promise<void>;
     changePassword(req: any, newPass: PasswordUserDto): Promise<User>;
     validateUser(details: GoogleUserDto): Promise<any>;
+    validateFacebook(details: any): Promise<any>;
     restorePassword(email: MailUserDto): Promise<[sgMail.ClientResponse, {}]>;
     updateRestorePassword(id: string, newPass: UpdatePasswordUserDto): Promise<User>;
     login(user: CreateUserDto): Promise<User>;

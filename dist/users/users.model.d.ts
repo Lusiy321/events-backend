@@ -26,10 +26,6 @@ import { Model } from 'mongoose';
 import { Categories } from './dto/caterory.interface';
 import { verify } from './dto/verify.user.dto';
 export type UserDocument = User & Document;
-export interface Photo {
-    publicId: string;
-    url: string;
-}
 export declare class User extends Model<User> {
     firstName: string;
     email: string;
@@ -51,9 +47,11 @@ export declare class User extends Model<User> {
     paid: boolean;
     trial: boolean;
     price: string;
+    social: Social;
     token: string;
     verified: verify;
     googleId: string;
+    facebookId: string;
     ban: boolean;
     agree_order: number;
     disagree_order: number;
@@ -64,3 +62,19 @@ export declare const UserSchema: import("mongoose").Schema<User, Model<User, any
 }, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, User, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<User>> & import("mongoose").FlatRecord<User> & {
     _id: import("mongoose").Types.ObjectId;
 }>;
+export interface Photo {
+    publicId: string;
+    url: string;
+}
+export interface Social {
+    Instagram?: string;
+    Facebook?: string;
+    Youtube?: string;
+    TikTok?: string;
+    Vimeo?: string;
+    SoundCloud?: string;
+    Spotify?: string;
+    AppleMusic?: string;
+    Deezer?: string;
+    WebSite?: string;
+}
