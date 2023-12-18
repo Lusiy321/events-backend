@@ -237,7 +237,7 @@ export class User extends Model<User> {
   price: string;
 
   @ApiProperty({
-    example: 'https://www.instagram.com/herlastsightband/',
+    example: '{Instagram: https://www.instagram.com/herlastsightband/}',
     description: 'User social links',
   })
   @Prop({ type: String })
@@ -278,6 +278,16 @@ export class User extends Model<User> {
     default: false,
   })
   ban: boolean;
+  @Prop({
+    type: Number,
+    default: 0,
+  })
+  totalRating: number;
+  @Prop({
+    type: Number,
+    default: 0,
+  })
+  numberOfRatings: number;
   @Prop({
     type: Number,
     default: 0,

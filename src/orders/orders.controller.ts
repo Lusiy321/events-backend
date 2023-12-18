@@ -3,11 +3,9 @@ import {
   Controller,
   Get,
   HttpCode,
-  Injectable,
   Param,
   Post,
   Query,
-  Redirect,
   Res,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';

@@ -53,6 +53,8 @@ export declare class User extends Model<User> {
     googleId: string;
     facebookId: string;
     ban: boolean;
+    totalRating: number;
+    numberOfRatings: number;
     agree_order: number;
     disagree_order: number;
     trialEnds: Date;

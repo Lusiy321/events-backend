@@ -266,7 +266,7 @@ __decorate([
 ], User.prototype, "price", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        example: 'https://www.instagram.com/herlastsightband/',
+        example: '{Instagram: https://www.instagram.com/herlastsightband/}',
         description: 'User social links',
     }),
     (0, mongoose_1.Prop)({ type: String }),
@@ -312,6 +312,20 @@ __decorate([
     }),
     __metadata("design:type", Boolean)
 ], User.prototype, "ban", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: Number,
+        default: 0,
+    }),
+    __metadata("design:type", Number)
+], User.prototype, "totalRating", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: Number,
+        default: 0,
+    }),
+    __metadata("design:type", Number)
+], User.prototype, "numberOfRatings", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
         type: Number,

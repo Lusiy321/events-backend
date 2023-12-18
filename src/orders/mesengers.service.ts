@@ -162,6 +162,18 @@ export class MesengersService {
               new KeyboardMessage(MAIN_KEYBOARD),
             ]);
             break;
+          case 'users':
+            const findOrder = await this.ordersModel.findOne({ _id: phone });
+
+            findOrder.accepted_users.map(async (user: any) => {
+              const findedUser = await this.userModel.findOne({ _id: user });
+              const msgOrder = `Замовлення:\n${findOrder.description}\nКористувач: ${findedUser.firstName}.\nКатегорія: ${findedUser.category[0].subcategories[0].name}\nОплата: ${findedUser.price}\nТелефон: +${findedUser.phone}.\nПосилання на профіль:\n${process.env.FRONT_LINK}artists/${findedUser._id}.`;
+              this.viber_bot.sendMessage({ id: chatId }, [
+                new TextMessage(msgOrder),
+                new KeyboardMessage(MAIN_KEYBOARD),
+              ]);
+            });
+            break;
           default:
             break;
         }
@@ -292,7 +304,7 @@ export class MesengersService {
         optCont,
       );
     });
-    // Написать функцию "Активные ордеры в моей категории"
+
     this.tg_bot.onText(/\/orders/, async (msg) => {
       try {
         const chatId = msg.chat.id;
@@ -476,7 +488,7 @@ export class MesengersService {
 
             findOrder.accepted_users.map(async (user: any) => {
               const findedUser = await this.userModel.findOne({ _id: user });
-              const msgOrder = `Користувач: ${findedUser.firstName}.\nКатегорія: ${findedUser.category[0].subcategories[0].name}\nТелефон: +${findedUser.phone}.\nПосилання на профіль:\n${process.env.FRONT_LINK}artists/${findedUser._id}.`;
+              const msgOrder = `Замовлення:\n${findOrder.description}\nКористувач: ${findedUser.firstName}.\nКатегорія: ${findedUser.category[0].subcategories[0].name}\nОплата: ${findedUser.price}\nТелефон: +${findedUser.phone}.\nПосилання на профіль:\n${process.env.FRONT_LINK}artists/${findedUser._id}.`;
               this.tg_bot.sendMessage(chatId, msgOrder);
             });
             break;
@@ -627,7 +639,6 @@ export class MesengersService {
     try {
       const user = await this.userModel.findOne({ viber: chatId }).exec();
       const find = await this.ordersModel.find({ viber: chatId }).exec();
-      console.log(find[0].viber, user.viber);
       if (
         (user.viber !== null && Array.isArray(find) && find.length === 0) ||
         find[0].viber !== user.viber
@@ -707,9 +718,27 @@ export class MesengersService {
                 },
               ],
             };
+            const USERS = {
+              Type: 'keyboard',
+              Revision: 1,
+              ButtonsGroupColumns: 6,
+              ButtonsGroupRows: 1,
+              Buttons: [
+                {
+                  ActionType: 'reply',
+                  ActionBody: `users:${finded._id}:${finded.viber}`,
+                  Text: '<font color="#FFFFFF" size="5">Відгуки на пропозицію</font>',
+                  TextSize: 'regular',
+                  TextVAlign: 'middle',
+                  TextHAlign: 'center',
+                  BgColor: '#094356',
+                },
+              ],
+            };
             this.viber_bot.sendMessage({ id: chatId }, [
               new TextMessage(msg),
-              new RichMediaMessage(KEYBOARD),
+              new RichMediaMessage(KEYBOARD, USERS),
+              new RichMediaMessage(USERS),
               new KeyboardMessage(FIND_KEYBOARD),
             ]);
           } else {
@@ -739,9 +768,27 @@ export class MesengersService {
                 },
               ],
             };
+            const USERS = {
+              Type: 'keyboard',
+              Revision: 1,
+              ButtonsGroupColumns: 6,
+              ButtonsGroupRows: 1,
+              Buttons: [
+                {
+                  ActionType: 'reply',
+                  ActionBody: `users:${finded._id}:${finded.viber}`,
+                  Text: '<font color="#FFFFFF" size="5">Відгуки на пропозицію</font>',
+                  TextSize: 'regular',
+                  TextVAlign: 'middle',
+                  TextHAlign: 'center',
+                  BgColor: '#094356',
+                },
+              ],
+            };
             this.viber_bot.sendMessage({ id: chatId }, [
               new TextMessage(msg),
               new RichMediaMessage(KEYBOARD),
+              new RichMediaMessage(USERS),
               new KeyboardMessage(FIND_KEYBOARD),
             ]);
           }
