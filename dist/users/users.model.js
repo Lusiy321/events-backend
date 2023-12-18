@@ -333,6 +333,10 @@ __decorate([
     }),
     __metadata("design:type", Date)
 ], User.prototype, "trialEnds", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: Array, default: [] }),
+    __metadata("design:type", Array)
+], User.prototype, "accepted_orders", void 0);
 exports.User = User = __decorate([
     (0, mongoose_1.Schema)({ versionKey: false, timestamps: true })
 ], User);

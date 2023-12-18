@@ -293,6 +293,8 @@ export class User extends Model<User> {
     default: 0,
   })
   trialEnds: Date;
+  @Prop({ type: Array, default: [] })
+  accepted_orders: Array<string>;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

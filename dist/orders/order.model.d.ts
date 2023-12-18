@@ -42,6 +42,7 @@ export declare class Orders extends Model<Orders> {
     sms: number;
     verify: boolean;
     approve_count: number;
+    accepted_users: Array<string>;
 }
 export declare const OrderSchema: import("mongoose").Schema<Orders, Model<Orders, any, any, any, import("mongoose").Document<unknown, any, Orders> & Orders & {
     _id: import("mongoose").Types.ObjectId;

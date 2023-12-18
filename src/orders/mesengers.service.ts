@@ -6,6 +6,7 @@ export const ViberBot = require('viber-bot').Bot;
 const TextMessage = require('viber-bot').Message.Text;
 const RichMediaMessage = require('viber-bot').Message.RichMedia;
 const KeyboardMessage = require('viber-bot').Message.Keyboard;
+const PictureMessage = require('viber-bot').Message.Picture;
 import { User } from 'src/users/users.model';
 import { Orders } from 'src/orders/order.model';
 const ngrok = require('ngrok');
@@ -293,71 +294,87 @@ export class MesengersService {
     });
     // Написать функцию "Активные ордеры в моей категории"
     this.tg_bot.onText(/\/orders/, async (msg) => {
-      const chatId = msg.chat.id;
-      const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
-      const find = await this.ordersModel.find({ tg_chat: chatId }).exec();
+      try {
+        const chatId = msg.chat.id;
+        const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
+        const find = await this.ordersModel.find({ tg_chat: chatId }).exec();
 
-      if (user.tg_chat !== find[0].tg_chat) {
-        this.tg_bot.sendMessage(
-          chatId,
-          'Ви не зареєстровані як замовник',
-          optCont,
-        );
-      } else {
-        if (Array.isArray(find) && find.length === 0) {
+        if (user.tg_chat && Array.isArray(find) && find.length === 0) {
           this.tg_bot.sendMessage(
             chatId,
-            'Ми не знайшли Ваших заявок, напевно ви не зареєструвались у чат боті (натисніть /start)',
+            'Ви не зареєстровані як замовник',
             optCont,
           );
         } else {
-          find.map((finded: Orders) => {
-            const msg = `Замовник: ${finded.name}.
+          if (Array.isArray(find) && find.length === 0) {
+            this.tg_bot.sendMessage(
+              chatId,
+              'Ми не знайшли Ваших заявок, напевно ви не зареєструвались у чат боті (натисніть /start)',
+              optCont,
+            );
+          } else if (find || user.tg_chat === find[0].tg_chat) {
+            find.map((finded: Orders) => {
+              const msg = `Замовник: ${finded.name}.
       Дата події: ${finded.date}.
       Категорія: ${finded.category[0].subcategories[0].name}.
       Вимоги замовника: ${finded.description}.
       Локація: ${finded.location}.
-      Гонорар: ${finded.price}₴.
+      Гонорар: ${finded.price}.
       Кількість відгуків: ${finded.approve_count}.`;
-            if (finded.active === true) {
-              const keyboard: InlineKeyboardMarkup = {
-                inline_keyboard: [
-                  [
-                    {
-                      text: 'Видалити',
-                      callback_data: `delete:${finded._id}:${chatId}`,
-                    },
-                    {
-                      text: 'Деактивувати',
-                      callback_data: `deactive:${finded._id}:${chatId}`,
-                    },
+              if (finded.active === true) {
+                const keyboard: InlineKeyboardMarkup = {
+                  inline_keyboard: [
+                    [
+                      {
+                        text: 'Видалити',
+                        callback_data: `delete:${finded._id}:${chatId}`,
+                      },
+                      {
+                        text: 'Деактивувати',
+                        callback_data: `deactive:${finded._id}:${chatId}`,
+                      },
+                    ],
+                    [
+                      {
+                        text: 'Відгуки на пропозицію',
+                        callback_data: `users:${finded._id}:${chatId}`,
+                      },
+                    ],
                   ],
-                ],
-              };
-              this.tg_bot.sendMessage(chatId, msg, {
-                reply_markup: keyboard,
-              });
-            } else {
-              const keyboard: InlineKeyboardMarkup = {
-                inline_keyboard: [
-                  [
-                    {
-                      text: 'Видалити',
-                      callback_data: `delete:${finded._id}:${chatId}`,
-                    },
-                    {
-                      text: 'Активувати',
-                      callback_data: `active:${finded._id}:${chatId}`,
-                    },
+                };
+                this.tg_bot.sendMessage(chatId, msg, {
+                  reply_markup: keyboard,
+                });
+              } else {
+                const keyboard: InlineKeyboardMarkup = {
+                  inline_keyboard: [
+                    [
+                      {
+                        text: 'Видалити',
+                        callback_data: `delete:${finded._id}:${chatId}`,
+                      },
+                      {
+                        text: 'Активувати',
+                        callback_data: `active:${finded._id}:${chatId}`,
+                      },
+                    ],
+                    [
+                      {
+                        text: 'Відгуки на пропозицію',
+                        callback_data: `users:${finded._id}:${chatId}`,
+                      },
+                    ],
                   ],
-                ],
-              };
-              this.tg_bot.sendMessage(chatId, msg, {
-                reply_markup: keyboard,
-              });
-            }
-          });
+                };
+                this.tg_bot.sendMessage(chatId, msg, {
+                  reply_markup: keyboard,
+                });
+              }
+            });
+          }
         }
+      } catch (e) {
+        throw new Error(`Помилка надсилання повідомлення: ${e}`);
       }
     });
 
@@ -394,67 +411,80 @@ export class MesengersService {
     });
 
     this.tg_bot.on('callback_query', async (query) => {
-      const { data } = query;
-      const [action, phone, chatId] = data.split(':');
+      try {
+        const { data } = query;
+        const [action, phone, chatId] = data.split(':');
 
-      switch (action) {
-        case 'accept':
-          const order = await this.sendTgAgreement(phone, chatId);
-          if (order === true) {
-            const msg = `${query.message.text}: Ви погодились на це замовлення \n`;
-            this.tg_bot.editMessageText(msg, {
-              chat_id: chatId,
-              message_id: query.message.message_id,
+        switch (action) {
+          case 'accept':
+            const order = await this.sendTgAgreement(phone, chatId);
+            if (order === true) {
+              const msg = `${query.message.text}: Ви погодились на це замовлення \n`;
+              this.tg_bot.editMessageText(msg, {
+                chat_id: chatId,
+                message_id: query.message.message_id,
+              });
+            }
+            break;
+          case 'disagree':
+            const orders = await this.ordersModel.findOne(phone);
+            const user = await this.userModel.findOne({ tg_chat: chatId });
+            user.disagree_order += 1;
+            await this.userModel.findByIdAndUpdate(user.id, {
+              disagree_order: user.disagree_order,
             });
-          }
-          break;
-        case 'disagree':
-          const orders = await this.ordersModel.findOne(phone);
-          const user = await this.userModel.findOne({ tg_chat: chatId });
-          user.disagree_order += 1;
-          await this.userModel.findByIdAndUpdate(user.id, {
-            disagree_order: user.disagree_order,
-          });
-          this.tg_bot.sendMessage(
-            chatId,
-            `Ви відмовились від виконання замовлення: ${orders.description}.`,
-            optURL,
-          );
-          break;
-        case 'delete':
-          const delOrder = await this.ordersModel.findById(phone);
-          this.tg_bot.sendMessage(
-            chatId,
-            `Ви видалили замевлення: ${delOrder.description}.`,
-            optURL,
-          );
-          await this.ordersModel.findByIdAndRemove(phone);
-          break;
-        case 'active':
-          const actiOrder = await this.ordersModel.findById(phone);
-          await this.ordersModel.findByIdAndUpdate(actiOrder.id, {
-            active: true,
-          });
-          this.tg_bot.sendMessage(
-            chatId,
-            `Ви активували замевлення: ${actiOrder.description}.`,
-            optURL,
-          );
+            this.tg_bot.sendMessage(
+              chatId,
+              `Ви відмовились від виконання замовлення: ${orders.description}.`,
+              optURL,
+            );
+            break;
+          case 'delete':
+            const delOrder = await this.ordersModel.findById(phone);
+            this.tg_bot.sendMessage(
+              chatId,
+              `Ви видалили замевлення: ${delOrder.description}.`,
+              optURL,
+            );
+            await this.ordersModel.findByIdAndRemove(phone);
+            break;
+          case 'active':
+            const actiOrder = await this.ordersModel.findById(phone);
+            await this.ordersModel.findByIdAndUpdate(actiOrder.id, {
+              active: true,
+            });
+            this.tg_bot.sendMessage(
+              chatId,
+              `Ви активували замевлення: ${actiOrder.description}.`,
+              optURL,
+            );
 
-          break;
-        case 'deactive':
-          const deactiOrder = await this.ordersModel.findById(phone);
-          await this.ordersModel.findByIdAndUpdate(deactiOrder.id, {
-            active: false,
-          });
-          this.tg_bot.sendMessage(
-            chatId,
-            `Ви деактивували замевлення: ${deactiOrder.description}.`,
-            optURL,
-          );
-          break;
-        default:
-          break;
+            break;
+          case 'deactive':
+            const deactiOrder = await this.ordersModel.findById(phone);
+            await this.ordersModel.findByIdAndUpdate(deactiOrder.id, {
+              active: false,
+            });
+            this.tg_bot.sendMessage(
+              chatId,
+              `Ви деактивували замевлення: ${deactiOrder.description}.`,
+              optURL,
+            );
+            break;
+          case 'users':
+            const findOrder = await this.ordersModel.findOne({ _id: phone });
+
+            findOrder.accepted_users.map(async (user: any) => {
+              const findedUser = await this.userModel.findOne({ _id: user });
+              const msgOrder = `Користувач: ${findedUser.firstName}.\nКатегорія: ${findedUser.category[0].subcategories[0].name}\nТелефон: +${findedUser.phone}.\nПосилання на профіль:\n${process.env.FRONT_LINK}artists/${findedUser._id}.`;
+              this.tg_bot.sendMessage(chatId, msgOrder);
+            });
+            break;
+          default:
+            break;
+        }
+      } catch (e) {
+        console.log(e);
       }
     });
 
@@ -487,7 +517,7 @@ export class MesengersService {
       Категорія: ${order.category[0].subcategories[0].name}.
       Вимоги замовника: ${order.description}.
       Локація: ${order.location}.
-      Гонорар: ${order.price}₴`;
+      Гонорар: ${order.price}`;
 
       const KEYBOARD = {
         Type: 'keyboard',
@@ -527,7 +557,9 @@ export class MesengersService {
 
   async sendViberAgreement(orderPhone: string, userChatId: string) {
     try {
-      const order = await this.ordersModel.findOne({ phone: orderPhone });
+      const order = await this.ordersModel.findOne({
+        phone: orderPhone,
+      });
       const user = await this.userModel.findOne({ viber: userChatId });
 
       const { viber, active, description, tg_chat } = order;
@@ -543,19 +575,35 @@ export class MesengersService {
           new KeyboardMessage(MAIN_KEYBOARD),
         ]);
         const msgOrder =
-          `Користувач ${firstName} готовий виконати ваше замовлення "${description}". \n Посилання на профіль виконавця: ${process.env.FRONT_LINK}${_id}.\n Ви можете написати йому у вайбер, або зателефонувати по номеру. \n` +
+          `Користувач ${firstName} готовий виконати ваше замовлення "${description}". \n Посилання на профіль виконавця: ${process.env.FRONT_LINK}artists/${_id}.\n Ви можете написати йому у Viber, або зателефонувати по номеру. \n` +
           `\n Телефон: +${phone}`;
 
         await this.viber_bot.sendMessage({ id: viber }, [
+          new PictureMessage(user.master_photo.url),
           new TextMessage(msgOrder),
           new KeyboardMessage(MAIN_KEYBOARD),
         ]);
         return true;
       } else if (tg_chat !== null && order.active === true) {
-        const msgOrder = `Виконавець ${user.firstName} готовий виконати ваше замовлення "${order.description}".
-      Ви можете написати йому в Viber, або зателефонувати по номеру ${user.phone}. \n
-      Посилання на профіль виконавця ${process.env.FRONT_LINK}${user._id}. ${user.video[0]}`;
+        const msgOrder = `Користувач ${user.firstName} готовий виконати ваше замовлення "${order.description}".
+      Ви можете написати йому в Viber, або зателефонувати по номеру +${user.phone}. \n
+      Посилання на профіль виконавця ${process.env.FRONT_LINK}artists/${user._id}.`;
         await this.sendMessage(order.tg_chat.toString(), msgOrder);
+        if (user.photo.length > 0) {
+          const images = user.photo.map((photos: any) => ({
+            type: 'photo',
+            media: photos.url,
+          }));
+          await this.tg_bot.sendMediaGroup(order.tg_chat.toString(), images);
+        }
+        if (user.video.length > 0) {
+          const videos = user.video.map((video: any) => ({
+            type: 'video',
+            media: video.url,
+          }));
+          await this.tg_bot.sendMediaGroup(order.tg_chat.toString(), videos);
+        }
+
         const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"${order.description}".\n \nВ категорії:\n"${order.category[0].name} - ${order.category[0].subcategories[0].name}". \n \nОчікуйте на дзвінок або повідомлення`;
         this.viber_bot.sendMessage({ id: userChatId }, [
           new TextMessage(msgTrue),
@@ -630,7 +678,7 @@ export class MesengersService {
       Категорія: ${finded.category[0].subcategories[0].name}.
       Вимоги замовника: ${finded.description}.
       Локація: ${finded.location}.
-      Гонорар: ${finded.price}₴.
+      Гонорар: ${finded.price}.
       Кількість відгуків: ${finded.approve_count}.`;
           if (finded.active === true) {
             const KEYBOARD = {
@@ -742,7 +790,6 @@ export class MesengersService {
           console.log('publicUrl => ', publicUrl);
 
           http.createServer(this.viber_bot.middleware()).listen(port, () => {
-            console.log('Server is running!');
             this.viber_bot.setWebhook(publicUrl);
           });
         })
@@ -787,22 +834,38 @@ export class MesengersService {
         user.agree_order += 1;
         await this.userModel.findByIdAndUpdate(user.id, {
           agree_order: user.agree_order,
+          accepted_orders: order.id,
         });
         await this.ordersModel.findByIdAndUpdate(order.id, {
           approve_count: order.approve_count,
+          accepted_users: user.id,
         });
         const msgOrder = `Виконавець ${user.firstName} готовий виконати ваше замовлення "${order.description}".
       Ви можете написати йому в телеграм @${user.telegram}, або зателефонувати по номеру ${user.phone}. \n
-      Посилання на профіль виконавця ${process.env.FRONT_LINK}artists/${user._id}. ${user.master_photo.url}`;
+      Посилання на профіль виконавця ${process.env.FRONT_LINK}artists/${user._id}.`;
         await this.sendMessage(order.tg_chat.toString(), msgOrder);
-
+        if (user.photo.length > 0) {
+          const images = user.photo.map((photos: any) => ({
+            type: 'photo',
+            media: photos.url,
+          }));
+          await this.tg_bot.sendMediaGroup(order.tg_chat.toString(), images);
+        }
+        if (user.video.length > 0) {
+          const videos = user.video.map((video: any) => ({
+            type: 'video',
+            media: video.url,
+          }));
+          await this.tg_bot.sendMediaGroup(order.tg_chat.toString(), videos);
+        }
         return true;
       } else if (order.viber !== null && order.active === true) {
         const msgOrder =
-          `Користувач ${user.firstName} готовий виконати ваше замовлення "${order.description}". \n Посилання на профіль виконавця: ${process.env.FRONT_LINK}artists/${user._id}.\n Ви можете написати йому у вайбер, або зателефонувати по номеру. \n` +
+          `Користувач ${user.firstName} готовий виконати ваше замовлення "${order.description}". \n Посилання на профіль виконавця: ${process.env.FRONT_LINK}artists/${user._id}.\n Ви можете написати йому у Viber, або зателефонувати по номеру. \n` +
           `\n Телефон: +${phone}`;
 
         await this.viber_bot.sendMessage({ id: order.viber }, [
+          new PictureMessage(user.master_photo.url),
           new TextMessage(msgOrder),
           new KeyboardMessage(MAIN_KEYBOARD),
         ]);
@@ -835,7 +898,7 @@ export class MesengersService {
       Категорія: ${order.category[0].subcategories[0].name}.
       Вимоги замовника: ${order.description}.
       Локація: ${order.location}.
-      Гонорар: ${order.price}₴`;
+      Гонорар: ${order.price}`;
       const keyboard: InlineKeyboardMarkup = {
         inline_keyboard: [
           [
@@ -864,4 +927,6 @@ export class MesengersService {
       throw new Error(`Помилка надсиланння повідомлення: ${error}`);
     }
   }
+
+  async findMyOrders(chatId: string) {}
 }

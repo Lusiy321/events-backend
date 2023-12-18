@@ -169,6 +169,10 @@ __decorate([
     }),
     __metadata("design:type", Number)
 ], Orders.prototype, "approve_count", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: Array, default: [] }),
+    __metadata("design:type", Array)
+], Orders.prototype, "accepted_users", void 0);
 exports.Orders = Orders = __decorate([
     (0, mongoose_1.Schema)({ versionKey: false, timestamps: true })
 ], Orders);

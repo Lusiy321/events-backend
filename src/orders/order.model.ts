@@ -142,6 +142,8 @@ export class Orders extends Model<Orders> {
     default: 0,
   })
   approve_count: number;
+  @Prop({ type: Array, default: [] })
+  accepted_users: Array<string>;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Orders);
