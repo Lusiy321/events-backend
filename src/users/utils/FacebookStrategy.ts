@@ -17,14 +17,14 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
   async validate(accessToken: string, refreshToken: string, profile: Profile) {
     console.log(profile);
     const user = await this.userService.validateFacebook({
-      // email: profile.emails[0].value,
-      password: refreshToken + accessToken,
-      firstName: profile.name.givenName,
+      email: 'vasya@gmail.com',
+      password: profile.id,
+      firstName: profile._json.first_name,
       facebookId: profile.id,
-      avatar: {
-        publicId: '1',
-        url: profile._json.picture,
-      },
+      // avatar: {
+      //   publicId: '1',
+      //   url: profile._json.picture,
+      // },
     });
     await user.save();
     return user || null;

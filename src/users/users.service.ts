@@ -484,7 +484,9 @@ export class UsersService {
   }
 
   async validateFacebook(details: any) {
-    const user = await this.userModel.findOne({ googleId: details.googleId });
+    const user = await this.userModel.findOne({
+      facebookId: details.facebookId,
+    });
     try {
       if (!user) {
         await this.userModel.create(details);

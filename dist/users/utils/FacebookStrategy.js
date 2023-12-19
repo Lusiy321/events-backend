@@ -27,13 +27,10 @@ let FacebookStrategy = class FacebookStrategy extends (0, passport_1.PassportStr
     async validate(accessToken, refreshToken, profile) {
         console.log(profile);
         const user = await this.userService.validateFacebook({
-            password: refreshToken + accessToken,
-            firstName: profile.name.givenName,
+            email: 'vasya@gmail.com',
+            password: profile.id,
+            firstName: profile._json.first_name,
             facebookId: profile.id,
-            avatar: {
-                publicId: '1',
-                url: profile._json.picture,
-            },
         });
         await user.save();
         return user || null;
