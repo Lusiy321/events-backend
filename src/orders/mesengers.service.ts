@@ -826,26 +826,19 @@ export class MesengersService {
         );
       });
     } else {
-      return ngrok
-        .connect({
-          addr: 1869,
-        })
-        .then(async (publicUrl: string) => {
-          const http = require('http');
-          const port = 1869;
+      const pubUrl = 'https://www.wechirka.com';
+      async (publicUrl: string) => {
+        const http = require('http');
+        const port = 1869;
 
-          console.log('publicUrl => ', publicUrl);
+        console.log('publicUrl => ', pubUrl);
 
-          http.createServer(this.viber_bot.middleware()).listen(port, () => {
-            this.viber_bot.setWebhook(publicUrl);
-          });
-        })
-        .catch((error: string) => {
-          console.log('Error occurred while connecting to ngrok.');
-          console.error(error);
-          process.exit(1);
+        http.createServer(this.viber_bot.middleware()).listen(port, () => {
+          this.viber_bot.setWebhook(pubUrl);
         });
+      };
     }
+    return;
   }
 
   //TELEGRAMM METHODS ON CLASS

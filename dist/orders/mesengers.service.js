@@ -715,24 +715,17 @@ let MesengersService = class MesengersService {
             });
         }
         else {
-            return ngrok
-                .connect({
-                addr: 1869,
-            })
-                .then(async (publicUrl) => {
+            const pubUrl = 'https://www.wechirka.com';
+            async (publicUrl) => {
                 const http = require('http');
                 const port = 1869;
-                console.log('publicUrl => ', publicUrl);
+                console.log('publicUrl => ', pubUrl);
                 http.createServer(this.viber_bot.middleware()).listen(port, () => {
-                    this.viber_bot.setWebhook(publicUrl);
+                    this.viber_bot.setWebhook(pubUrl);
                 });
-            })
-                .catch((error) => {
-                console.log('Error occurred while connecting to ngrok.');
-                console.error(error);
-                process.exit(1);
-            });
+            };
         }
+        return;
     }
     async sendMessage(chatId, msg) {
         try {
