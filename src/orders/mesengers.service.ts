@@ -9,7 +9,8 @@ const KeyboardMessage = require('viber-bot').Message.Keyboard;
 const PictureMessage = require('viber-bot').Message.Picture;
 import { User } from 'src/users/users.model';
 import { Orders } from 'src/orders/order.model';
-const ngrok = require('ngrok');
+
+const getPublicUrl = require('./url');
 
 const MAIN_KEYBOARD = {
   Type: 'keyboard',
@@ -814,31 +815,58 @@ export class MesengersService {
     });
   }
 
-  startServer() {
-    if (process.env.NOW_URL || process.env.HEROKU_URL) {
-      const http = require('http');
-      const port = 1869;
-
-      http.createServer(this.viber_bot.middleware()).listen(port, () => {
-        console.log('Server is running!');
-        this.viber_bot.setWebhook(
-          process.env.NOW_URL || process.env.HEROKU_URL,
-        );
-      });
-    } else {
-      const pubUrl = 'https://www.wechirka.com';
-      async (publicUrl: string) => {
+  async startServer() {
+    if (process.env.BACK_LINK || process.env.HEROKU_URL) {
+      try {
         const http = require('http');
-        const port = 1869;
+        const port = 8080;
 
-        console.log('publicUrl => ', pubUrl);
+        http
+          .createServer(this.viber_bot.middleware())
+          .listen(port, () =>
+            this.viber_bot.setWebhook(
+              process.env.BACK_LINK || process.env.HEROKU_URL,
+            ),
+          );
+      } catch (e) {
+        console.log(e);
+      }
+    } else {
+      return getPublicUrl()
+        .then((publicUrl) => {
+          const http = require('http');
+          const port = process.env.PORT || 8080;
 
-        http.createServer(this.viber_bot.middleware()).listen(port, () => {
-          this.viber_bot.setWebhook(pubUrl);
+          http
+            .createServer(this.viber_bot.middleware())
+            .listen(port, () => this.viber_bot.setWebhook(publicUrl));
+        })
+        .catch((error) => {
+          console.log('Can not connect to ngrok server. Is it running?');
+          console.error(error);
+          process.exit(1);
         });
-      };
     }
-    return;
+    // const http = require('http');
+    // const port = 5001;
+    // const domain = 'www.wechirka.com';
+
+    // try {
+    //   await new Promise<void>((resolve) => {
+    //     http.createServer(this.viber_bot.middleware()).listen(port, () => {
+    //       console.log('Server is running!');
+    //       resolve();
+    //     });
+    //   });
+
+    //   const webhookUrl = `https://${domain}/webhook`;
+    //   await this.viber_bot.setWebhook(webhookUrl);
+    //   console.log(`Webhook is set to: ${webhookUrl}`);
+    // } catch (error) {
+    //   console.error('Ошибка:', error);
+    //   // Дополнительная обработка ошибки, если необходимо
+    // }
+    // return;
   }
 
   //TELEGRAMM METHODS ON CLASS

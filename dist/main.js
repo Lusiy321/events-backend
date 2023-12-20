@@ -39,7 +39,6 @@ async function start() {
     swagger_1.SwaggerModule.setup('docs', app, document);
     await app.listen(PORT, () => console.log(`Server started on port = http://localhost:${PORT}`));
     const mesengersService = app.get(mesengers_service_1.MesengersService);
-    await mesengersService.startServer();
 }
 start();
 //# sourceMappingURL=main.js.map

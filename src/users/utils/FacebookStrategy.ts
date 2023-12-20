@@ -10,7 +10,8 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
       clientID: process.env.FACEBOOK_ID,
       clientSecret: process.env.FACEBOOK_SECRET,
       callbackURL: process.env.FACEBOOK_CALLBACK_URL,
-      profileFields: ['email', 'name'],
+      scope: ['email', 'profile'],
+      graphAPIVersion: 'v18.0',
     });
   }
 
