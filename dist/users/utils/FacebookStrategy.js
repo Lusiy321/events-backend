@@ -20,8 +20,8 @@ let FacebookStrategy = class FacebookStrategy extends (0, passport_1.PassportStr
             clientID: process.env.FACEBOOK_ID,
             clientSecret: process.env.FACEBOOK_SECRET,
             callbackURL: process.env.FACEBOOK_CALLBACK_URL,
-            scope: ['email', 'profile'],
-            graphAPIVersion: 'v18.0',
+            profileFields: ['email', 'profile'],
+            graphAPIVersion: 'v18.00',
         });
         this.userService = userService;
     }

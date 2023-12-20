@@ -841,6 +841,7 @@ export class MesengersService {
             .createServer(this.viber_bot.middleware())
             .listen(port, () => this.viber_bot.setWebhook(publicUrl));
         })
+
         .catch((error) => {
           console.log('Can not connect to ngrok server. Is it running?');
           console.error(error);
