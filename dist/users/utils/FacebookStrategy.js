@@ -20,14 +20,7 @@ let FacebookStrategy = class FacebookStrategy extends (0, passport_1.PassportStr
             clientID: process.env.FACEBOOK_ID,
             clientSecret: process.env.FACEBOOK_SECRET,
             callbackURL: process.env.FACEBOOK_CALLBACK_URL,
-            profileFields: [
-                'id',
-                'email',
-                'name',
-                'displayName',
-                'picture.type(large)',
-            ],
-            tokenURL: `https://graph.facebook.com/v18.0/oauth/access_token=EAAETFobaGvcBO5FWbHJYQIm5uEfxxlKdwROrrEUWVv90SOEtsqFPFU3l9uaZA2WZAFRLJtvtZCyuEAxonXS0HFUlACeES8uQ66ls3EcXKVUicc5j2I3xMS4PvcWz549Czi3QiWEw77IvCT8HGq7jxs5cxbiZBEYmTyHQbDpZAZAO2n61UcSKDZA6aU1T4TMQ51pCgZBVVC3bnizKlu7R1zT2M2yg83x2AygCrFdYnTdsR6oZD`,
+            profileFields: ['id', 'email', 'name', 'picture.type(large)'],
             profileURL: 'https://graph.facebook.com/v18.0/me?fields=id%2Cname%2Cemail%2Cpicture%7Burl%7D&access_token=EAAETFobaGvcBO5FWbHJYQIm5uEfxxlKdwROrrEUWVv90SOEtsqFPFU3l9uaZA2WZAFRLJtvtZCyuEAxonXS0HFUlACeES8uQ66ls3EcXKVUicc5j2I3xMS4PvcWz549Czi3QiWEw77IvCT8HGq7jxs5cxbiZBEYmTyHQbDpZAZAO2n61UcSKDZA6aU1T4TMQ51pCgZBVVC3bnizKlu7R1zT2M2yg83x2AygCrFdYnTdsR6oZD',
         });
         this.userService = userService;
