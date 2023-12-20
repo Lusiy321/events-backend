@@ -10,7 +10,7 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
       clientID: process.env.FACEBOOK_ID,
       clientSecret: process.env.FACEBOOK_SECRET,
       callbackURL: process.env.FACEBOOK_CALLBACK_URL,
-      profileFields: [],
+      profileURL: `https://graph.facebook.com/v18.0/me?fields=id,name,email,picture&access_token=EAAETFobaGvcBO01ATm2NQYzKtBCgZB5tZAvXmodHoZAVIlZALGSRnBXjZAgbTWjmarEMB6Gu0zcwzkvF49MxXA4IZA09BlM4PZCfygbhBmSrvmPzuaXWCU7151h1h5Cl7qguXrAFrioSDV72TqkZC2KFgxotGEl21yuMZAsOac2qD3Ii5ZC5aWsCrZAgHjJZAuH3ipy9IGLQx9KwQZCmKrYfHQz07yT75ZCRVwLUx7BzZCr5cApj4GfyYyK9nBActpOJzq5SObzLrNXucYVaMMZD`,
     });
   }
 
