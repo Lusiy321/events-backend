@@ -10,7 +10,16 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
       clientID: process.env.FACEBOOK_ID,
       clientSecret: process.env.FACEBOOK_SECRET,
       callbackURL: process.env.FACEBOOK_CALLBACK_URL,
-      profileURL: `https://graph.facebook.com/v18.0/me?fields=id,name,email,picture{height=100,width=100,url}&access_token=EAAETFobaGvcBO01ATm2NQYzKtBCgZB5tZAvXmodHoZAVIlZALGSRnBXjZAgbTWjmarEMB6Gu0zcwzkvF49MxXA4IZA09BlM4PZCfygbhBmSrvmPzuaXWCU7151h1h5Cl7qguXrAFrioSDV72TqkZC2KFgxotGEl21yuMZAsOac2qD3Ii5ZC5aWsCrZAgHjJZAuH3ipy9IGLQx9KwQZCmKrYfHQz07yT75ZCRVwLUx7BzZCr5cApj4GfyYyK9nBActpOJzq5SObzLrNXucYVaMMZD`,
+      profileFields: [
+        'id',
+        'email',
+        'name',
+        'displayName',
+        'picture.type(large)',
+      ],
+      tokenURL: `https://graph.facebook.com/v18.0/oauth/access_token=EAAETFobaGvcBO5FWbHJYQIm5uEfxxlKdwROrrEUWVv90SOEtsqFPFU3l9uaZA2WZAFRLJtvtZCyuEAxonXS0HFUlACeES8uQ66ls3EcXKVUicc5j2I3xMS4PvcWz549Czi3QiWEw77IvCT8HGq7jxs5cxbiZBEYmTyHQbDpZAZAO2n61UcSKDZA6aU1T4TMQ51pCgZBVVC3bnizKlu7R1zT2M2yg83x2AygCrFdYnTdsR6oZD`,
+      profileURL:
+        'https://graph.facebook.com/v18.0/me?fields=id%2Cname%2Cemail%2Cpicture%7Burl%7D&access_token=EAAETFobaGvcBO5FWbHJYQIm5uEfxxlKdwROrrEUWVv90SOEtsqFPFU3l9uaZA2WZAFRLJtvtZCyuEAxonXS0HFUlACeES8uQ66ls3EcXKVUicc5j2I3xMS4PvcWz549Czi3QiWEw77IvCT8HGq7jxs5cxbiZBEYmTyHQbDpZAZAO2n61UcSKDZA6aU1T4TMQ51pCgZBVVC3bnizKlu7R1zT2M2yg83x2AygCrFdYnTdsR6oZD',
     });
   }
 
