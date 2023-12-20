@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-facebook';
 import { UsersService } from '../users.service';
+import axios from 'axios';
 
 @Injectable()
 export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
@@ -17,18 +18,21 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
   }
 
   async validate(accessToken: string, refreshToken: string, profile: Profile) {
-    console.log(profile, accessToken, refreshToken);
+    const userProfile = await axios.get(
+      `https://graph.facebook.com/v18.0/me?fields=id%2Cname%2Cemail%2Cpicture%7Burl%7D&access_token=${accessToken}`,
+    );
+    console.log(userProfile);
     const user = await this.userService.validateFacebook({
-      email: 'vasya@gmail.com',
+      email: userProfile.data.email,
       password: profile.id,
       firstName: profile._json.first_name,
       facebookId: profile.id,
-      // avatar: {
-      //   publicId: '1',
-      //   url: profile._json.picture,
-      // },
+      avatar: {
+        publicId: '1',
+        url: userProfile.data.picture.data.url,
+      },
     });
-    await user.save();
+
     return user || null;
   }
 }

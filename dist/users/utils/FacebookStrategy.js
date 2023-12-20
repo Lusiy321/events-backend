@@ -14,6 +14,7 @@ const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const passport_facebook_1 = require("passport-facebook");
 const users_service_1 = require("../users.service");
+const axios_1 = require("axios");
 let FacebookStrategy = class FacebookStrategy extends (0, passport_1.PassportStrategy)(passport_facebook_1.Strategy, 'facebook') {
     constructor(userService) {
         super({
@@ -26,14 +27,18 @@ let FacebookStrategy = class FacebookStrategy extends (0, passport_1.PassportStr
         this.userService = userService;
     }
     async validate(accessToken, refreshToken, profile) {
-        console.log(profile, accessToken, refreshToken);
+        const userProfile = await axios_1.default.get(`https://graph.facebook.com/v18.0/me?fields=id%2Cname%2Cemail%2Cpicture%7Burl%7D&access_token=${accessToken}`);
+        console.log(userProfile);
         const user = await this.userService.validateFacebook({
-            email: 'vasya@gmail.com',
+            email: userProfile.data.email,
             password: profile.id,
             firstName: profile._json.first_name,
             facebookId: profile.id,
+            avatar: {
+                publicId: '1',
+                url: userProfile.data.picture.data.url,
+            },
         });
-        await user.save();
         return user || null;
     }
 };

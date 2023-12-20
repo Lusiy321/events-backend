@@ -489,7 +489,9 @@ export class UsersService {
     });
     try {
       if (!user) {
-        await this.userModel.create(details);
+        const createdUser = await this.userModel.create(details);
+        createdUser.setPassword(details.password);
+        createdUser.save();
         const userUpdateToken = await this.userModel.findOne({
           email: details.email,
         });
