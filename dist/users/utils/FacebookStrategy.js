@@ -14,29 +14,26 @@ const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const passport_facebook_1 = require("passport-facebook");
 const users_service_1 = require("../users.service");
-const axios_1 = require("axios");
 let FacebookStrategy = class FacebookStrategy extends (0, passport_1.PassportStrategy)(passport_facebook_1.Strategy, 'facebook') {
     constructor(userService) {
         super({
             clientID: process.env.FACEBOOK_ID,
             clientSecret: process.env.FACEBOOK_SECRET,
             callbackURL: process.env.FACEBOOK_CALLBACK_URL,
-            profileFields: ['id', 'email', 'name', 'picture.type(large)'],
+            scope: ['email', 'public_profile'],
             profileURL: 'https://graph.facebook.com/v18.0/me?fields=id%2Cname%2Cemail%2Cpicture%7Burl%7D&access_token=EAAETFobaGvcBO5FWbHJYQIm5uEfxxlKdwROrrEUWVv90SOEtsqFPFU3l9uaZA2WZAFRLJtvtZCyuEAxonXS0HFUlACeES8uQ66ls3EcXKVUicc5j2I3xMS4PvcWz549Czi3QiWEw77IvCT8HGq7jxs5cxbiZBEYmTyHQbDpZAZAO2n61UcSKDZA6aU1T4TMQ51pCgZBVVC3bnizKlu7R1zT2M2yg83x2AygCrFdYnTdsR6oZD',
         });
         this.userService = userService;
     }
     async validate(accessToken, refreshToken, profile) {
-        const userProfile = await axios_1.default.get(`https://graph.facebook.com/v18.0/me?fields=id%2Cname%2Cemail%2Cpicture%7Burl%7D&access_token=${accessToken}`);
-        console.log(userProfile);
         const user = await this.userService.validateFacebook({
-            email: userProfile.data.email,
-            password: profile.id,
-            firstName: profile._json.first_name,
+            email: profile._json.email,
+            password: accessToken,
+            firstName: profile._json.name,
             facebookId: profile.id,
             avatar: {
                 publicId: '1',
-                url: userProfile.data.picture.data.url,
+                url: profile._json.picture.data.url,
             },
         });
         return user || null;
