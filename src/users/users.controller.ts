@@ -268,6 +268,19 @@ export class UsersController {
     return this.usersService.updateRestorePassword(id, password);
   }
 
+  @ApiOperation({
+    summary: 'Send link to verify email',
+  })
+  @ApiResponse({ status: 200, type: Object })
+  @HttpCode(200)
+  @Post('/send-email/:Id')
+  async setEmailPsw(@Param('Id') id: string): Promise<any> {
+    return this.usersService.sendVerificationEmail(
+      id,
+      'https://show-swart.vercel.app/artists',
+    );
+  }
+
   @ApiOperation({ summary: 'Verify user email' })
   @Patch('verify-email/:Id')
   async verifyEmail(@Param('Id') id: string, @Res() res: any) {

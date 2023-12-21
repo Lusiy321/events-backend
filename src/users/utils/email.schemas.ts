@@ -10,7 +10,7 @@ export async function verifyEmailMsg(verificationLink: string) {
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f4f4f4;
+            background-color: #094356;
             margin: 0;
             padding: 0;
         }
@@ -35,7 +35,7 @@ export async function verifyEmailMsg(verificationLink: string) {
         .button {
             display: inline-block;
             padding: 10px 20px;
-            background-color: #3498db;
+            background-color: #ebdfca;
             color: #ffffff;
             text-decoration: none;
             border-radius: 5px;
@@ -45,21 +45,21 @@ export async function verifyEmailMsg(verificationLink: string) {
         a {
             text-decoration: none;
             font-size: 20px;
-            color: #3498db;
-            border-bottom: 2px solid #3498db;
+            color: #094356;
+            border-bottom: 2px solid #ffffff;
             transition: color 0.3s, border-bottom 0.3s;
         }
 
         a:hover {
-            color: #2079b0;
-            border-bottom: 2px solid #2079b0;
+            color: #094356;
+            border-bottom: 2px solid #ffffff;
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>Вітаємо з реєстрацією на WECHIRKA</h1>
+        <h1>Вітаємо з реєстрацією на WECHIRKA.COM</h1>
         <p>Дякуємо за реєстрацію на нашій платформі.</p>
         <p>Щоб завершити реєстрацію, натисніть кнопку нижче, щоб підтвердити свою електронну адресу:</p>
         <a href="${verificationLink}" class="button">Підтвердити E-mail</a>

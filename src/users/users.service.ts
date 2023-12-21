@@ -14,6 +14,7 @@ import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
 import { GoogleUserDto } from './dto/google.user.dto';
 import { Category } from './category.model';
 import { Categories, Subcategory } from './dto/caterory.interface';
+import * as nodemailer from 'nodemailer';
 import { verifyEmailMsg } from './utils/email.schemas';
 import {
   mergeAndRemoveDuplicates,
@@ -409,16 +410,25 @@ export class UsersService {
     email: string,
     verificationLink: string,
   ): Promise<void> {
-    const body = await verifyEmailMsg(verificationLink);
-    const msg = {
-      to: email,
-      from: 'lusiy321@gmail.com',
-      subject: 'Підтвердження e-mail Wechirka.com',
-      html: body,
-    };
-
     try {
-      await sgMail.send(msg);
+      const transporter = nodemailer.createTransport({
+        host: 'smtp.zoho.eu',
+        port: 465,
+        secure: true,
+        auth: {
+          user: process.env.NOREPLY_MAIL,
+          pass: process.env.NOREPLY_PASSWORD,
+        },
+      });
+      const body = await verifyEmailMsg(verificationLink);
+      const msg = {
+        from: 'noreply@wechirka.com',
+        to: email,
+        subject: 'Wechirka.com - підтведження реєстрації',
+        html: body,
+      };
+
+      await transporter.sendMail(msg);
     } catch (error) {
       throw new Error('Failed to send verification email');
     }

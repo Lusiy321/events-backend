@@ -111,6 +111,9 @@ let UsersController = class UsersController {
     async setUpdatePsw(id, password) {
         return this.usersService.updateRestorePassword(id, password);
     }
+    async setEmailPsw(id) {
+        return this.usersService.sendVerificationEmail(id, 'https://show-swart.vercel.app/artists');
+    }
     async verifyEmail(id, res) {
         await this.usersService.verifyUserEmail(id);
         return res.redirect(`https://show-git-main-smirnypavel.vercel.app`);
@@ -352,6 +355,18 @@ __decorate([
     __metadata("design:paramtypes", [String, updatePassword_user_dto_1.UpdatePasswordUserDto]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "setUpdatePsw", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({
+        summary: 'Send link to verify email',
+    }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: Object }),
+    (0, common_1.HttpCode)(200),
+    (0, common_1.Post)('/send-email/:Id'),
+    __param(0, (0, common_1.Param)('Id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "setEmailPsw", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Verify user email' }),
     (0, common_1.Patch)('verify-email/:Id'),

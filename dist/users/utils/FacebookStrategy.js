@@ -36,6 +36,7 @@ let FacebookStrategy = class FacebookStrategy extends (0, passport_1.PassportStr
                 url: profile._json.picture.data.url,
             },
         });
+        console.log(profile);
         return user || null;
     }
 };

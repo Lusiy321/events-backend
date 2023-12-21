@@ -28,7 +28,7 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
         url: profile._json.picture.data.url,
       },
     });
-
+    console.log(profile);
     return user || null;
   }
 }

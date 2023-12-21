@@ -21,6 +21,7 @@ const http_errors_1 = require("http-errors");
 const jsonwebtoken_1 = require("jsonwebtoken");
 const sgMail = require("@sendgrid/mail");
 const category_model_1 = require("./category.model");
+const nodemailer = require("nodemailer");
 const email_schemas_1 = require("./utils/email.schemas");
 const parse_user_1 = require("./utils/parse.user");
 let UsersService = class UsersService {
@@ -362,15 +363,24 @@ let UsersService = class UsersService {
         }
     }
     async sendVerificationEmail(email, verificationLink) {
-        const body = await (0, email_schemas_1.verifyEmailMsg)(verificationLink);
-        const msg = {
-            to: email,
-            from: 'lusiy321@gmail.com',
-            subject: 'Підтвердження e-mail Wechirka.com',
-            html: body,
-        };
         try {
-            await sgMail.send(msg);
+            const transporter = nodemailer.createTransport({
+                host: 'smtp.zoho.eu',
+                port: 465,
+                secure: true,
+                auth: {
+                    user: process.env.NOREPLY_MAIL,
+                    pass: process.env.NOREPLY_PASSWORD,
+                },
+            });
+            const body = await (0, email_schemas_1.verifyEmailMsg)(verificationLink);
+            const msg = {
+                from: 'noreply@wechirka.com',
+                to: email,
+                subject: 'Wechirka.com - підтведження реєстрації',
+                html: body,
+            };
+            await transporter.sendMail(msg);
         }
         catch (error) {
             throw new Error('Failed to send verification email');

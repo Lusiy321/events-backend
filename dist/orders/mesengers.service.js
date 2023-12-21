@@ -23,7 +23,7 @@ const KeyboardMessage = require('viber-bot').Message.Keyboard;
 const PictureMessage = require('viber-bot').Message.Picture;
 const users_model_1 = require("../users/users.model");
 const order_model_1 = require("./order.model");
-const getPublicUrl = require('./url');
+const ngrok = require('ngrok');
 const MAIN_KEYBOARD = {
     Type: 'keyboard',
     Revision: 1,
@@ -706,23 +706,27 @@ let MesengersService = class MesengersService {
         });
     }
     async startServer() {
-        if (process.env.BACK_LINK || process.env.HEROKU_URL) {
+        if (process.env.NOW_URL || process.env.HEROKU_URL) {
             try {
                 const http = require('http');
                 const port = 8080;
                 http
                     .createServer(this.viber_bot.middleware())
-                    .listen(port, () => this.viber_bot.setWebhook(process.env.BACK_LINK || process.env.HEROKU_URL));
+                    .listen(port, () => this.viber_bot.setWebhook(process.env.NOW_URL || process.env.HEROKU_URL));
             }
             catch (e) {
                 console.log(e);
             }
         }
         else {
-            return getPublicUrl()
-                .then((publicUrl) => {
+            return ngrok
+                .connect({
+                addr: 3000,
+            })
+                .then(async (publicUrl) => {
                 const http = require('http');
-                const port = process.env.PORT || 8080;
+                const port = process.env.PORT || 5000;
+                console.log('publicUrl => ', publicUrl);
                 http
                     .createServer(this.viber_bot.middleware())
                     .listen(port, () => this.viber_bot.setWebhook(publicUrl));

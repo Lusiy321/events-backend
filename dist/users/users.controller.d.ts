@@ -35,6 +35,7 @@ export declare class UsersController {
     cangePwd(request: any, password: PasswordUserDto): Promise<User>;
     forgotPwd(email: MailUserDto): Promise<[import("@sendgrid/mail").ClientResponse, {}]>;
     setUpdatePsw(id: string, password: UpdatePasswordUserDto): Promise<User>;
+    setEmailPsw(id: string): Promise<any>;
     verifyEmail(id: string, res: any): Promise<any>;
     callback(data: any): any;
 }
