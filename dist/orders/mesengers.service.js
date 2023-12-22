@@ -23,7 +23,7 @@ const KeyboardMessage = require('viber-bot').Message.Keyboard;
 const PictureMessage = require('viber-bot').Message.Picture;
 const users_model_1 = require("../users/users.model");
 const order_model_1 = require("./order.model");
-const ngrok = require('ngrok');
+const ngrok = require("@ngrok/ngrok");
 const MAIN_KEYBOARD = {
     Type: 'keyboard',
     Revision: 1,
@@ -706,37 +706,23 @@ let MesengersService = class MesengersService {
         });
     }
     async startServer() {
-        if (process.env.NOW_URL || process.env.HEROKU_URL) {
-            try {
-                const http = require('http');
-                const port = 8080;
-                http
-                    .createServer(this.viber_bot.middleware())
-                    .listen(port, () => this.viber_bot.setWebhook(process.env.NOW_URL || process.env.HEROKU_URL));
-            }
-            catch (e) {
-                console.log(e);
-            }
-        }
-        else {
-            return ngrok
-                .connect({
-                addr: 3000,
-            })
-                .then(async (publicUrl) => {
-                const http = require('http');
-                const port = process.env.PORT || 5000;
-                console.log('publicUrl => ', publicUrl);
-                http
-                    .createServer(this.viber_bot.middleware())
-                    .listen(port, () => this.viber_bot.setWebhook(publicUrl));
-            })
-                .catch((error) => {
-                console.log('Can not connect to ngrok server. Is it running?');
-                console.error(error);
-                process.exit(1);
-            });
-        }
+        const http = require('http');
+        const port = 8080;
+        ngrok
+            .connect({
+            addr: port,
+            authtoken_from_env: true,
+        })
+            .then(async (listener) => {
+            console.log('publicUrl => ', listener.url());
+            await http
+                .createServer(this.viber_bot.middleware())
+                .listen(port, () => this.viber_bot.setWebhook(listener.url()));
+        })
+            .catch((error) => {
+            console.log('Can not connect to ngrok server. Is it running?');
+            console.error(error);
+        });
     }
     async sendMessage(chatId, msg) {
         try {

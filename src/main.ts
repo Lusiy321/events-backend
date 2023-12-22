@@ -48,6 +48,6 @@ async function start() {
   );
   const mesengersService = app.get(MesengersService);
 
-  // await mesengersService.startServer();
+  await mesengersService.startServer();
 }
 start();
