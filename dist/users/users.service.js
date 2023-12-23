@@ -12,7 +12,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UsersService = void 0;
+exports.UsersService = exports.TRANSPORTER_PROVIDER = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const users_model_1 = require("./users.model");
@@ -21,14 +21,25 @@ const http_errors_1 = require("http-errors");
 const jsonwebtoken_1 = require("jsonwebtoken");
 const sgMail = require("@sendgrid/mail");
 const category_model_1 = require("./category.model");
-const nodemailer = require("nodemailer");
 const email_schemas_1 = require("./utils/email.schemas");
 const parse_user_1 = require("./utils/parse.user");
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
+exports.TRANSPORTER_PROVIDER = 'TRANSPORTER_PROVIDER';
 let UsersService = class UsersService {
-    constructor(userModel, categoryModel) {
+    constructor(userModel, categoryModel, transporter) {
         this.userModel = userModel;
         this.categoryModel = categoryModel;
-        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+        this.transporter = transporter;
+        this.transporter = nodemailer.createTransport({
+            host: 'smtp.zoho.eu',
+            port: 465,
+            secure: true,
+            auth: {
+                user: process.env.NOREPLY_MAIL,
+                pass: process.env.NOREPLY_PASSWORD,
+            },
+        });
     }
     async searchUsers(query) {
         const { req, loc, page, cat, subcat } = query;
@@ -364,23 +375,14 @@ let UsersService = class UsersService {
     }
     async sendVerificationEmail(email, verificationLink) {
         try {
-            const transporter = nodemailer.createTransport({
-                host: 'smtp.zoho.eu',
-                port: 465,
-                secure: true,
-                auth: {
-                    user: process.env.NOREPLY_MAIL,
-                    pass: process.env.NOREPLY_PASSWORD,
-                },
-            });
             const body = await (0, email_schemas_1.verifyEmailMsg)(verificationLink);
             const msg = {
-                from: 'noreply@wechirka.com',
+                from: process.env.NOREPLY_MAIL,
                 to: email,
                 subject: 'Wechirka.com - підтведження реєстрації',
                 html: body,
             };
-            await transporter.sendMail(msg);
+            await this.transporter.sendMail(msg);
         }
         catch (error) {
             throw new Error('Failed to send verification email');
@@ -389,8 +391,10 @@ let UsersService = class UsersService {
     async verifyUserEmail(id) {
         try {
             const user = await this.userModel.findById(id);
-            user.verify = true;
-            user.save();
+            if (!user) {
+                throw new http_errors_1.NotFound('User not found');
+            }
+            await this.userModel.findByIdAndUpdate({ _id: id }, { verify: true });
         }
         catch (e) {
             throw new http_errors_1.BadRequest(e.message);
@@ -405,10 +409,10 @@ let UsersService = class UsersService {
             const { oldPassword, password } = newPass;
             if (user.comparePassword(oldPassword) === true) {
                 user.setPassword(password);
-                user.save();
+                await this.userModel.findByIdAndUpdate({ _id: user._id }, { password: user.password });
                 const msg = {
                     to: user.email,
-                    from: 'lusiy321@gmail.com',
+                    from: process.env.NOREPLY_MAIL,
                     subject: 'Your password has been changed on swep.com',
                     html: `<div class="container">
           <h1>Your Password Has Been Changed</h1>
@@ -416,7 +420,7 @@ let UsersService = class UsersService {
           <p><a href="${process.env.FRONT_LINK}/auth/login">Go to your account</a></p>
       </div>`,
                 };
-                await sgMail.send(msg);
+                await this.transporter.sendMail(msg);
                 return await this.userModel.findById(user._id).select(parse_user_1.rows).exec();
             }
             throw new http_errors_1.BadRequest('Password is not avaible');
@@ -479,18 +483,20 @@ let UsersService = class UsersService {
                     return password;
                 }
                 const newPassword = generatePassword();
+                restoreMail.setPassword(newPassword);
+                await this.userModel.findByIdAndUpdate({ _id: restoreMail._id }, { password: restoreMail.password });
                 const msg = {
                     to: restoreMail.email,
-                    from: 'lusiy321@gmail.com',
-                    subject: 'Change your password on swep.com',
+                    from: process.env.NOREPLY_MAIL,
+                    subject: 'Відновлення пароля на Wechirka.com',
                     html: `<div class="container">
-          <h1>Your Password Has Been Changed</h1>
-          <p>Your new password: ${newPassword}</p>
-          <p>Click on the link below to go to your personal account:</p>
-          <p><a href="${process.env.FRONT_LINK}profile">Go to your account</a></p>
+          <h1>Ваш пароль було змінено</h1>
+          <p>Новий пароль для входу: ${newPassword}</p>
+          <p>Натисніть на посіляння для переходу на сайт:</p>
+          <p><a href="${process.env.FRONT_LINK}auth/login">Перейти за посиланням для в ходу</a></p>
       </div>`,
                 };
-                return await sgMail.send(msg);
+                return await this.transporter.sendMail(msg);
             }
         }
         catch (e) {
@@ -506,7 +512,7 @@ let UsersService = class UsersService {
                 user.save();
                 const msg = {
                     to: user.email,
-                    from: 'lusiy321@gmail.com',
+                    from: process.env.NOREPLY_MAIL,
                     subject: 'Your password has been changed on swep.com',
                     html: `<div class="container">
           <h1>Your Password Has Been Changed</h1>
@@ -753,14 +759,50 @@ let UsersService = class UsersService {
             throw new http_errors_1.NotFound('User not found');
         }
     }
+    async monoPayment(amount) {
+        const privateKey = 'ufV_RSdULOS - VD7HnIJGQCVCxdsn1VsPn6x6WgS5DfzM';
+        let pubKeyBase64 = 'LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFQUc1LzZ3NnZubGJZb0ZmRHlYWE4vS29CbVVjTgo3NWJSUWg4MFBhaEdldnJoanFCQnI3OXNSS0JSbnpHODFUZVQ5OEFOakU1c0R3RmZ5Znhub0ZJcmZBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==';
+        let xSignBase64 = 'MEUCIQC/mVKhi8FKoayul2Mim3E2oaIOCNJk5dEXxTqbkeJSOQIgOM0hsW0qcP2H8iXy1aQYpmY0SJWEaWur7nQXlKDCFxA=';
+        let message = `{
+    "invoiceId": "p2_9ZgpZVsl3",
+    "status": "created",
+    "failureReason": "string",
+    "amount": 4200,
+    "ccy": 980,
+    "finalAmount": 4200,
+    "createdDate": "2019-08-24T14:15:22Z",
+    "modifiedDate": "2019-08-24T14:15:22Z",
+    "reference": "84d0070ee4e44667b31371d8f8813947",
+    "cancelList": [
+      {
+        "status": "processing",
+        "amount": 4200,
+        "ccy": 980,
+        "createdDate": "2019-08-24T14:15:22Z",
+        "modifiedDate": "2019-08-24T14:15:22Z",
+        "approvalCode": "662476",
+        "rrn": "060189181768",
+        "extRef": "635ace02599849e981b2cd7a65f417fe"
+      }
+    ]
+  }`;
+        let signatureBuf = Buffer.from(xSignBase64, 'base64');
+        let publicKeyBuf = Buffer.from(pubKeyBase64, 'base64');
+        let verify = crypto.createVerify('SHA256');
+        verify.write(message);
+        verify.end();
+        let result = verify.verify(publicKeyBuf, signatureBuf);
+        console.log(result === true ? 'OK' : 'NOT OK');
+    }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(users_model_1.User.name)),
     __param(1, (0, mongoose_1.InjectModel)(category_model_1.Category.name)),
+    __param(2, (0, common_1.Inject)(exports.TRANSPORTER_PROVIDER)),
     __metadata("design:paramtypes", [users_model_1.User,
-        category_model_1.Category])
+        category_model_1.Category, Object])
 ], UsersService);
 users_model_1.UserSchema.methods.setPassword = async function (password) {
     return (this.password = (0, bcrypt_1.hashSync)(password, 10));

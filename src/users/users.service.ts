@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserSchema } from './users.model';
 import { CreateUserDto } from './dto/create.user.dto';
@@ -14,13 +14,15 @@ import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
 import { GoogleUserDto } from './dto/google.user.dto';
 import { Category } from './category.model';
 import { Categories, Subcategory } from './dto/caterory.interface';
-import * as nodemailer from 'nodemailer';
 import { verifyEmailMsg } from './utils/email.schemas';
 import {
   mergeAndRemoveDuplicates,
   paginateArray,
   rows,
 } from './utils/parse.user';
+import * as crypto from 'crypto';
+import * as nodemailer from 'nodemailer';
+export const TRANSPORTER_PROVIDER = 'TRANSPORTER_PROVIDER';
 
 @Injectable()
 export class UsersService {
@@ -28,8 +30,18 @@ export class UsersService {
     @InjectModel(User.name)
     private userModel: User,
     @InjectModel(Category.name) private categoryModel: Category,
+    @Inject(TRANSPORTER_PROVIDER)
+    private transporter: nodemailer.Transporter,
   ) {
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    this.transporter = nodemailer.createTransport({
+      host: 'smtp.zoho.eu',
+      port: 465,
+      secure: true,
+      auth: {
+        user: process.env.NOREPLY_MAIL,
+        pass: process.env.NOREPLY_PASSWORD,
+      },
+    });
   }
   // USER
 
@@ -411,24 +423,15 @@ export class UsersService {
     verificationLink: string,
   ): Promise<void> {
     try {
-      const transporter = nodemailer.createTransport({
-        host: 'smtp.zoho.eu',
-        port: 465,
-        secure: true,
-        auth: {
-          user: process.env.NOREPLY_MAIL,
-          pass: process.env.NOREPLY_PASSWORD,
-        },
-      });
       const body = await verifyEmailMsg(verificationLink);
       const msg = {
-        from: 'noreply@wechirka.com',
+        from: process.env.NOREPLY_MAIL,
         to: email,
         subject: 'Wechirka.com - підтведження реєстрації',
         html: body,
       };
 
-      await transporter.sendMail(msg);
+      await this.transporter.sendMail(msg);
     } catch (error) {
       throw new Error('Failed to send verification email');
     }
@@ -437,8 +440,10 @@ export class UsersService {
   async verifyUserEmail(id: any) {
     try {
       const user = await this.userModel.findById(id);
-      user.verify = true;
-      user.save();
+      if (!user) {
+        throw new NotFound('User not found');
+      }
+      await this.userModel.findByIdAndUpdate({ _id: id }, { verify: true });
     } catch (e) {
       throw new BadRequest(e.message);
     }
@@ -453,10 +458,13 @@ export class UsersService {
       const { oldPassword, password } = newPass;
       if (user.comparePassword(oldPassword) === true) {
         user.setPassword(password);
-        user.save();
+        await this.userModel.findByIdAndUpdate(
+          { _id: user._id },
+          { password: user.password },
+        );
         const msg = {
           to: user.email,
-          from: 'lusiy321@gmail.com',
+          from: process.env.NOREPLY_MAIL,
           subject: 'Your password has been changed on swep.com',
           html: `<div class="container">
           <h1>Your Password Has Been Changed</h1>
@@ -464,7 +472,7 @@ export class UsersService {
           <p><a href="${process.env.FRONT_LINK}/auth/login">Go to your account</a></p>
       </div>`,
         };
-        await sgMail.send(msg);
+        await this.transporter.sendMail(msg);
         return await this.userModel.findById(user._id).select(rows).exec();
       }
       throw new BadRequest('Password is not avaible');
@@ -532,18 +540,24 @@ export class UsersService {
           return password;
         }
         const newPassword = generatePassword();
+        restoreMail.setPassword(newPassword);
+        await this.userModel.findByIdAndUpdate(
+          { _id: restoreMail._id },
+          { password: restoreMail.password },
+        );
+
         const msg: any = {
           to: restoreMail.email,
-          from: 'lusiy321@gmail.com',
-          subject: 'Change your password on swep.com',
+          from: process.env.NOREPLY_MAIL,
+          subject: 'Відновлення пароля на Wechirka.com',
           html: `<div class="container">
-          <h1>Your Password Has Been Changed</h1>
-          <p>Your new password: ${newPassword}</p>
-          <p>Click on the link below to go to your personal account:</p>
-          <p><a href="${process.env.FRONT_LINK}profile">Go to your account</a></p>
+          <h1>Ваш пароль було змінено</h1>
+          <p>Новий пароль для входу: ${newPassword}</p>
+          <p>Натисніть на посіляння для переходу на сайт:</p>
+          <p><a href="${process.env.FRONT_LINK}auth/login">Перейти за посиланням для в ходу</a></p>
       </div>`,
         };
-        return await sgMail.send(msg);
+        return await this.transporter.sendMail(msg);
       }
     } catch (e) {
       throw new BadRequest('User not found');
@@ -562,7 +576,7 @@ export class UsersService {
         user.save();
         const msg = {
           to: user.email,
-          from: 'lusiy321@gmail.com',
+          from: process.env.NOREPLY_MAIL,
           subject: 'Your password has been changed on swep.com',
           html: `<div class="container">
           <h1>Your Password Has Been Changed</h1>
@@ -862,6 +876,51 @@ export class UsersService {
     } catch (e) {
       throw new NotFound('User not found');
     }
+  }
+
+  async monoPayment(amount: number) {
+    const privateKey = 'ufV_RSdULOS - VD7HnIJGQCVCxdsn1VsPn6x6WgS5DfzM';
+    let pubKeyBase64 =
+      'LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFQUc1LzZ3NnZubGJZb0ZmRHlYWE4vS29CbVVjTgo3NWJSUWg4MFBhaEdldnJoanFCQnI3OXNSS0JSbnpHODFUZVQ5OEFOakU1c0R3RmZ5Znhub0ZJcmZBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==';
+
+    let xSignBase64 =
+      'MEUCIQC/mVKhi8FKoayul2Mim3E2oaIOCNJk5dEXxTqbkeJSOQIgOM0hsW0qcP2H8iXy1aQYpmY0SJWEaWur7nQXlKDCFxA=';
+
+    let message = `{
+    "invoiceId": "p2_9ZgpZVsl3",
+    "status": "created",
+    "failureReason": "string",
+    "amount": 4200,
+    "ccy": 980,
+    "finalAmount": 4200,
+    "createdDate": "2019-08-24T14:15:22Z",
+    "modifiedDate": "2019-08-24T14:15:22Z",
+    "reference": "84d0070ee4e44667b31371d8f8813947",
+    "cancelList": [
+      {
+        "status": "processing",
+        "amount": 4200,
+        "ccy": 980,
+        "createdDate": "2019-08-24T14:15:22Z",
+        "modifiedDate": "2019-08-24T14:15:22Z",
+        "approvalCode": "662476",
+        "rrn": "060189181768",
+        "extRef": "635ace02599849e981b2cd7a65f417fe"
+      }
+    ]
+  }`;
+
+    let signatureBuf = Buffer.from(xSignBase64, 'base64');
+    let publicKeyBuf = Buffer.from(pubKeyBase64, 'base64');
+
+    let verify = crypto.createVerify('SHA256');
+
+    verify.write(message);
+    verify.end();
+
+    let result = verify.verify(publicKeyBuf, signatureBuf);
+
+    console.log(result === true ? 'OK' : 'NOT OK');
   }
 }
 

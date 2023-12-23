@@ -1,5 +1,5 @@
-import { Module, forwardRef } from '@nestjs/common';
-import { UsersService } from './users.service';
+import { Module } from '@nestjs/common';
+import { TRANSPORTER_PROVIDER, UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './users.model';
@@ -11,6 +11,7 @@ import { CloudinaryService } from './cloudinary.service';
 import { ConfigService } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
 import { FacebookStrategy } from './utils/FacebookStrategy';
+import * as nodemailer from 'nodemailer';
 
 @Module({
   imports: [
@@ -34,8 +35,22 @@ import { FacebookStrategy } from './utils/FacebookStrategy';
     UsersService,
     CloudinaryService,
     ConfigService,
+    {
+      provide: TRANSPORTER_PROVIDER,
+      useFactory: () => {
+        return nodemailer.createTransport({
+          host: 'smtp.zoho.eu',
+          port: 465,
+          secure: true,
+          auth: {
+            user: process.env.NOREPLY_MAIL,
+            pass: process.env.NOREPLY_PASSWORD,
+          },
+        });
+      },
+    },
   ],
-  exports: [UsersService, CloudinaryService],
+  exports: [UsersService, CloudinaryService, TRANSPORTER_PROVIDER],
   controllers: [UsersController],
 })
 export class UsersModule {}

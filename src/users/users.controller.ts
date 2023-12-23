@@ -252,7 +252,8 @@ export class UsersController {
   @HttpCode(200)
   @Post('forgot-password')
   async forgotPwd(@Body() email: MailUserDto) {
-    return await this.usersService.restorePassword(email);
+    await this.usersService.restorePassword(email);
+    return { message: 'Email send' };
   }
 
   @ApiOperation({

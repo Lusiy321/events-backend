@@ -2,15 +2,17 @@ import { User } from './users.model';
 import { CreateUserDto } from './dto/create.user.dto';
 import { UpdateUserDto, search_result } from './dto/update.user.dto';
 import { PasswordUserDto } from './dto/password.user.dto';
-import * as sgMail from '@sendgrid/mail';
 import { MailUserDto } from './dto/email.user.dto';
 import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
 import { GoogleUserDto } from './dto/google.user.dto';
 import { Category } from './category.model';
+import * as nodemailer from 'nodemailer';
+export declare const TRANSPORTER_PROVIDER = "TRANSPORTER_PROVIDER";
 export declare class UsersService {
     private userModel;
     private categoryModel;
-    constructor(userModel: User, categoryModel: Category);
+    private transporter;
+    constructor(userModel: User, categoryModel: Category, transporter: nodemailer.Transporter);
     searchUsers(query: any): Promise<search_result>;
     findAllUsers(): Promise<User[]>;
     findById(id: string): Promise<User>;
@@ -21,7 +23,7 @@ export declare class UsersService {
     changePassword(req: any, newPass: PasswordUserDto): Promise<User>;
     validateUser(details: GoogleUserDto): Promise<any>;
     validateFacebook(details: any): Promise<any>;
-    restorePassword(email: MailUserDto): Promise<[sgMail.ClientResponse, {}]>;
+    restorePassword(email: MailUserDto): Promise<any>;
     updateRestorePassword(id: string, newPass: UpdatePasswordUserDto): Promise<User>;
     login(user: CreateUserDto): Promise<User>;
     logout(req: any): Promise<User>;
@@ -34,4 +36,5 @@ export declare class UsersService {
     }): Promise<any>;
     refreshAccessToken(req: any): Promise<User>;
     findCategory(): Promise<Category[]>;
+    monoPayment(amount: number): Promise<void>;
 }

@@ -33,7 +33,9 @@ export declare class UsersController {
     facebookAuthRedirect(res: any, req: any): Promise<any>;
     refresh(request: any): Promise<User>;
     cangePwd(request: any, password: PasswordUserDto): Promise<User>;
-    forgotPwd(email: MailUserDto): Promise<[import("@sendgrid/mail").ClientResponse, {}]>;
+    forgotPwd(email: MailUserDto): Promise<{
+        message: string;
+    }>;
     setUpdatePsw(id: string, password: UpdatePasswordUserDto): Promise<User>;
     setEmailPsw(id: string): Promise<any>;
     verifyEmail(id: string, res: any): Promise<any>;

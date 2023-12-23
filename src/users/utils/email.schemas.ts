@@ -1,6 +1,6 @@
 export async function verifyEmailMsg(verificationLink: string) {
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="ua">
 
 <head>
     <meta charset="UTF-8">

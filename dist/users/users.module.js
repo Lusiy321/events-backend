@@ -20,6 +20,7 @@ const cloudinary_service_1 = require("./cloudinary.service");
 const config_1 = require("@nestjs/config");
 const platform_express_1 = require("@nestjs/platform-express");
 const FacebookStrategy_1 = require("./utils/FacebookStrategy");
+const nodemailer = require("nodemailer");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;
@@ -46,8 +47,22 @@ exports.UsersModule = UsersModule = __decorate([
             users_service_1.UsersService,
             cloudinary_service_1.CloudinaryService,
             config_1.ConfigService,
+            {
+                provide: users_service_1.TRANSPORTER_PROVIDER,
+                useFactory: () => {
+                    return nodemailer.createTransport({
+                        host: 'smtp.zoho.eu',
+                        port: 465,
+                        secure: true,
+                        auth: {
+                            user: process.env.NOREPLY_MAIL,
+                            pass: process.env.NOREPLY_PASSWORD,
+                        },
+                    });
+                },
+            },
         ],
-        exports: [users_service_1.UsersService, cloudinary_service_1.CloudinaryService],
+        exports: [users_service_1.UsersService, cloudinary_service_1.CloudinaryService, users_service_1.TRANSPORTER_PROVIDER],
         controllers: [users_controller_1.UsersController],
     })
 ], UsersModule);

@@ -106,7 +106,8 @@ let UsersController = class UsersController {
         return await this.usersService.changePassword(request, password);
     }
     async forgotPwd(email) {
-        return await this.usersService.restorePassword(email);
+        await this.usersService.restorePassword(email);
+        return { message: 'Email send' };
     }
     async setUpdatePsw(id, password) {
         return this.usersService.updateRestorePassword(id, password);
