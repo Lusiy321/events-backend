@@ -3,7 +3,6 @@ import { CreateUserDto } from './dto/create.user.dto';
 import { UpdateUserDto, search_result } from './dto/update.user.dto';
 import { PasswordUserDto } from './dto/password.user.dto';
 import { MailUserDto } from './dto/email.user.dto';
-import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
 import { GoogleUserDto } from './dto/google.user.dto';
 import { Category } from './category.model';
 import * as nodemailer from 'nodemailer';
@@ -24,7 +23,6 @@ export declare class UsersService {
     validateUser(details: GoogleUserDto): Promise<any>;
     validateFacebook(details: any): Promise<any>;
     restorePassword(email: MailUserDto): Promise<any>;
-    updateRestorePassword(id: string, newPass: UpdatePasswordUserDto): Promise<User>;
     login(user: CreateUserDto): Promise<User>;
     logout(req: any): Promise<User>;
     update(user: UpdateUserDto, req: any): Promise<User>;

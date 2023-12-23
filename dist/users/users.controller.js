@@ -23,7 +23,6 @@ const google_user_dto_1 = require("./dto/google.user.dto");
 const Guards_1 = require("./utils/Guards");
 const password_user_dto_1 = require("./dto/password.user.dto");
 const email_user_dto_1 = require("./dto/email.user.dto");
-const updatePassword_user_dto_1 = require("./dto/updatePassword.user.dto");
 const category_model_1 = require("./category.model");
 const platform_express_1 = require("@nestjs/platform-express");
 const cloudinary_service_1 = require("./cloudinary.service");
@@ -108,9 +107,6 @@ let UsersController = class UsersController {
     async forgotPwd(email) {
         await this.usersService.restorePassword(email);
         return { message: 'Email send' };
-    }
-    async setUpdatePsw(id, password) {
-        return this.usersService.updateRestorePassword(id, password);
     }
     async setEmailPsw(id) {
         return this.usersService.sendVerificationEmail(id, 'https://show-swart.vercel.app/artists');
@@ -343,19 +339,6 @@ __decorate([
     __metadata("design:paramtypes", [email_user_dto_1.MailUserDto]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "forgotPwd", null);
-__decorate([
-    (0, swagger_1.ApiOperation)({
-        summary: 'Update password for forgot password',
-    }),
-    (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
-    (0, common_1.HttpCode)(200),
-    (0, common_1.Post)('/update-password/:Id'),
-    __param(0, (0, common_1.Param)('Id')),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, updatePassword_user_dto_1.UpdatePasswordUserDto]),
-    __metadata("design:returntype", Promise)
-], UsersController.prototype, "setUpdatePsw", null);
 __decorate([
     (0, swagger_1.ApiOperation)({
         summary: 'Send link to verify email',

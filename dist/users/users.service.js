@@ -19,7 +19,6 @@ const users_model_1 = require("./users.model");
 const bcrypt_1 = require("bcrypt");
 const http_errors_1 = require("http-errors");
 const jsonwebtoken_1 = require("jsonwebtoken");
-const sgMail = require("@sendgrid/mail");
 const category_model_1 = require("./category.model");
 const email_schemas_1 = require("./utils/email.schemas");
 const parse_user_1 = require("./utils/parse.user");
@@ -413,11 +412,11 @@ let UsersService = class UsersService {
                 const msg = {
                     to: user.email,
                     from: process.env.NOREPLY_MAIL,
-                    subject: 'Your password has been changed on swep.com',
+                    subject: 'Зміна пароля',
                     html: `<div class="container">
-          <h1>Your Password Has Been Changed</h1>
-          <p>Click on the link below to go to your personal account:</p>
-          <p><a href="${process.env.FRONT_LINK}/auth/login">Go to your account</a></p>
+          <h1>Ваш пароль було змінено на Wechirka.com</h1>
+          <p>Натисніть на посіляння для переходу на сайт:</p>
+          <p><a href="${process.env.FRONT_LINK}/auth/login">Перейти у профіль</a></p>
       </div>`,
                 };
                 await this.transporter.sendMail(msg);
@@ -501,32 +500,6 @@ let UsersService = class UsersService {
         }
         catch (e) {
             throw new http_errors_1.BadRequest('User not found');
-        }
-    }
-    async updateRestorePassword(id, newPass) {
-        const user = await this.userModel.findById(id);
-        const { password } = newPass;
-        try {
-            if (user) {
-                user.setPassword(password);
-                user.save();
-                const msg = {
-                    to: user.email,
-                    from: process.env.NOREPLY_MAIL,
-                    subject: 'Your password has been changed on swep.com',
-                    html: `<div class="container">
-          <h1>Your Password Has Been Changed</h1>
-          <p>Click on the link below to go to your personal account:</p>
-          <p><a href="${process.env.FRONT_LINK}profile"> Go to your account </a></p>
-      </div>`,
-                };
-                await sgMail.send(msg);
-                return await this.userModel.findById(user._id);
-            }
-            throw new http_errors_1.BadRequest('User not found');
-        }
-        catch (e) {
-            throw new http_errors_1.BadRequest(e.message);
         }
     }
     async login(user) {
@@ -695,10 +668,7 @@ let UsersService = class UsersService {
             else {
                 const SECRET_KEY = process.env.SECRET_KEY;
                 const findId = (0, jsonwebtoken_1.verify)(token, SECRET_KEY);
-                const user = await this.userModel
-                    .findById({ _id: findId.id })
-                    .select('-password')
-                    .exec();
+                const user = await this.userModel.findById({ _id: findId.id }).exec();
                 return user;
             }
         }
@@ -812,6 +782,7 @@ users_model_1.UserSchema.methods.setName = function (email) {
     this.firstName = parts[0];
 };
 users_model_1.UserSchema.methods.comparePassword = function (password) {
+    console.log(password);
     return (0, bcrypt_1.compareSync)(password, this.password);
 };
 //# sourceMappingURL=users.service.js.map

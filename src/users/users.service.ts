@@ -465,11 +465,11 @@ export class UsersService {
         const msg = {
           to: user.email,
           from: process.env.NOREPLY_MAIL,
-          subject: 'Your password has been changed on swep.com',
+          subject: 'Зміна пароля',
           html: `<div class="container">
-          <h1>Your Password Has Been Changed</h1>
-          <p>Click on the link below to go to your personal account:</p>
-          <p><a href="${process.env.FRONT_LINK}/auth/login">Go to your account</a></p>
+          <h1>Ваш пароль було змінено на Wechirka.com</h1>
+          <p>Натисніть на посіляння для переходу на сайт:</p>
+          <p><a href="${process.env.FRONT_LINK}/auth/login">Перейти у профіль</a></p>
       </div>`,
         };
         await this.transporter.sendMail(msg);
@@ -561,36 +561,6 @@ export class UsersService {
       }
     } catch (e) {
       throw new BadRequest('User not found');
-    }
-  }
-
-  async updateRestorePassword(
-    id: string,
-    newPass: UpdatePasswordUserDto,
-  ): Promise<User> {
-    const user = await this.userModel.findById(id);
-    const { password } = newPass;
-    try {
-      if (user) {
-        user.setPassword(password);
-        user.save();
-        const msg = {
-          to: user.email,
-          from: process.env.NOREPLY_MAIL,
-          subject: 'Your password has been changed on swep.com',
-          html: `<div class="container">
-          <h1>Your Password Has Been Changed</h1>
-          <p>Click on the link below to go to your personal account:</p>
-          <p><a href="${process.env.FRONT_LINK}profile"> Go to your account </a></p>
-      </div>`,
-        };
-        await sgMail.send(msg);
-        return await this.userModel.findById(user._id);
-      }
-
-      throw new BadRequest('User not found');
-    } catch (e) {
-      throw new BadRequest(e.message);
     }
   }
 
@@ -809,10 +779,7 @@ export class UsersService {
       } else {
         const SECRET_KEY = process.env.SECRET_KEY;
         const findId = verify(token, SECRET_KEY) as JwtPayload;
-        const user = await this.userModel
-          .findById({ _id: findId.id })
-          .select('-password')
-          .exec();
+        const user = await this.userModel.findById({ _id: findId.id }).exec();
         return user;
       }
     } catch (e) {
@@ -933,5 +900,6 @@ UserSchema.methods.setName = function (email: string) {
   this.firstName = parts[0];
 };
 UserSchema.methods.comparePassword = function (password: string) {
+  console.log(password);
   return compareSync(password, this.password);
 };

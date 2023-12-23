@@ -5,7 +5,6 @@ import { CreateUserDto } from './dto/create.user.dto';
 import { UpdateUserDto } from './dto/update.user.dto';
 import { PasswordUserDto } from './dto/password.user.dto';
 import { MailUserDto } from './dto/email.user.dto';
-import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
 import { Category } from './category.model';
 import { CloudinaryService } from './cloudinary.service';
 import { DelUserMediaDto } from './dto/delete.user.dto';
@@ -36,7 +35,6 @@ export declare class UsersController {
     forgotPwd(email: MailUserDto): Promise<{
         message: string;
     }>;
-    setUpdatePsw(id: string, password: UpdatePasswordUserDto): Promise<User>;
     setEmailPsw(id: string): Promise<any>;
     verifyEmail(id: string, res: any): Promise<any>;
     callback(data: any): any;

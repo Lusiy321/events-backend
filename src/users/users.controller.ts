@@ -256,18 +256,18 @@ export class UsersController {
     return { message: 'Email send' };
   }
 
-  @ApiOperation({
-    summary: 'Update password for forgot password',
-  })
-  @ApiResponse({ status: 200, type: User })
-  @HttpCode(200)
-  @Post('/update-password/:Id')
-  async setUpdatePsw(
-    @Param('Id') id: string,
-    @Body() password: UpdatePasswordUserDto,
-  ): Promise<User> {
-    return this.usersService.updateRestorePassword(id, password);
-  }
+  // @ApiOperation({
+  //   summary: 'Update password for forgot password',
+  // })
+  // @ApiResponse({ status: 200, type: User })
+  // @HttpCode(200)
+  // @Post('/update-password/:Id')
+  // async setUpdatePsw(
+  //   @Param('Id') id: string,
+  //   @Body() password: UpdatePasswordUserDto,
+  // ): Promise<User> {
+  //   return this.usersService.updateRestorePassword(id, password);
+  // }
 
   @ApiOperation({
     summary: 'Send link to verify email',
