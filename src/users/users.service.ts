@@ -647,7 +647,13 @@ export class UsersService {
             } else {
               const combinedArray = [...categories, ...newCategory];
 
-              const uniqueArray = Array.from(new Set(combinedArray));
+              const idMap = new Map<string, any>();
+
+              combinedArray.forEach((obj) => {
+                idMap.set(obj._id, obj);
+              });
+              const uniqueArray = Array.from(idMap.values());
+
               return uniqueArray;
             }
           }

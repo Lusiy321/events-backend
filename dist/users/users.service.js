@@ -569,7 +569,11 @@ let UsersService = class UsersService {
                         }
                         else {
                             const combinedArray = [...categories, ...newCategory];
-                            const uniqueArray = Array.from(new Set(combinedArray));
+                            const idMap = new Map();
+                            combinedArray.forEach((obj) => {
+                                idMap.set(obj._id, obj);
+                            });
+                            const uniqueArray = Array.from(idMap.values());
                             return uniqueArray;
                         }
                     }
