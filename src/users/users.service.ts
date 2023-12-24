@@ -634,55 +634,26 @@ export class UsersService {
       ) {
         // работа с категориями
         if (category) {
-          console.log(category);
+          console.log('Инф с фронта', category);
           const findUser = await this.userModel.findById(findId.id).exec();
           const arrCategory = findUser.category;
           function addSubcategory(
-            categories: Category[],
-            categoryId: string,
-            newSubcategory: Subcategory,
+            categories: Categories[],
             newCategory: Categories[],
           ) {
             if (Array.isArray(categories) && categories.length === 0) {
               categories.push(...newCategory);
-              console.log(categories);
               return categories;
-            }
-            const updatedCategories = categories.map((category) => {
-              if (category._id === categoryId) {
-                const existingSubcategory = category.subcategories.find(
-                  (sub) => sub.id === newSubcategory.id,
-                );
+            } else {
+              const combinedArray = [...categories, ...newCategory];
 
-                if (existingSubcategory) {
-                  console.log(categories);
-                  return category;
-                }
-                console.log({
-                  ...category,
-                  subcategories: [...category.subcategories, newSubcategory],
-                });
-                return {
-                  ...category,
-                  subcategories: [...category.subcategories, newSubcategory],
-                };
-              } else if (category._id !== categoryId) {
-                categories.push(...newCategory);
-                console.log(categories);
-                return categories;
-              }
-            });
-            console.log(updatedCategories);
-            return updatedCategories;
+              const uniqueArray = Array.from(new Set(combinedArray));
+              return uniqueArray;
+            }
           }
 
-          const newCategoryArr = addSubcategory(
-            arrCategory,
-            category[0]._id,
-            category[0].subcategories[0],
-            category,
-          );
-          console.log(newCategoryArr);
+          const newCategoryArr = addSubcategory(arrCategory, category);
+
           await this.userModel.findByIdAndUpdate(
             { _id: findId.id },
             {
@@ -907,6 +878,5 @@ UserSchema.methods.setName = function (email: string) {
   this.firstName = parts[0];
 };
 UserSchema.methods.comparePassword = function (password: string) {
-  console.log(password);
   return compareSync(password, this.password);
 };

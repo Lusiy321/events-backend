@@ -559,36 +559,21 @@ let UsersService = class UsersService {
                 price ||
                 social) {
                 if (category) {
-                    console.log(category);
+                    console.log('Инф с фронта', category);
                     const findUser = await this.userModel.findById(findId.id).exec();
                     const arrCategory = findUser.category;
-                    function addSubcategory(categories, categoryId, newSubcategory, newCategory) {
+                    function addSubcategory(categories, newCategory) {
                         if (Array.isArray(categories) && categories.length === 0) {
                             categories.push(...newCategory);
-                            console.log(categories);
                             return categories;
                         }
-                        const updatedCategories = categories.map((category) => {
-                            if (category._id === categoryId) {
-                                const existingSubcategory = category.subcategories.find((sub) => sub.id === newSubcategory.id);
-                                if (existingSubcategory) {
-                                    console.log(categories);
-                                    return category;
-                                }
-                                console.log(Object.assign(Object.assign({}, category), { subcategories: [...category.subcategories, newSubcategory] }));
-                                return Object.assign(Object.assign({}, category), { subcategories: [...category.subcategories, newSubcategory] });
-                            }
-                            else if (category._id !== categoryId) {
-                                categories.push(...newCategory);
-                                console.log(categories);
-                                return categories;
-                            }
-                        });
-                        console.log(updatedCategories);
-                        return updatedCategories;
+                        else {
+                            const combinedArray = [...categories, ...newCategory];
+                            const uniqueArray = Array.from(new Set(combinedArray));
+                            return uniqueArray;
+                        }
                     }
-                    const newCategoryArr = addSubcategory(arrCategory, category[0]._id, category[0].subcategories[0], category);
-                    console.log(newCategoryArr);
+                    const newCategoryArr = addSubcategory(arrCategory, category);
                     await this.userModel.findByIdAndUpdate({ _id: findId.id }, {
                         $set: { category: newCategoryArr },
                     });
@@ -791,7 +776,6 @@ users_model_1.UserSchema.methods.setName = function (email) {
     this.firstName = parts[0];
 };
 users_model_1.UserSchema.methods.comparePassword = function (password) {
-    console.log(password);
     return (0, bcrypt_1.compareSync)(password, this.password);
 };
 //# sourceMappingURL=users.service.js.map
