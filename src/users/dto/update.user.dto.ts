@@ -61,22 +61,6 @@ export class UpdateUserDto {
   })
   readonly photo: Photo[];
   @ApiProperty({
-    example: [
-      {
-        _id: '65258a576f9a7d99e555c7bd',
-        name: 'Музичні послуги',
-        subcategories: [
-          {
-            name: 'Жива музика',
-            id: '872c7525-ef5b-4dc3-9082-bdb98426fb1a',
-          },
-        ],
-      },
-    ],
-    description: 'Category and subcategory',
-  })
-  readonly category: Categories[];
-  @ApiProperty({
     example: 'https://www.instagram.com/herlastsightband/',
     description: 'User social links',
   })

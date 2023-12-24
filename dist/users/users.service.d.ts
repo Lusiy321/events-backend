@@ -5,6 +5,7 @@ import { PasswordUserDto } from './dto/password.user.dto';
 import { MailUserDto } from './dto/email.user.dto';
 import { GoogleUserDto } from './dto/google.user.dto';
 import { Category } from './category.model';
+import { Categories } from './dto/caterory.interface';
 import * as nodemailer from 'nodemailer';
 export declare const TRANSPORTER_PROVIDER = "TRANSPORTER_PROVIDER";
 export declare class UsersService {
@@ -26,6 +27,7 @@ export declare class UsersService {
     login(user: CreateUserDto): Promise<User>;
     logout(req: any): Promise<User>;
     update(user: UpdateUserDto, req: any): Promise<User>;
+    updateCategory(data: Categories, req: any): Promise<any>;
     deleteUserVideo(id: string, req: any): Promise<any>;
     findOrCreateUser(googleId: string, firstName: string, email: string): Promise<any>;
     findToken(req: any): Promise<User>;

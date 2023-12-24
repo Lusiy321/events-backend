@@ -8,6 +8,7 @@ import { MailUserDto } from './dto/email.user.dto';
 import { Category } from './category.model';
 import { CloudinaryService } from './cloudinary.service';
 import { DelUserMediaDto } from './dto/delete.user.dto';
+import { Categories } from './dto/caterory.interface';
 export declare class UsersController {
     private readonly usersService;
     private readonly cloudinaryService;
@@ -21,6 +22,7 @@ export declare class UsersController {
     login(user: CreateUserDto): Promise<User>;
     logout(request: any): Promise<User>;
     update(data: UpdateUserDto, request: any): Promise<User>;
+    updateCat(data: Categories, request: any): Promise<User>;
     uploadPhoto(req: any, images: Express.Multer.File[]): Promise<User>;
     uploadUserAvatar(req: any, images: Express.Multer.File[]): Promise<User>;
     deleteImage(id: DelUserMediaDto, req: any): Promise<User>;

@@ -609,7 +609,6 @@ export class UsersService {
       location,
       master_photo,
       video,
-      category,
       price,
     } = user;
     const findId = await this.findToken(req);
@@ -628,46 +627,9 @@ export class UsersService {
         location ||
         master_photo ||
         video ||
-        category ||
         price ||
         social
       ) {
-        // работа с категориями
-        if (category) {
-          console.log('Инф с фронта', category);
-          const findUser = await this.userModel.findById(findId.id).exec();
-          const arrCategory = findUser.category;
-          function addSubcategory(
-            categories: Categories[],
-            newCategory: Categories[],
-          ) {
-            if (Array.isArray(categories) && categories.length === 0) {
-              categories.push(...newCategory);
-              return categories;
-            } else {
-              const combinedArray = [...categories, ...newCategory];
-
-              const idMap = new Map<string, any>();
-
-              combinedArray.forEach((obj) => {
-                idMap.set(obj._id, obj);
-              });
-              const uniqueArray = Array.from(idMap.values());
-
-              return uniqueArray;
-            }
-          }
-
-          const newCategoryArr = addSubcategory(arrCategory, category);
-
-          await this.userModel.findByIdAndUpdate(
-            { _id: findId.id },
-            {
-              $set: { category: newCategoryArr },
-            },
-          );
-          return await this.userModel.findById({ _id: findId.id });
-        }
         if (video) {
           const findUser = await this.userModel.findById(findId.id).exec();
           const arrVideo = findUser.video;
@@ -708,6 +670,44 @@ export class UsersService {
     } catch (e) {
       throw new BadRequest(e.message);
     }
+  }
+
+  async updateCategory(data: Categories, req: any) {
+    const category = [data];
+    const findId = await this.findToken(req);
+    const findUser = await this.userModel.findById(findId.id).exec();
+    const arrCategory = findUser.category;
+    function addSubcategory(
+      categories: Categories[],
+      newCategory: Categories[],
+    ) {
+      if (Array.isArray(categories) && categories.length === 0) {
+        categories.push(...newCategory);
+        return categories;
+      } else {
+        const combinedArray = [...categories, ...newCategory];
+        const idMap = new Map<string, any>();
+
+        combinedArray.forEach((obj) => {
+          idMap.set(obj._id, obj);
+        });
+        const uniqueArray = Array.from(idMap.values());
+        return uniqueArray;
+      }
+    }
+
+    const newCategoryArr = addSubcategory(arrCategory, category);
+
+    await this.userModel.findByIdAndUpdate(
+      { _id: findId.id },
+      {
+        $set: { category: newCategoryArr },
+      },
+    );
+    return await this.userModel
+      .findById({ _id: findId.id })
+      .select(rows)
+      .exec();
   }
 
   async deleteUserVideo(id: string, req: any) {

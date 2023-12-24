@@ -38,6 +38,7 @@ import { diskStorage } from 'multer';
 import * as path from 'path';
 import { DelUserMediaDto } from './dto/delete.user.dto';
 import { FacebookAuthGuard } from './utils/GuardFacebook';
+import { Categories } from './dto/caterory.interface';
 
 @ApiTags('User')
 @Controller('users')
@@ -112,6 +113,17 @@ export class UsersController {
     @Req() request: any,
   ): Promise<User> {
     return this.usersService.update(data, request);
+  }
+
+  @ApiOperation({ summary: 'Update user' })
+  @ApiResponse({ status: 200, type: User })
+  @ApiBearerAuth('BearerAuthMethod')
+  @Put('/update-category')
+  async updateCat(
+    @Body() data: Categories,
+    @Req() request: any,
+  ): Promise<User> {
+    return this.usersService.updateCategory(data, request);
   }
 
   @ApiOperation({ summary: 'Upload images' })
