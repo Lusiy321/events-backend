@@ -8,9 +8,7 @@ import { Conflict, NotFound, BadRequest, Unauthorized } from 'http-errors';
 import { UpdateUserDto, search_result } from './dto/update.user.dto';
 import { sign, verify, JwtPayload } from 'jsonwebtoken';
 import { PasswordUserDto } from './dto/password.user.dto';
-import * as sgMail from '@sendgrid/mail';
 import { MailUserDto } from './dto/email.user.dto';
-import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
 import { GoogleUserDto } from './dto/google.user.dto';
 import { Category } from './category.model';
 import { Categories, Subcategory } from './dto/caterory.interface';
@@ -389,8 +387,8 @@ export class UsersService {
         createdUser.setPassword(password);
         createdUser.save();
 
-        // const verificationLink = `${process.env.BACK_LINK}verify-email/${createdUser._id}`;
-        // await this.sendVerificationEmail(email, verificationLink);
+        const verificationLink = `${process.env.BACK_LINK}verify-email/${createdUser._id}`;
+        await this.sendVerificationEmail(email, verificationLink);
         return await this.userModel
           .findById(createdUser._id)
           .select(rows)
@@ -469,7 +467,7 @@ export class UsersService {
           html: `<div class="container">
           <h1>Ваш пароль було змінено на Wechirka.com</h1>
           <p>Натисніть на посіляння для переходу на сайт:</p>
-          <p><a href="${process.env.FRONT_LINK}/auth/login">Перейти у профіль</a></p>
+          <p><a href="${process.env.FRONT_LINK}profile">Перейти у профіль</a></p>
       </div>`,
         };
         await this.transporter.sendMail(msg);
@@ -634,7 +632,9 @@ export class UsersService {
         price ||
         social
       ) {
+        // работа с категориями
         if (category) {
+          console.log(category);
           const findUser = await this.userModel.findById(findId.id).exec();
           const arrCategory = findUser.category;
           function addSubcategory(
@@ -645,7 +645,7 @@ export class UsersService {
           ) {
             if (Array.isArray(categories) && categories.length === 0) {
               categories.push(...newCategory);
-
+              console.log(categories);
               return categories;
             }
             const updatedCategories = categories.map((category) => {
@@ -655,18 +655,24 @@ export class UsersService {
                 );
 
                 if (existingSubcategory) {
+                  console.log(categories);
                   return category;
                 }
-
+                console.log({
+                  ...category,
+                  subcategories: [...category.subcategories, newSubcategory],
+                });
                 return {
                   ...category,
                   subcategories: [...category.subcategories, newSubcategory],
                 };
               } else if (category._id !== categoryId) {
                 categories.push(...newCategory);
+                console.log(categories);
                 return categories;
               }
             });
+            console.log(updatedCategories);
             return updatedCategories;
           }
 
@@ -676,6 +682,7 @@ export class UsersService {
             category[0].subcategories[0],
             category,
           );
+          console.log(newCategoryArr);
           await this.userModel.findByIdAndUpdate(
             { _id: findId.id },
             {

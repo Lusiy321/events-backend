@@ -256,19 +256,6 @@ export class UsersController {
     return { message: 'Email send' };
   }
 
-  // @ApiOperation({
-  //   summary: 'Update password for forgot password',
-  // })
-  // @ApiResponse({ status: 200, type: User })
-  // @HttpCode(200)
-  // @Post('/update-password/:Id')
-  // async setUpdatePsw(
-  //   @Param('Id') id: string,
-  //   @Body() password: UpdatePasswordUserDto,
-  // ): Promise<User> {
-  //   return this.usersService.updateRestorePassword(id, password);
-  // }
-
   @ApiOperation({
     summary: 'Send link to verify email',
   })
@@ -286,7 +273,7 @@ export class UsersController {
   @Patch('verify-email/:Id')
   async verifyEmail(@Param('Id') id: string, @Res() res: any) {
     await this.usersService.verifyUserEmail(id);
-    return res.redirect(`https://show-git-main-smirnypavel.vercel.app`);
+    return res.redirect(`${process.env.FRONT_LINK}auth/login`);
   }
 
   @Post('payment/callback')

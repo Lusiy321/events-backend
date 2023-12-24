@@ -113,7 +113,7 @@ let UsersController = class UsersController {
     }
     async verifyEmail(id, res) {
         await this.usersService.verifyUserEmail(id);
-        return res.redirect(`https://show-git-main-smirnypavel.vercel.app`);
+        return res.redirect(`${process.env.FRONT_LINK}auth/login`);
     }
     callback(data) {
         return console.log(data);

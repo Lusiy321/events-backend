@@ -345,6 +345,8 @@ let UsersService = class UsersService {
                 createdUser.setName(lowerCaseEmail);
                 createdUser.setPassword(password);
                 createdUser.save();
+                const verificationLink = `${process.env.BACK_LINK}verify-email/${createdUser._id}`;
+                await this.sendVerificationEmail(email, verificationLink);
                 return await this.userModel
                     .findById(createdUser._id)
                     .select(parse_user_1.rows)
@@ -416,7 +418,7 @@ let UsersService = class UsersService {
                     html: `<div class="container">
           <h1>Ваш пароль було змінено на Wechirka.com</h1>
           <p>Натисніть на посіляння для переходу на сайт:</p>
-          <p><a href="${process.env.FRONT_LINK}/auth/login">Перейти у профіль</a></p>
+          <p><a href="${process.env.FRONT_LINK}profile">Перейти у профіль</a></p>
       </div>`,
                 };
                 await this.transporter.sendMail(msg);
@@ -557,29 +559,36 @@ let UsersService = class UsersService {
                 price ||
                 social) {
                 if (category) {
+                    console.log(category);
                     const findUser = await this.userModel.findById(findId.id).exec();
                     const arrCategory = findUser.category;
                     function addSubcategory(categories, categoryId, newSubcategory, newCategory) {
                         if (Array.isArray(categories) && categories.length === 0) {
                             categories.push(...newCategory);
+                            console.log(categories);
                             return categories;
                         }
                         const updatedCategories = categories.map((category) => {
                             if (category._id === categoryId) {
                                 const existingSubcategory = category.subcategories.find((sub) => sub.id === newSubcategory.id);
                                 if (existingSubcategory) {
+                                    console.log(categories);
                                     return category;
                                 }
+                                console.log(Object.assign(Object.assign({}, category), { subcategories: [...category.subcategories, newSubcategory] }));
                                 return Object.assign(Object.assign({}, category), { subcategories: [...category.subcategories, newSubcategory] });
                             }
                             else if (category._id !== categoryId) {
                                 categories.push(...newCategory);
+                                console.log(categories);
                                 return categories;
                             }
                         });
+                        console.log(updatedCategories);
                         return updatedCategories;
                     }
                     const newCategoryArr = addSubcategory(arrCategory, category[0]._id, category[0].subcategories[0], category);
+                    console.log(newCategoryArr);
                     await this.userModel.findByIdAndUpdate({ _id: findId.id }, {
                         $set: { category: newCategoryArr },
                     });
