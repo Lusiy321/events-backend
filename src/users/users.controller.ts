@@ -126,6 +126,14 @@ export class UsersController {
     return this.usersService.updateCategory(data, request);
   }
 
+  @ApiOperation({ summary: 'Update user' })
+  @ApiResponse({ status: 200, type: User })
+  @ApiBearerAuth('BearerAuthMethod')
+  @Delete('/category/:id')
+  async delCat(@Param('id') id: string, @Req() request: any): Promise<User> {
+    return this.usersService.deleteCategory(id, request);
+  }
+
   @ApiOperation({ summary: 'Upload images' })
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')

@@ -28,6 +28,7 @@ export declare class UsersService {
     logout(req: any): Promise<User>;
     update(user: UpdateUserDto, req: any): Promise<User>;
     updateCategory(data: Categories, req: any): Promise<any>;
+    deleteCategory(id: string, req: any): Promise<any>;
     deleteUserVideo(id: string, req: any): Promise<any>;
     findOrCreateUser(googleId: string, firstName: string, email: string): Promise<any>;
     findToken(req: any): Promise<User>;

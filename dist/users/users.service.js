@@ -594,33 +594,76 @@ let UsersService = class UsersService {
         }
     }
     async updateCategory(data, req) {
-        const category = [data];
-        const findId = await this.findToken(req);
-        const findUser = await this.userModel.findById(findId.id).exec();
-        const arrCategory = findUser.category;
-        function addSubcategory(categories, newCategory) {
-            if (Array.isArray(categories) && categories.length === 0) {
-                categories.push(...newCategory);
-                return categories;
+        try {
+            const category = [data];
+            const findId = await this.findToken(req);
+            if (!findId) {
+                throw new http_errors_1.Unauthorized('jwt expired');
             }
-            else {
-                const combinedArray = [...categories, ...newCategory];
-                const idMap = new Map();
-                combinedArray.forEach((obj) => {
-                    idMap.set(obj._id, obj);
+            const findUser = await this.userModel.findById(findId.id).exec();
+            const arrCategory = findUser.category;
+            function addSubcategory(categories, newCategory) {
+                if (Array.isArray(categories) && categories.length === 0) {
+                    categories.push(...newCategory);
+                    return categories;
+                }
+                else {
+                    const combinedArray = [...categories, ...newCategory];
+                    const idMap = new Map();
+                    combinedArray.forEach((obj) => {
+                        idMap.set(obj._id, obj);
+                    });
+                    const uniqueArray = Array.from(idMap.values());
+                    return uniqueArray;
+                }
+            }
+            const newCategoryArr = addSubcategory(arrCategory, category);
+            await this.userModel.findByIdAndUpdate({ _id: findId.id }, {
+                $set: { category: newCategoryArr },
+            });
+            return await this.userModel
+                .findById({ _id: findId.id })
+                .select(parse_user_1.rows)
+                .exec();
+        }
+        catch (e) {
+            throw new http_errors_1.BadRequest(e.message);
+        }
+    }
+    async deleteCategory(id, req) {
+        try {
+            const user = await this.findToken(req);
+            if (!user) {
+                throw new http_errors_1.Unauthorized('jwt expired');
+            }
+            const categoryArray = user.category;
+            const newArrSub = categoryArray.filter((cat) => cat._id === id);
+            if (Array.isArray(newArrSub) && newArrSub.length === 0) {
+                const subArr = categoryArray[0].subcategories;
+                console.log(subArr);
+                const newArrSubcat = subArr.filter((sub) => sub.id !== id);
+                console.log(newArrSubcat);
+                await this.userModel.updateOne({ _id: user.id, 'category._id': categoryArray[0]._id }, {
+                    $set: { 'category.$.subcategories': newArrSubcat },
                 });
-                const uniqueArray = Array.from(idMap.values());
-                return uniqueArray;
+                return await this.userModel
+                    .findById({ _id: user.id })
+                    .select(parse_user_1.rows)
+                    .exec();
+            }
+            else if (Array.isArray(newArrSub) && newArrSub.length !== 0) {
+                await this.userModel.updateOne({ _id: user.id }, {
+                    $set: { category: newArrSub },
+                });
+                return await this.userModel
+                    .findById({ _id: user.id })
+                    .select(parse_user_1.rows)
+                    .exec();
             }
         }
-        const newCategoryArr = addSubcategory(arrCategory, category);
-        await this.userModel.findByIdAndUpdate({ _id: findId.id }, {
-            $set: { category: newCategoryArr },
-        });
-        return await this.userModel
-            .findById({ _id: findId.id })
-            .select(parse_user_1.rows)
-            .exec();
+        catch (e) {
+            throw new http_errors_1.BadRequest(e.message);
+        }
     }
     async deleteUserVideo(id, req) {
         const user = await this.findToken(req);

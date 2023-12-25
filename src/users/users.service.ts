@@ -673,41 +673,89 @@ export class UsersService {
   }
 
   async updateCategory(data: Categories, req: any) {
-    const category = [data];
-    const findId = await this.findToken(req);
-    const findUser = await this.userModel.findById(findId.id).exec();
-    const arrCategory = findUser.category;
-    function addSubcategory(
-      categories: Categories[],
-      newCategory: Categories[],
-    ) {
-      if (Array.isArray(categories) && categories.length === 0) {
-        categories.push(...newCategory);
-        return categories;
-      } else {
-        const combinedArray = [...categories, ...newCategory];
-        const idMap = new Map<string, any>();
-
-        combinedArray.forEach((obj) => {
-          idMap.set(obj._id, obj);
-        });
-        const uniqueArray = Array.from(idMap.values());
-        return uniqueArray;
+    try {
+      const category = [data];
+      const findId = await this.findToken(req);
+      if (!findId) {
+        throw new Unauthorized('jwt expired');
       }
+      const findUser = await this.userModel.findById(findId.id).exec();
+      const arrCategory = findUser.category;
+      function addSubcategory(
+        categories: Categories[],
+        newCategory: Categories[],
+      ) {
+        if (Array.isArray(categories) && categories.length === 0) {
+          categories.push(...newCategory);
+          return categories;
+        } else {
+          const combinedArray = [...categories, ...newCategory];
+          const idMap = new Map<string, any>();
+
+          combinedArray.forEach((obj) => {
+            idMap.set(obj._id, obj);
+          });
+          const uniqueArray = Array.from(idMap.values());
+          return uniqueArray;
+        }
+      }
+
+      const newCategoryArr = addSubcategory(arrCategory, category);
+
+      await this.userModel.findByIdAndUpdate(
+        { _id: findId.id },
+        {
+          $set: { category: newCategoryArr },
+        },
+      );
+      return await this.userModel
+        .findById({ _id: findId.id })
+        .select(rows)
+        .exec();
+    } catch (e) {
+      throw new BadRequest(e.message);
     }
+  }
 
-    const newCategoryArr = addSubcategory(arrCategory, category);
+  async deleteCategory(id: string, req: any) {
+    try {
+      const user = await this.findToken(req);
+      if (!user) {
+        throw new Unauthorized('jwt expired');
+      }
+      const categoryArray = user.category;
+      const newArrSub = categoryArray.filter((cat) => cat._id === id);
 
-    await this.userModel.findByIdAndUpdate(
-      { _id: findId.id },
-      {
-        $set: { category: newCategoryArr },
-      },
-    );
-    return await this.userModel
-      .findById({ _id: findId.id })
-      .select(rows)
-      .exec();
+      if (Array.isArray(newArrSub) && newArrSub.length === 0) {
+        const subArr = categoryArray[0].subcategories;
+        console.log(subArr);
+        const newArrSubcat = subArr.filter((sub) => sub.id !== id);
+        console.log(newArrSubcat);
+        await this.userModel.updateOne(
+          { _id: user.id, 'category._id': categoryArray[0]._id },
+          {
+            $set: { 'category.$.subcategories': newArrSubcat },
+          },
+        );
+        return await this.userModel
+          .findById({ _id: user.id })
+          .select(rows)
+          .exec();
+      } else if (Array.isArray(newArrSub) && newArrSub.length !== 0) {
+        await this.userModel.updateOne(
+          { _id: user.id },
+          {
+            $set: { category: newArrSub },
+          },
+        );
+        return await this.userModel
+          .findById({ _id: user.id })
+          .select(rows)
+          .exec();
+      }
+    } catch (e) {
+      throw new BadRequest(e.message);
+    }
   }
 
   async deleteUserVideo(id: string, req: any) {

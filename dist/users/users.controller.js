@@ -62,6 +62,9 @@ let UsersController = class UsersController {
     async updateCat(data, request) {
         return this.usersService.updateCategory(data, request);
     }
+    async delCat(id, request) {
+        return this.usersService.deleteCategory(id, request);
+    }
     async uploadPhoto(req, images) {
         const user = await this.usersService.findToken(req);
         await this.cloudinaryService.uploadImages(user, images);
@@ -211,6 +214,17 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "updateCat", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Update user' }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
+    (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
+    (0, common_1.Delete)('/category/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "delCat", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Upload images' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
