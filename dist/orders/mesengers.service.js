@@ -178,7 +178,7 @@ let MesengersService = class MesengersService {
                         ]);
                         if (order.verify === false) {
                             this.viber_bot.sendMessage({ id: res.userProfile.id }, [
-                                new TextMessage(`Ваш код верифікаціЇ: ${order.sms}`),
+                                new TextMessage(`Ваш код верифікаціЇ: ${order.sms}\nПерейти на сайт: ${process.env.CODE_LINK}`),
                                 new KeyboardMessage(MAIN_KEYBOARD),
                             ]);
                         }
@@ -271,10 +271,11 @@ let MesengersService = class MesengersService {
                             const msg = `Замовник: ${finded.name}.
       Дата події: ${finded.date}.
       Категорія: ${finded.category[0].subcategories[0].name}.
-      Вимоги замовника: ${finded.description}.
+      Вимоги: ${finded.description}.
       Локація: ${finded.location}.
       Гонорар: ${finded.price}.
-      Кількість відгуків: ${finded.approve_count}.`;
+      Кількість відгуків: ${finded.approve_count}.
+      Статус: ${finded.active ? 'Активний' : 'Неактивний'}.\n`;
                             if (finded.active === true) {
                                 const keyboard = {
                                     inline_keyboard: [
@@ -355,7 +356,7 @@ let MesengersService = class MesengersService {
                 }
                 this.tg_bot.sendMessage(chatId, `Дякую, ${msg.from.first_name} тепер Вам будуть надходити повідомлення про нові пропозиції в обраній категорії. Щоб вимкнути оповіщення виберіть "Меню" та натисніть /stop`, optURL);
                 if (order.verify === false) {
-                    this.tg_bot.sendMessage(chatId, `Ваш код верифікації: ${order.sms}`, optURL);
+                    this.tg_bot.sendMessage(chatId, `Ваш код верифікації: ${order.sms}\nПерейти на сайт: ${process.env.CODE_LINK}`);
                 }
             }
         });
@@ -425,11 +426,13 @@ let MesengersService = class MesengersService {
                 await this.userModel.findByIdAndUpdate(user.id, { tg_chat: null });
             }
             else {
-                const order = await this.ordersModel
-                    .findOne({ tg_chat: chatId })
-                    .exec();
-                if (order) {
-                    await this.ordersModel.findByIdAndUpdate(order.id, { tg_chat: null });
+                const order = await this.ordersModel.find({ tg_chat: chatId }).exec();
+                if (Array.isArray(order) && order.length > 0) {
+                    order.map(async (order) => {
+                        await this.ordersModel.findByIdAndUpdate(order.id, {
+                            tg_chat: null,
+                        });
+                    });
                 }
             }
             this.tg_bot.sendMessage(chatId, `Ви вимкнули оповіщення. Щоб знову отримувати оповіщення, натисніть кнопку "Відправити номер телефону".`, optCont);
@@ -591,7 +594,8 @@ let MesengersService = class MesengersService {
       Вимоги замовника: ${finded.description}.
       Локація: ${finded.location}.
       Гонорар: ${finded.price}.
-      Кількість відгуків: ${finded.approve_count}.`;
+      Кількість відгуків: ${finded.approve_count}.
+      Статус: ${finded.active ? 'Активний' : 'Неактивний'}.\n`;
                     if (finded.active === true) {
                         const KEYBOARD = {
                             Type: 'keyboard',
@@ -751,6 +755,26 @@ let MesengersService = class MesengersService {
                 this.sendMessage(user.tg_chat.toString(), msg);
             }
         });
+    }
+    async sendCode(chatId) {
+        try {
+            const telegram = await this.ordersModel.findOne({ tg_chat: chatId });
+            const viber = await this.ordersModel.findOne({ viber: chatId });
+            if (telegram) {
+                const msg = `Ваш код верифікації: ${telegram.sms}\nПерейти на сайт: ${process.env.CODE_LINK}`;
+                await this.sendMessage(chatId, msg);
+            }
+            else if (viber) {
+                const msg = `Ваш код верифікації: ${viber.sms}\nПерейти на сайт: ${process.env.CODE_LINK}`;
+                await this.viber_bot.sendMessage({ id: chatId }, new TextMessage(msg), new KeyboardMessage(MAIN_KEYBOARD));
+            }
+            else {
+                throw new Error(`Помилка надсилання повідомлення`);
+            }
+        }
+        catch (error) {
+            throw new Error(`Помилка надсилання повідомлення: ${error}`);
+        }
     }
     async sendTgAgreement(phone, chatId) {
         try {

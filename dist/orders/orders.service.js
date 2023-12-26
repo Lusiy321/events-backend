@@ -78,6 +78,22 @@ let OrdersService = class OrdersService {
             const createdOrder = await this.ordersModel.create(params);
             await this.ordersModel.findByIdAndUpdate({ _id: createdOrder._id }, { sms: verificationCode });
             const order = await this.ordersModel.findById(createdOrder._id);
+            const allOrders = await this.ordersModel.find({ phone: order.phone });
+            if (Array.isArray(allOrders) && allOrders.length !== 0) {
+                const tgChat = allOrders[0].tg_chat;
+                const viber = allOrders[0].viber;
+                if (tgChat !== null) {
+                    await this.mesengersService.sendCode(tgChat);
+                    return order;
+                }
+                else if (viber !== null) {
+                    await this.mesengersService.sendCode(viber);
+                    return order;
+                }
+                else {
+                    return order;
+                }
+            }
             return order;
         }
         catch (e) {

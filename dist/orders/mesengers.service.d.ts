@@ -15,6 +15,7 @@ export declare class MesengersService {
     startServer(): Promise<void>;
     sendMessage(chatId: string, msg: string): Promise<TelegramBot.Message>;
     sendMessagesToAllTgUsers(msg: string): Promise<void>;
+    sendCode(chatId: string): Promise<void>;
     sendTgAgreement(phone: string, chatId: string): Promise<boolean>;
     sendNewTgOrder(chatId: string, order: Orders): Promise<TelegramBot.Message>;
     findMyOrders(chatId: string): Promise<void>;
