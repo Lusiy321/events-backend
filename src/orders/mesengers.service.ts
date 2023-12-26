@@ -61,7 +61,7 @@ export class MesengersService {
     this.viber_bot.onSubscribe(async (response: any) => {
       say(
         response,
-        `Привіт ${response.userProfile.name}. Я бот ресурсу ${this.viber_bot.name}! Щоб отримувати сповіщеня, відправте свій номер телефону у форматі 380981231122. Сюди, Вам будуть надходити сповіщеня про найм`,
+        `Привіт ${response.userProfile.name}. Я бот ресурсу ${this.viber_bot.name}! Щоб отримувати сповіщеня, відправте свій номер телефону у форматі 380981231122.\n\nСюди, Вам будуть надходити сповіщеня про замовлення або пропозиції від виконавців.`,
       );
     });
 
@@ -210,6 +210,12 @@ export class MesengersService {
               ),
               new KeyboardMessage(MAIN_KEYBOARD),
             ]);
+            if (order.verify === false) {
+              this.viber_bot.sendMessage({ id: res.userProfile.id }, [
+                new TextMessage(`Ваш код верифікаціЇ: ${order.code}`),
+                new KeyboardMessage(MAIN_KEYBOARD),
+              ]);
+            }
             return updatedUser || updatedOrder;
           } else if (
             (user && user.viber === res.userProfile.id) ||
@@ -301,7 +307,7 @@ export class MesengersService {
 
       this.tg_bot.sendMessage(
         chatId,
-        'Будь ласка, натисніть кнопку "Відправити номер телефону" для надання номеру телефону.',
+        `Привіт ${msg.from.first_name}. Я бот ресурсу WECHIRKA! Щоб отримувати сповіщеня, натисніть кнопку "Відправити номер телефону" для реєстрації у боті.\n\nСюди, Вам будуть надходити сповіщеня про замовлення або пропозиції від виконавців.`,
         optCont,
       );
     });
@@ -322,7 +328,7 @@ export class MesengersService {
           if (Array.isArray(find) && find.length === 0) {
             this.tg_bot.sendMessage(
               chatId,
-              'Ми не знайшли Ваших заявок, напевно ви не зареєструвались у чат боті (натисніть /start)',
+              'Ми не знайшли Ваших заявок, напевно ви не зареєструвались, натисніть кнопку "Відправити номер телефону" для реєстрації у боті',
               optCont,
             );
           } else if (find || user.tg_chat === find[0].tg_chat) {
@@ -406,7 +412,7 @@ export class MesengersService {
 
         this.tg_bot.sendMessage(
           chatId,
-          `Дякую, ${msg.from.first_name} тепер Вам будуть надходити повідомлення про нові пропозиції в твоїй категорії. Щоб вимкнути оповіщення виберіть "Меню" та натисніть /stop`,
+          `Дякую, ${msg.from.first_name} тепер Вам будуть надходити повідомлення про нові пропозиції в обраній категорії. Щоб вимкнути оповіщення виберіть "Меню" та натисніть /stop`,
           optURL,
         );
       } else {
@@ -417,9 +423,16 @@ export class MesengersService {
         }
         this.tg_bot.sendMessage(
           chatId,
-          `Дякую, ${msg.from.first_name} тепер Вам будуть надходити повідомлення про нові пропозиції в твоїй категорії. Щоб вимкнути оповіщення виберіть "Меню" та натисніть /stop`,
+          `Дякую, ${msg.from.first_name} тепер Вам будуть надходити повідомлення про нові пропозиції в обраній категорії. Щоб вимкнути оповіщення виберіть "Меню" та натисніть /stop`,
           optURL,
         );
+        if (order.verify === false) {
+          this.tg_bot.sendMessage(
+            chatId,
+            `Ваш код верифікації: ${order.code}`,
+            optURL,
+          );
+        }
       }
     });
 

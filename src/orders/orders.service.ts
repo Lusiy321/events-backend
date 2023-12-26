@@ -70,11 +70,6 @@ export class OrdersService {
       );
 
       const order = await this.ordersModel.findById(createdOrder._id);
-      // const phone = '+' + order.phone;
-      // await this.twilioService.sendSMS(
-      //   phone,
-      //   `Your verification code Wechirka.com: ${order.sms}`,
-      // );
 
       return order;
     } catch (e) {

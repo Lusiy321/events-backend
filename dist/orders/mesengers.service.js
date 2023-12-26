@@ -60,7 +60,7 @@ let MesengersService = class MesengersService {
             avatar: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701947849/service/paanrsds5krezvpreog0.webp',
         });
         this.viber_bot.onSubscribe(async (response) => {
-            say(response, `Привіт ${response.userProfile.name}. Я бот ресурсу ${this.viber_bot.name}! Щоб отримувати сповіщеня, відправте свій номер телефону у форматі 380981231122. Сюди, Вам будуть надходити сповіщеня про найм`);
+            say(response, `Привіт ${response.userProfile.name}. Я бот ресурсу ${this.viber_bot.name}! Щоб отримувати сповіщеня, відправте свій номер телефону у форматі 380981231122.\n\nСюди, Вам будуть надходити сповіщеня про замовлення або пропозиції від виконавців.`);
         });
         function say(response, message) {
             response.send(new KeyboardMessage(MAIN_KEYBOARD), new TextMessage(message));
@@ -176,6 +176,12 @@ let MesengersService = class MesengersService {
                             new TextMessage(`Дякую, ${res.userProfile.name} теперь Вам будуть надходити сповіщення про нові пропозиції у обраній категорії категорії.`),
                             new KeyboardMessage(MAIN_KEYBOARD),
                         ]);
+                        if (order.verify === false) {
+                            this.viber_bot.sendMessage({ id: res.userProfile.id }, [
+                                new TextMessage(`Ваш код верифікаціЇ: ${order.code}`),
+                                new KeyboardMessage(MAIN_KEYBOARD),
+                            ]);
+                        }
                         return updatedUser || updatedOrder;
                     }
                     else if ((user && user.viber === res.userProfile.id) ||
@@ -246,7 +252,7 @@ let MesengersService = class MesengersService {
         };
         this.tg_bot.onText(/\/start/, async (msg) => {
             const chatId = msg.chat.id;
-            this.tg_bot.sendMessage(chatId, 'Будь ласка, натисніть кнопку "Відправити номер телефону" для надання номеру телефону.', optCont);
+            this.tg_bot.sendMessage(chatId, `Привіт ${msg.from.first_name}. Я бот ресурсу WECHIRKA! Щоб отримувати сповіщеня, натисніть кнопку "Відправити номер телефону" для реєстрації у боті.\n\nСюди, Вам будуть надходити сповіщеня про замовлення або пропозиції від виконавців.`, optCont);
         });
         this.tg_bot.onText(/\/orders/, async (msg) => {
             try {
@@ -258,7 +264,7 @@ let MesengersService = class MesengersService {
                 }
                 else {
                     if (Array.isArray(find) && find.length === 0) {
-                        this.tg_bot.sendMessage(chatId, 'Ми не знайшли Ваших заявок, напевно ви не зареєструвались у чат боті (натисніть /start)', optCont);
+                        this.tg_bot.sendMessage(chatId, 'Ми не знайшли Ваших заявок, напевно ви не зареєструвались, натисніть кнопку "Відправити номер телефону" для реєстрації у боті', optCont);
                     }
                     else if (find || user.tg_chat === find[0].tg_chat) {
                         find.map((finded) => {
@@ -339,7 +345,7 @@ let MesengersService = class MesengersService {
                     tg_chat: chatId,
                     verify: true,
                 });
-                this.tg_bot.sendMessage(chatId, `Дякую, ${msg.from.first_name} тепер Вам будуть надходити повідомлення про нові пропозиції в твоїй категорії. Щоб вимкнути оповіщення виберіть "Меню" та натисніть /stop`, optURL);
+                this.tg_bot.sendMessage(chatId, `Дякую, ${msg.from.first_name} тепер Вам будуть надходити повідомлення про нові пропозиції в обраній категорії. Щоб вимкнути оповіщення виберіть "Меню" та натисніть /stop`, optURL);
             }
             else {
                 if (order.tg_chat === null) {
@@ -347,7 +353,10 @@ let MesengersService = class MesengersService {
                         tg_chat: chatId,
                     });
                 }
-                this.tg_bot.sendMessage(chatId, `Дякую, ${msg.from.first_name} тепер Вам будуть надходити повідомлення про нові пропозиції в твоїй категорії. Щоб вимкнути оповіщення виберіть "Меню" та натисніть /stop`, optURL);
+                this.tg_bot.sendMessage(chatId, `Дякую, ${msg.from.first_name} тепер Вам будуть надходити повідомлення про нові пропозиції в обраній категорії. Щоб вимкнути оповіщення виберіть "Меню" та натисніть /stop`, optURL);
+                if (order.verify === false) {
+                    this.tg_bot.sendMessage(chatId, `Ваш код верифікації: ${order.code}`, optURL);
+                }
             }
         });
         this.tg_bot.on('callback_query', async (query) => {
