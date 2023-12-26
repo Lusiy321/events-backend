@@ -212,7 +212,7 @@ export class MesengersService {
             ]);
             if (order.verify === false) {
               this.viber_bot.sendMessage({ id: res.userProfile.id }, [
-                new TextMessage(`Ваш код верифікаціЇ: ${order.code}`),
+                new TextMessage(`Ваш код верифікаціЇ: ${order.sms}`),
                 new KeyboardMessage(MAIN_KEYBOARD),
               ]);
             }
@@ -429,7 +429,7 @@ export class MesengersService {
         if (order.verify === false) {
           this.tg_bot.sendMessage(
             chatId,
-            `Ваш код верифікації: ${order.code}`,
+            `Ваш код верифікації: ${order.sms}`,
             optURL,
           );
         }
