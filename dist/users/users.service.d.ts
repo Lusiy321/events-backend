@@ -7,6 +7,7 @@ import { GoogleUserDto } from './dto/google.user.dto';
 import { Category } from './category.model';
 import { Categories } from './dto/caterory.interface';
 import * as nodemailer from 'nodemailer';
+import { LoginUserDto } from './dto/login.user.dto';
 export declare const TRANSPORTER_PROVIDER = "TRANSPORTER_PROVIDER";
 export declare class UsersService {
     private userModel;
@@ -24,7 +25,7 @@ export declare class UsersService {
     validateUser(details: GoogleUserDto): Promise<any>;
     validateFacebook(details: any): Promise<any>;
     restorePassword(email: MailUserDto): Promise<any>;
-    login(user: CreateUserDto): Promise<User>;
+    login(user: LoginUserDto): Promise<User>;
     logout(req: any): Promise<User>;
     update(user: UpdateUserDto, req: any): Promise<User>;
     updateCategory(data: Categories, req: any): Promise<any>;

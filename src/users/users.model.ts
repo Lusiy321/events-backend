@@ -257,7 +257,12 @@ export class User extends Model<User> {
     default: 'new',
   })
   verified: verify;
-
+  @ApiProperty({ example: false, description: 'User email verify' })
+  @Prop({
+    type: Boolean,
+    default: false,
+  })
+  verify: boolean;
   @ApiProperty({
     example: 'wVl3VGGX675UCqOFrLx-1xNH-GObq9v7GbZj0s',
     description: 'Google ID',
@@ -300,9 +305,13 @@ export class User extends Model<User> {
   disagree_order: number;
   @Prop({
     type: Date,
-    default: 0,
   })
   trialEnds: Date;
+  @Prop({
+    type: Date,
+  })
+  paidEnds: Date;
+
   @Prop({ type: Array, default: [] })
   accepted_orders: Array<string>;
 }

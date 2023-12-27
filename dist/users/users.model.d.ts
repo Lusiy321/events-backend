@@ -50,6 +50,7 @@ export declare class User extends Model<User> {
     social: Social;
     token: string;
     verified: verify;
+    verify: boolean;
     googleId: string;
     facebookId: string;
     ban: boolean;
@@ -58,6 +59,7 @@ export declare class User extends Model<User> {
     agree_order: number;
     disagree_order: number;
     trialEnds: Date;
+    paidEnds: Date;
     accepted_orders: Array<string>;
 }
 export declare const UserSchema: import("mongoose").Schema<User, Model<User, any, any, any, import("mongoose").Document<unknown, any, User> & User & {

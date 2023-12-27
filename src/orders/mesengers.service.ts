@@ -36,6 +36,15 @@ const MAIN_KEYBOARD = {
       TextHAlign: 'center',
       BgColor: '#094356',
     },
+    {
+      ActionType: 'reply',
+      ActionBody: `review`,
+      Text: '<font color="#FFFFFF" size="5">Мої відгуки (лише для виконавців)</font>',
+      TextSize: 'regular',
+      TextVAlign: 'middle',
+      TextHAlign: 'center',
+      BgColor: '#094356',
+    },
   ],
 };
 
@@ -101,6 +110,15 @@ export class MesengersService {
               TextHAlign: 'center',
               BgColor: '#094356',
             },
+            {
+              ActionType: 'reply',
+              ActionBody: `review:${userProfile}:${userId}`,
+              Text: '<font color="#FFFFFF" size="5">Мої відгуки (лише для виконавців)</font>',
+              TextSize: 'regular',
+              TextVAlign: 'middle',
+              TextHAlign: 'center',
+              BgColor: '#094356',
+            },
           ],
         };
         this.viber_bot.sendMessage(
@@ -128,6 +146,9 @@ export class MesengersService {
             break;
           case 'orders':
             await this.myOrdersList(chatId);
+            break;
+          case 'review':
+            await this.myReviewList(chatId);
             break;
           case 'delete':
             const delOrder = await this.ordersModel.findById(phone);
@@ -271,6 +292,7 @@ export class MesengersService {
     this.tg_bot.setMyCommands([
       { command: '/stop', description: 'Зупинити оповіщення' },
       { command: '/orders', description: 'Управління замовленнями' },
+      { command: '/reviews', description: 'Управління відгуками' },
     ]);
 
     // KEYBOARDS
@@ -392,6 +414,47 @@ export class MesengersService {
                   reply_markup: keyboard,
                 });
               }
+            });
+          }
+        }
+      } catch (e) {
+        throw new Error(`Помилка надсилання повідомлення: ${e}`);
+      }
+    });
+
+    this.tg_bot.onText(/\/reviews/, async (msg) => {
+      try {
+        const chatId = msg.chat.id;
+        const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
+        const find = user.accepted_orders;
+
+        if (!user.tg_chat && Array.isArray(find) && find.length === 0) {
+          this.tg_bot.sendMessage(
+            chatId,
+            'Ви не зареєстровані як виконавець',
+            optCont,
+          );
+        } else {
+          if (Array.isArray(find) && find.length === 0) {
+            this.tg_bot.sendMessage(
+              chatId,
+              'Ми не знайшли Ваших відгуків.',
+              optCont,
+            );
+          } else if (Array.isArray(find) && find.length !== 0) {
+            find.map(async (finded: Orders) => {
+              const findetOrder = await this.ordersModel.findOne({
+                _id: finded,
+              });
+              const msg = `Замовник: ${findetOrder.name}.
+      Дата події: ${findetOrder.date}.
+      Категорія: ${findetOrder.category[0].subcategories[0].name}.
+      Вимоги: ${findetOrder.description}.
+      Локація: ${findetOrder.location}.
+      Гонорар: ${findetOrder.price}.      
+      Статус: ${findetOrder.active ? 'Активний' : 'Неактивний'}.\n`;
+
+              this.tg_bot.sendMessage(chatId, msg, optCont);
             });
           }
         }
@@ -811,6 +874,83 @@ export class MesengersService {
               new KeyboardMessage(FIND_KEYBOARD),
             ]);
           }
+        });
+      }
+    } catch (e) {
+      throw new Error(`Помилка надсилання повідомлення: ${e}`);
+    }
+  }
+
+  async myReviewList(chatId: string) {
+    try {
+      const user = await this.userModel.findOne({ viber: chatId }).exec();
+      const orederArr = user.accepted_orders;
+      if (
+        user.viber !== null &&
+        Array.isArray(orederArr) &&
+        orederArr.length === 0
+      ) {
+        this.viber_bot.sendMessage(
+          { id: chatId },
+          new TextMessage('Ми не знайшли Ваших відгуків на замовлення'),
+        );
+      } else if (!user) {
+        this.viber_bot.sendMessage(
+          { id: chatId },
+          new TextMessage(
+            'Ми не знайшли Ваших відгуків, напевно ви не зарееструвались у чат боті. Будь ласка, відправте свій номер телефону у форматі 380981231122',
+          ),
+        );
+      } else {
+        orederArr.map(async (finded: Orders) => {
+          const myOrders = await this.ordersModel.findOne({ _id: finded });
+          const FIND_KEYBOARD = {
+            Type: 'keyboard',
+            Revision: 1,
+            ButtonsGroupColumns: 3,
+            ButtonsGroupRows: 1,
+            Buttons: [
+              {
+                ActionType: 'open-url',
+                ActionBody: 'https://www.wechirka.com',
+                Text: '<font color="#FFFFFF" size="5">Перейти на наш сайт</font>',
+                TextSize: 'regular',
+                TextVAlign: 'middle',
+                TextHAlign: 'center',
+                BgColor: '#094356',
+              },
+              {
+                ActionType: 'reply',
+                ActionBody: `orders:${user.name}:${user.viber}`,
+                Text: '<font color="#FFFFFF" size="5">Мої заявки (лише для замовників)</font>',
+                TextSize: 'regular',
+                TextVAlign: 'middle',
+                TextHAlign: 'center',
+                BgColor: '#094356',
+              },
+              {
+                ActionType: 'reply',
+                ActionBody: `review:${user.viber}:${user.viber}`,
+                Text: '<font color="#FFFFFF" size="5">Мої відгуки (лише для виконавців)</font>',
+                TextSize: 'regular',
+                TextVAlign: 'middle',
+                TextHAlign: 'center',
+                BgColor: '#094356',
+              },
+            ],
+          };
+          const msg = `Замовник: ${myOrders.name}.
+      Дата події: ${myOrders.date}.
+      Категорія: ${myOrders.category[0].subcategories[0].name}.
+      Вимоги замовника: ${myOrders.description}.
+      Локація: ${myOrders.location}.
+      Гонорар: ${myOrders.price}.      
+      Статус: ${myOrders.active ? 'Активний' : 'Неактивний'}.\n`;
+
+          this.viber_bot.sendMessage({ id: chatId }, [
+            new TextMessage(msg),
+            new KeyboardMessage(FIND_KEYBOARD),
+          ]);
         });
       }
     } catch (e) {

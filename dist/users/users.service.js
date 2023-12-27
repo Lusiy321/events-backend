@@ -322,6 +322,7 @@ let UsersService = class UsersService {
     async findById(id) {
         try {
             const find = await this.userModel.findById(id).select('-password').exec();
+            await this.checkTrialStatus(id);
             return find;
         }
         catch (e) {
@@ -341,7 +342,7 @@ let UsersService = class UsersService {
                 }
                 const trialEnds = new Date();
                 trialEnds.setMonth(trialEnds.getMonth() + 2);
-                const createdUser = await this.userModel.create(Object.assign(Object.assign({}, user), { trial: true, trialEnds }));
+                const createdUser = await this.userModel.create(Object.assign(Object.assign({}, user), { trial: true, trialEnds, paidEnds: trialEnds }));
                 createdUser.setName(lowerCaseEmail);
                 createdUser.setPassword(password);
                 createdUser.save();
@@ -434,13 +435,18 @@ let UsersService = class UsersService {
         const user = await this.userModel.findOne({ googleId: details.googleId });
         try {
             if (!user) {
-                await this.userModel.create(details);
+                const trialEnds = new Date();
+                trialEnds.setMonth(trialEnds.getMonth() + 2);
+                const createdUser = await this.userModel.create(Object.assign(Object.assign({}, details), { trial: true, trialEnds, paidEnds: trialEnds }));
+                createdUser.setPassword(details.password);
+                createdUser.save();
                 const userUpdateToken = await this.userModel.findOne({
                     email: details.email,
                 });
                 await this.createToken(userUpdateToken);
                 return await this.userModel.findById({ _id: userUpdateToken._id });
             }
+            await this.checkTrialStatus(user._id);
             await this.createToken(user);
             return await this.userModel.findOne({ _id: user.id });
         }
@@ -454,12 +460,15 @@ let UsersService = class UsersService {
         });
         try {
             if (!user) {
-                const createdUser = await this.userModel.create(details);
+                const trialEnds = new Date();
+                trialEnds.setMonth(trialEnds.getMonth() + 2);
+                const createdUser = await this.userModel.create(Object.assign(Object.assign({}, details), { trial: true, trialEnds, paidEnds: trialEnds }));
                 createdUser.setPassword(details.password);
                 createdUser.save();
                 const userUpdateToken = await this.userModel.findOne({
                     email: details.email,
                 });
+                await this.checkTrialStatus(user._id);
                 await this.createToken(userUpdateToken);
                 return await this.userModel.findById({ _id: userUpdateToken._id });
             }
@@ -636,30 +645,24 @@ let UsersService = class UsersService {
             if (!user) {
                 throw new http_errors_1.Unauthorized('jwt expired');
             }
-            const categoryArray = user.category;
-            const newArrSub = categoryArray.filter((cat) => cat._id === id);
-            if (Array.isArray(newArrSub) && newArrSub.length === 0) {
-                const subArr = categoryArray[0].subcategories;
-                console.log(subArr);
-                const newArrSubcat = subArr.filter((sub) => sub.id !== id);
-                console.log(newArrSubcat);
-                await this.userModel.updateOne({ _id: user.id, 'category._id': categoryArray[0]._id }, {
-                    $set: { 'category.$.subcategories': newArrSubcat },
-                });
-                return await this.userModel
-                    .findById({ _id: user.id })
-                    .select(parse_user_1.rows)
-                    .exec();
-            }
-            else if (Array.isArray(newArrSub) && newArrSub.length !== 0) {
-                await this.userModel.updateOne({ _id: user.id }, {
-                    $set: { category: newArrSub },
-                });
-                return await this.userModel
-                    .findById({ _id: user.id })
-                    .select(parse_user_1.rows)
-                    .exec();
-            }
+            const updatedCategories = user.category
+                .map((category) => {
+                if (category._id === id) {
+                    return undefined;
+                }
+                else {
+                    category.subcategories = category.subcategories.filter((subcat) => subcat.id !== id);
+                    return category;
+                }
+            })
+                .filter(Boolean);
+            await this.userModel.updateOne({ _id: user.id }, {
+                $set: { category: updatedCategories },
+            });
+            return await this.userModel
+                .findById({ _id: user.id })
+                .select(parse_user_1.rows)
+                .exec();
         }
         catch (e) {
             throw new http_errors_1.BadRequest(e.message);

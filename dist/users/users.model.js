@@ -289,6 +289,14 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "verified", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: false, description: 'User email verify' }),
+    (0, mongoose_1.Prop)({
+        type: Boolean,
+        default: false,
+    }),
+    __metadata("design:type", Boolean)
+], User.prototype, "verify", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({
         example: 'wVl3VGGX675UCqOFrLx-1xNH-GObq9v7GbZj0s',
         description: 'Google ID',
@@ -343,10 +351,15 @@ __decorate([
 __decorate([
     (0, mongoose_1.Prop)({
         type: Date,
-        default: 0,
     }),
     __metadata("design:type", Date)
 ], User.prototype, "trialEnds", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: Date,
+    }),
+    __metadata("design:type", Date)
+], User.prototype, "paidEnds", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ type: Array, default: [] }),
     __metadata("design:type", Array)
