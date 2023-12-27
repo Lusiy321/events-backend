@@ -564,12 +564,19 @@ export class MesengersService {
             break;
           case 'users':
             const findOrder = await this.ordersModel.findOne({ _id: phone });
-
-            findOrder.accepted_users.map(async (user: any) => {
-              const findedUser = await this.userModel.findOne({ _id: user });
-              const msgOrder = `Замовлення:\n${findOrder.description}\nКористувач: ${findedUser.firstName}.\nКатегорія: ${findedUser.category[0].subcategories[0].name}\nОплата: ${findedUser.price}\nТелефон: +${findedUser.phone}.\nПосилання на профіль:\n${process.env.FRONT_LINK}artists/${findedUser._id}.`;
-              this.tg_bot.sendMessage(chatId, msgOrder);
-            });
+            if (findOrder.accepted_users.length === 0) {
+              this.tg_bot.sendMessage(
+                chatId,
+                `Немає відгуків на пропозицію.`,
+                optURL,
+              );
+            } else {
+              findOrder.accepted_users.map(async (user: any) => {
+                const findedUser = await this.userModel.findOne({ _id: user });
+                const msgOrder = `Замовлення:\n${findOrder.description}\nКористувач: ${findedUser.firstName}.\nКатегорія: ${findedUser.category[0].subcategories[0].name}\nОплата: ${findedUser.price}\nТелефон: +${findedUser.phone}.\nПосилання на профіль:\n${process.env.FRONT_LINK}artists/${findedUser._id}.`;
+                this.tg_bot.sendMessage(chatId, msgOrder);
+              });
+            }
             break;
           default:
             break;
@@ -660,8 +667,16 @@ export class MesengersService {
       if (viber !== null && active === true) {
         const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"${order.description}".\n \nВ категорії:\n"${order.category[0].name} - ${order.category[0].subcategories[0].name}". \n \nОчікуйте на дзвінок або повідомлення`;
         user.agree_order += 1;
+        user.accepted_orders.push(order._id);
         await this.userModel.findByIdAndUpdate(user.id, {
           agree_order: user.agree_order,
+          accepted_orders: user.accepted_orders,
+        });
+        order.approve_count += 1;
+        order.accepted_users.push(user._id);
+        await this.ordersModel.findByIdAndUpdate(order.id, {
+          accepted_users: order.accepted_users,
+          approve_count: order.approve_count,
         });
         this.viber_bot.sendMessage({ id: userChatId }, [
           new TextMessage(msgTrue),
@@ -758,6 +773,15 @@ export class MesengersService {
                 ActionType: 'reply',
                 ActionBody: `orders:${finded.name}:${finded.viber}`,
                 Text: '<font color="#FFFFFF" size="5">Мої заявки (лише для замовників)</font>',
+                TextSize: 'regular',
+                TextVAlign: 'middle',
+                TextHAlign: 'center',
+                BgColor: '#094356',
+              },
+              {
+                ActionType: 'reply',
+                ActionBody: `review:${finded.name}:${chatId}`,
+                Text: '<font color="#FFFFFF" size="5">Мої відгуки (лише для виконавців)</font>',
                 TextSize: 'regular',
                 TextVAlign: 'middle',
                 TextHAlign: 'center',
@@ -1046,13 +1070,15 @@ export class MesengersService {
         await this.sendMessage(chatId, msgTrue);
         order.approve_count += 1;
         user.agree_order += 1;
+        user.accepted_orders.push(order.id);
         await this.userModel.findByIdAndUpdate(user.id, {
           agree_order: user.agree_order,
-          accepted_orders: order.id,
+          accepted_orders: user.accepted_orders,
         });
+        order.accepted_users.push(user.id);
         await this.ordersModel.findByIdAndUpdate(order.id, {
           approve_count: order.approve_count,
-          accepted_users: user.id,
+          accepted_users: order.accepted_users,
         });
         const msgOrder = `Виконавець ${user.firstName} готовий виконати ваше замовлення "${order.description}".
       Ви можете написати йому в телеграм @${user.telegram}, або зателефонувати по номеру ${user.phone}. \n
