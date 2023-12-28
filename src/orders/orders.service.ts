@@ -135,6 +135,9 @@ export class OrdersService {
           return usersArr;
         }
       }
+      if (!order) {
+        throw new NotFound('Order not found');
+      }
     } catch (e) {
       throw new BadRequest(e.message);
     }

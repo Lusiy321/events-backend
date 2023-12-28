@@ -135,6 +135,9 @@ let OrdersService = class OrdersService {
                     return usersArr;
                 }
             }
+            if (!order) {
+                throw new http_errors_1.NotFound('Order not found');
+            }
         }
         catch (e) {
             throw new http_errors_1.BadRequest(e.message);
