@@ -309,6 +309,7 @@ export class User extends Model<User> {
   trialEnds: Date;
   @Prop({
     type: Date,
+    default: new Date(),
   })
   paidEnds: Date;
 

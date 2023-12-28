@@ -357,6 +357,7 @@ __decorate([
 __decorate([
     (0, mongoose_1.Prop)({
         type: Date,
+        default: new Date(),
     }),
     __metadata("design:type", Date)
 ], User.prototype, "paidEnds", void 0);

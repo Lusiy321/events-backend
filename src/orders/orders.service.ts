@@ -12,6 +12,7 @@ import {
   paginateArray,
   rows,
 } from 'src/users/utils/parse.user';
+import { count } from 'console';
 
 @Injectable()
 export class OrdersService {
@@ -94,31 +95,45 @@ export class OrdersService {
     try {
       const order = await this.ordersModel.findOne({ sms: code });
       if (order.verify === false) {
-        const updatedOrder = await this.ordersModel.findByIdAndUpdate(
+        await this.ordersModel.findByIdAndUpdate(
           { _id: order._id },
-          { verify: true },
+          { verify: true, sms: null },
         );
 
         const usersArr = await this.findUserByCategory(order);
 
-        for (const user of usersArr) {
-          if (user.tg_chat !== null && user.location === order.location) {
+        const sendMessagePromises = usersArr.map(async (user) => {
+          if (user.tg_chat !== null) {
             const check = await this.checkTrialStatus(user._id);
-            if (check === true || user.paid === true) {
+            if (check === true) {
               await this.mesengersService.sendNewTgOrder(user.tg_chat, order);
             }
           }
-        }
 
-        for (const user of usersArr) {
-          if (user.viber !== null && user.location === order.location) {
+          if (user.viber !== null) {
             const check = await this.checkTrialStatus(user._id);
-            if (check === true || user.paid === true) {
+            if (check === true) {
               await this.mesengersService.sendNewViberOrder(user.viber, order);
             }
           }
+        });
+
+        await Promise.all(sendMessagePromises);
+
+        if (usersArr.length !== 0) {
+          return usersArr;
+        } else {
+          const message =
+            'На жаль, ніхто не підійшов під ваше замовлення. Спробуйте пізніше або виконайте пошук самостійно https://www.wechirka.com/artists';
+
+          if (order.tg_chat !== null) {
+            await this.mesengersService.sendMessageTg(order.tg_chat, message);
+          } else if (order.viber !== null) {
+            await this.mesengersService.sendMessageViber(order.viber, message);
+          }
+
+          return usersArr;
         }
-        return updatedOrder;
       }
     } catch (e) {
       throw new BadRequest(e.message);
@@ -131,10 +146,11 @@ export class OrdersService {
       throw new NotFound('User not found');
     }
 
-    if (user.trial && user.trialEnds > new Date()) {
+    if (user.trialEnds > new Date() || user.paidEnds > new Date()) {
       return true;
     } else {
       user.trial = false;
+      user.paid = false;
       await user.save();
       return false;
     }
@@ -166,10 +182,40 @@ export class OrdersService {
         'category.subcategories': {
           $elemMatch: {
             id: findId,
+            location: order.location,
           },
         },
       })
       .exec();
+    if (Array.isArray(subcategory) && subcategory.length === 0) {
+      const [city, region, country] = order.location.split(', ');
+      if (country === undefined) {
+        const regexLocation = new RegExp('Київська область', 'i');
+        const category = await this.userModel
+          .find({
+            category: {
+              $elemMatch: {
+                id: findId,
+                location: { $regex: regexLocation },
+              },
+            },
+          })
+          .exec();
+        return category;
+      }
+      const regexLocation = new RegExp(region, 'i');
+      const category = await this.userModel
+        .find({
+          category: {
+            $elemMatch: {
+              id: findId,
+              location: { $regex: regexLocation },
+            },
+          },
+        })
+        .exec();
+      return category;
+    }
 
     return subcategory;
   }

@@ -158,6 +158,10 @@ export class MesengersService {
               ),
               new KeyboardMessage(MAIN_KEYBOARD),
             ]);
+            await this.userModel.updateMany(
+              { accepted_orders: phone },
+              { $pull: { accepted_orders: phone } },
+            );
             await this.ordersModel.findByIdAndRemove(phone);
             break;
           case 'active':
@@ -537,6 +541,10 @@ export class MesengersService {
               `Ви видалили замевлення: ${delOrder.description}.`,
               optURL,
             );
+            await this.userModel.updateMany(
+              { accepted_orders: phone },
+              { $pull: { accepted_orders: phone } },
+            );
             await this.ordersModel.findByIdAndRemove(phone);
             break;
           case 'active':
@@ -664,7 +672,16 @@ export class MesengersService {
 
       const { viber, active, description, tg_chat } = order;
       const { firstName, phone, _id } = user;
-      if (viber !== null && active === true) {
+
+      const accept = user.accepted_orders;
+      if (accept.includes(order._id)) {
+        const msg = `Ви вже погодились на це замовлення`;
+        this.viber_bot.sendMessage({ id: userChatId }, [
+          new TextMessage(msg),
+          new KeyboardMessage(MAIN_KEYBOARD),
+        ]);
+        return false;
+      } else if (viber !== null && active === true) {
         const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"${order.description}".\n \nВ категорії:\n"${order.category[0].name} - ${order.category[0].subcategories[0].name}". \n \nОчікуйте на дзвінок або повідомлення`;
         user.agree_order += 1;
         user.accepted_orders.push(order._id);
@@ -696,7 +713,7 @@ export class MesengersService {
         const msgOrder = `Користувач ${user.firstName} готовий виконати ваше замовлення "${order.description}".
       Ви можете написати йому в Viber, або зателефонувати по номеру +${user.phone}. \n
       Посилання на профіль виконавця ${process.env.FRONT_LINK}artists/${user._id}.`;
-        await this.sendMessage(order.tg_chat.toString(), msgOrder);
+        await this.sendMessageTg(order.tg_chat.toString(), msgOrder);
         if (user.photo.length > 0) {
           const images = user.photo.map((photos: any) => ({
             type: 'photo',
@@ -997,6 +1014,18 @@ export class MesengersService {
     });
   }
 
+  async sendMessageViber(chatId: string, msg: string) {
+    try {
+      const message = await this.viber_bot.sendMessage({ id: chatId }, [
+        new TextMessage(msg),
+        new KeyboardMessage(MAIN_KEYBOARD),
+      ]);
+      return message;
+    } catch (error) {
+      throw new Error(`Помилка надсилання повідомлення: ${error}`);
+    }
+  }
+
   async startServer() {
     const http = require('http');
     const port = 8080;
@@ -1019,7 +1048,7 @@ export class MesengersService {
 
   //TELEGRAMM METHODS ON CLASS /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  async sendMessage(chatId: string, msg: string) {
+  async sendMessageTg(chatId: string, msg: string) {
     try {
       const message = await this.tg_bot.sendMessage(chatId, msg);
       return message;
@@ -1034,7 +1063,7 @@ export class MesengersService {
     const allTgUsers = allOrders.concat(allUsers);
     allTgUsers.map((user: any) => {
       if (user.tg_chat !== null) {
-        this.sendMessage(user.tg_chat.toString(), msg);
+        this.sendMessageTg(user.tg_chat.toString(), msg);
       }
     });
   }
@@ -1045,7 +1074,7 @@ export class MesengersService {
       const viber = await this.ordersModel.findOne({ viber: chatId });
       if (telegram) {
         const msg = `Ваш код верифікації: ${telegram.sms}\nПерейти на сайт: ${process.env.CODE_LINK}`;
-        await this.sendMessage(chatId, msg);
+        await this.sendMessageTg(chatId, msg);
       } else if (viber) {
         const msg = `Ваш код верифікації: ${viber.sms}\nПерейти на сайт: ${process.env.CODE_LINK}`;
         await this.viber_bot.sendMessage(
@@ -1065,9 +1094,14 @@ export class MesengersService {
     try {
       const order = await this.ordersModel.findOne({ phone: phone });
       const user = await this.userModel.findOne({ tg_chat: chatId });
-      if (order.tg_chat !== null && order.active === true) {
+      const accept = user.accepted_orders;
+      if (accept.includes(order.id)) {
+        const msg = `Ви вже погодились на це замовлення`;
+        await this.sendMessageTg(chatId, msg);
+        return false;
+      } else if (order.tg_chat !== null && order.active === true) {
         const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"${order.description}".\n \nВ категорії:\n"${order.category[0].name} - ${order.category[0].subcategories[0].name}". \n \nОчікуйте на дзвінок або повідомлення`;
-        await this.sendMessage(chatId, msgTrue);
+        await this.sendMessageTg(chatId, msgTrue);
         order.approve_count += 1;
         user.agree_order += 1;
         user.accepted_orders.push(order.id);
@@ -1083,7 +1117,7 @@ export class MesengersService {
         const msgOrder = `Виконавець ${user.firstName} готовий виконати ваше замовлення "${order.description}".
       Ви можете написати йому в телеграм @${user.telegram}, або зателефонувати по номеру ${user.phone}. \n
       Посилання на профіль виконавця ${process.env.FRONT_LINK}artists/${user._id}.`;
-        await this.sendMessage(order.tg_chat.toString(), msgOrder);
+        await this.sendMessageTg(order.tg_chat.toString(), msgOrder);
         if (user.photo.length > 0) {
           const images = user.photo.map((photos: any) => ({
             type: 'photo',
@@ -1110,7 +1144,7 @@ export class MesengersService {
           new KeyboardMessage(MAIN_KEYBOARD),
         ]);
         const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"${order.description}".\n \nВ категорії:\n"${order.category[0].name} - ${order.category[0].subcategories[0].name}". \n \nОчікуйте на дзвінок або повідомлення`;
-        await this.sendMessage(chatId, msgTrue);
+        await this.sendMessageTg(chatId, msgTrue);
         order.approve_count = +1;
         await this.ordersModel.findByIdAndUpdate(order.id, {
           approve_count: order.approve_count,
@@ -1118,12 +1152,12 @@ export class MesengersService {
         return true;
       } else if (order.tg_chat === null && order.viber === null) {
         const msg = `Замовник ще не активував чат-бот, спробуйте пізніше`;
-        await this.sendMessage(chatId, msg);
+        await this.sendMessageTg(chatId, msg);
         return false;
       } else if (order.active === false) {
         const msg = `Замовник призупинив пошук`;
-        await this.sendMessage(chatId, msg);
-        return true;
+        await this.sendMessageTg(chatId, msg);
+        return false;
       }
     } catch (e) {
       throw new Error(`Помилка надсилання повідомлення: ${e}`);

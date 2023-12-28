@@ -616,25 +616,26 @@ export class UsersService {
   }
 
   async update(user: UpdateUserDto, req: any): Promise<User> {
-    const {
-      firstName,
-      social,
-      title,
-      description,
-      phone,
-      telegram,
-      whatsapp,
-      location,
-      master_photo,
-      video,
-      price,
-    } = user;
-    const findId = await this.findToken(req);
-
-    if (!findId) {
-      throw new Unauthorized('jwt expired');
-    }
     try {
+      const {
+        firstName,
+        social,
+        title,
+        description,
+        phone,
+        telegram,
+        whatsapp,
+        location,
+        master_photo,
+        video,
+        price,
+      } = user;
+      const findId = await this.findToken(req);
+
+      if (!findId) {
+        throw new Unauthorized('jwt expired');
+      }
+
       if (
         firstName ||
         title ||
@@ -649,20 +650,33 @@ export class UsersService {
         social
       ) {
         if (video) {
-          const findUser = await this.userModel.findById(findId.id).exec();
-          const arrVideo = findUser.video;
-          if (arrVideo.length <= 4) {
-            arrVideo.push(...video);
-            await this.userModel.findByIdAndUpdate(
-              { _id: findId.id },
-              {
-                $set: { video: arrVideo },
-              },
-            );
-            return await this.userModel.findById({ _id: findId.id });
-          } else {
-            throw new NotFound('To many videos');
-          }
+          await this.userModel.findByIdAndUpdate(
+            { _id: findId.id },
+            {
+              $push: { video: { $each: video, $slice: 5 } },
+            },
+          );
+          return await this.userModel
+            .findById({ _id: findId.id })
+            .select(rows)
+            .exec();
+        }
+        if (social) {
+          const updatedSocial = { ...findId.social, ...social };
+
+          const sanitizedSocial = Object.entries(updatedSocial)
+            .filter(([key, value]) => key && value)
+            .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+
+          await this.userModel.findByIdAndUpdate(
+            { _id: findId.id },
+            { $set: { social: sanitizedSocial } },
+          );
+
+          return await this.userModel
+            .findById({ _id: findId.id })
+            .select(rows)
+            .exec();
         }
         await this.userModel.findByIdAndUpdate(
           { _id: findId.id },
@@ -676,7 +690,6 @@ export class UsersService {
             location,
             master_photo,
             price,
-            social,
           },
         );
 
@@ -690,42 +703,40 @@ export class UsersService {
     }
   }
 
-  async updateCategory(data: Categories, req: any) {
+  async updateCategory(data: Categories, req: any): Promise<User> {
     try {
       const category = [data];
       const findId = await this.findToken(req);
+
       if (!findId) {
         throw new Unauthorized('jwt expired');
       }
+
       const findUser = await this.userModel.findById(findId.id).exec();
       const arrCategory = findUser.category;
+
       function addSubcategory(
         categories: Categories[],
         newCategory: Categories[],
-      ) {
-        if (Array.isArray(categories) && categories.length === 0) {
-          categories.push(...newCategory);
-          return categories;
-        } else {
-          const combinedArray = [...categories, ...newCategory];
-          const idMap = new Map<string, any>();
-
-          combinedArray.forEach((obj) => {
-            idMap.set(obj._id, obj);
-          });
-          const uniqueArray = Array.from(idMap.values());
-          return uniqueArray;
-        }
+      ): Categories[] {
+        const idSet = new Set(categories.map((obj) => obj._id));
+        newCategory.forEach((obj) => {
+          idSet.add(obj._id);
+        });
+        return Array.from(idSet).map(
+          (id) => newCategory.find((obj) => obj._id === id)!,
+        );
       }
 
       const newCategoryArr = addSubcategory(arrCategory, category);
 
-      await this.userModel.findByIdAndUpdate(
+      await this.userModel.updateOne(
         { _id: findId.id },
         {
           $set: { category: newCategoryArr },
         },
       );
+
       return await this.userModel
         .findById({ _id: findId.id })
         .select(rows)

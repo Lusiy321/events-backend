@@ -549,12 +549,12 @@ let UsersService = class UsersService {
         }
     }
     async update(user, req) {
-        const { firstName, social, title, description, phone, telegram, whatsapp, location, master_photo, video, price, } = user;
-        const findId = await this.findToken(req);
-        if (!findId) {
-            throw new http_errors_1.Unauthorized('jwt expired');
-        }
         try {
+            const { firstName, social, title, description, phone, telegram, whatsapp, location, master_photo, video, price, } = user;
+            const findId = await this.findToken(req);
+            if (!findId) {
+                throw new http_errors_1.Unauthorized('jwt expired');
+            }
             if (firstName ||
                 title ||
                 description ||
@@ -567,18 +567,24 @@ let UsersService = class UsersService {
                 price ||
                 social) {
                 if (video) {
-                    const findUser = await this.userModel.findById(findId.id).exec();
-                    const arrVideo = findUser.video;
-                    if (arrVideo.length <= 4) {
-                        arrVideo.push(...video);
-                        await this.userModel.findByIdAndUpdate({ _id: findId.id }, {
-                            $set: { video: arrVideo },
-                        });
-                        return await this.userModel.findById({ _id: findId.id });
-                    }
-                    else {
-                        throw new http_errors_1.NotFound('To many videos');
-                    }
+                    await this.userModel.findByIdAndUpdate({ _id: findId.id }, {
+                        $push: { video: { $each: video, $slice: 5 } },
+                    });
+                    return await this.userModel
+                        .findById({ _id: findId.id })
+                        .select(parse_user_1.rows)
+                        .exec();
+                }
+                if (social) {
+                    const updatedSocial = Object.assign(Object.assign({}, findId.social), social);
+                    const sanitizedSocial = Object.entries(updatedSocial)
+                        .filter(([key, value]) => key && value)
+                        .reduce((acc, [key, value]) => (Object.assign(Object.assign({}, acc), { [key]: value })), {});
+                    await this.userModel.findByIdAndUpdate({ _id: findId.id }, { $set: { social: sanitizedSocial } });
+                    return await this.userModel
+                        .findById({ _id: findId.id })
+                        .select(parse_user_1.rows)
+                        .exec();
                 }
                 await this.userModel.findByIdAndUpdate({ _id: findId.id }, {
                     firstName,
@@ -590,7 +596,6 @@ let UsersService = class UsersService {
                     location,
                     master_photo,
                     price,
-                    social,
                 });
                 return await this.userModel
                     .findById({ _id: findId.id })
@@ -612,22 +617,14 @@ let UsersService = class UsersService {
             const findUser = await this.userModel.findById(findId.id).exec();
             const arrCategory = findUser.category;
             function addSubcategory(categories, newCategory) {
-                if (Array.isArray(categories) && categories.length === 0) {
-                    categories.push(...newCategory);
-                    return categories;
-                }
-                else {
-                    const combinedArray = [...categories, ...newCategory];
-                    const idMap = new Map();
-                    combinedArray.forEach((obj) => {
-                        idMap.set(obj._id, obj);
-                    });
-                    const uniqueArray = Array.from(idMap.values());
-                    return uniqueArray;
-                }
+                const idSet = new Set(categories.map((obj) => obj._id));
+                newCategory.forEach((obj) => {
+                    idSet.add(obj._id);
+                });
+                return Array.from(idSet).map((id) => newCategory.find((obj) => obj._id === id));
             }
             const newCategoryArr = addSubcategory(arrCategory, category);
-            await this.userModel.findByIdAndUpdate({ _id: findId.id }, {
+            await this.userModel.updateOne({ _id: findId.id }, {
                 $set: { category: newCategoryArr },
             });
             return await this.userModel
