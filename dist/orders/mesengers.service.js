@@ -274,8 +274,13 @@ let MesengersService = class MesengersService {
             },
         };
         this.tg_bot.onText(/\/start/, async (msg) => {
-            const chatId = msg.chat.id;
-            this.tg_bot.sendMessage(chatId, `Привіт ${msg.from.first_name}. Я бот ресурсу WECHIRKA! Щоб отримувати сповіщеня, натисніть кнопку "Відправити номер телефону" для реєстрації у боті.\n\nСюди, Вам будуть надходити сповіщеня про замовлення або пропозиції від виконавців.`, optCont);
+            try {
+                const chatId = msg.chat.id;
+                this.tg_bot.sendMessage(chatId, `Привіт ${msg.from.first_name}. Я бот ресурсу WECHIRKA! Щоб отримувати сповіщеня, натисніть кнопку "Відправити номер телефону" для реєстрації у боті.\n\nСюди, Вам будуть надходити сповіщеня про замовлення або пропозиції від виконавців.`, optCont);
+            }
+            catch (e) {
+                throw new Error(`Помилка надсилання повідомлення: ${e}`);
+            }
         });
         this.tg_bot.onText(/\/orders/, async (msg) => {
             try {
@@ -391,27 +396,34 @@ let MesengersService = class MesengersService {
             }
         });
         this.tg_bot.on('contact', async (msg) => {
-            const chatId = msg.chat.id;
-            const phoneNumber = msg.contact.phone_number;
-            const user = await this.userModel.findOne({ phone: phoneNumber }).exec();
-            const order = await this.ordersModel
-                .findOne({ phone: phoneNumber })
-                .exec();
-            if (user.tg_chat === null) {
-                await this.userModel.findByIdAndUpdate(user.id, {
-                    tg_chat: chatId,
-                    verify: true,
-                });
-                this.tg_bot.sendMessage(chatId, `Дякую, ${msg.from.first_name} тепер Вам будуть надходити повідомлення про нові пропозиції в обраній категорії. Щоб вимкнути оповіщення виберіть "Меню" та натисніть /stop`, optURL);
+            try {
+                const chatId = msg.chat.id;
+                const phoneNumber = msg.contact.phone_number;
+                const user = await this.userModel
+                    .findOne({ phone: phoneNumber })
+                    .exec();
+                const order = await this.ordersModel
+                    .findOne({ phone: phoneNumber })
+                    .exec();
+                if (user && user.tg_chat === null) {
+                    await this.userModel.findByIdAndUpdate(user.id, {
+                        tg_chat: chatId,
+                        verify: true,
+                    });
+                    await this.tg_bot.sendMessage(chatId, `Дякую, ${msg.from.first_name} тепер Вам будуть надходити повідомлення про нові пропозиції в обраній категорії. Щоб вимкнути оповіщення виберіть "Меню" та натисніть /stop`, optURL);
+                }
+                if (order && order.tg_chat === null) {
+                    await this.ordersModel.findByIdAndUpdate(order.id, {
+                        tg_chat: chatId,
+                    });
+                    await this.tg_bot.sendMessage(chatId, `Дякую, ${msg.from.first_name} тепер Вам будуть надходити повідомлення про нові пропозиції в обраній категорії. Щоб вимкнути оповіщення виберіть "Меню" та натисніть /stop`, optURL);
+                    if (order.verify === false) {
+                        await this.tg_bot.sendMessage(chatId, `Ваш код верифікації: ${order.sms}\nПерейти на сайт: ${process.env.CODE_LINK}`);
+                    }
+                }
             }
-            else if (order.tg_chat === null) {
-                await this.ordersModel.findByIdAndUpdate(order.id, {
-                    tg_chat: chatId,
-                });
-            }
-            this.tg_bot.sendMessage(chatId, `Дякую, ${msg.from.first_name} тепер Вам будуть надходити повідомлення про нові пропозиції в обраній категорії. Щоб вимкнути оповіщення виберіть "Меню" та натисніть /stop`, optURL);
-            if (order.verify === false) {
-                this.tg_bot.sendMessage(chatId, `Ваш код верифікації: ${order.sms}\nПерейти на сайт: ${process.env.CODE_LINK}`);
+            catch (e) {
+                throw new Error(`Помилка надсилання повідомлення: ${e}`);
             }
         });
         this.tg_bot.on('callback_query', async (query) => {
