@@ -67,7 +67,7 @@ __decorate([
         type: String,
         minlength: 10,
         maxlength: 13,
-        default: '+380000000000',
+        default: '380000000000',
     }),
     __metadata("design:type", String)
 ], User.prototype, "phone", void 0);

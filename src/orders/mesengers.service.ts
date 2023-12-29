@@ -485,23 +485,21 @@ export class MesengersService {
           `Дякую, ${msg.from.first_name} тепер Вам будуть надходити повідомлення про нові пропозиції в обраній категорії. Щоб вимкнути оповіщення виберіть "Меню" та натисніть /stop`,
           optURL,
         );
-      } else {
-        if (order.tg_chat === null) {
-          await this.ordersModel.findByIdAndUpdate(order.id, {
-            tg_chat: chatId,
-          });
-        }
+      } else if (order.tg_chat === null) {
+        await this.ordersModel.findByIdAndUpdate(order.id, {
+          tg_chat: chatId,
+        });
+      }
+      this.tg_bot.sendMessage(
+        chatId,
+        `Дякую, ${msg.from.first_name} тепер Вам будуть надходити повідомлення про нові пропозиції в обраній категорії. Щоб вимкнути оповіщення виберіть "Меню" та натисніть /stop`,
+        optURL,
+      );
+      if (order.verify === false) {
         this.tg_bot.sendMessage(
           chatId,
-          `Дякую, ${msg.from.first_name} тепер Вам будуть надходити повідомлення про нові пропозиції в обраній категорії. Щоб вимкнути оповіщення виберіть "Меню" та натисніть /stop`,
-          optURL,
+          `Ваш код верифікації: ${order.sms}\nПерейти на сайт: ${process.env.CODE_LINK}`,
         );
-        if (order.verify === false) {
-          this.tg_bot.sendMessage(
-            chatId,
-            `Ваш код верифікації: ${order.sms}\nПерейти на сайт: ${process.env.CODE_LINK}`,
-          );
-        }
       }
     });
 

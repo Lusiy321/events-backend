@@ -290,7 +290,7 @@ export class UsersController {
   }
 
   @ApiOperation({ summary: 'Verify user email' })
-  @Patch('verify-email/:Id')
+  @Get('verify-email/:Id')
   async verifyEmail(@Param('Id') id: string, @Res() res: any) {
     await this.usersService.verifyUserEmail(id);
     return res.redirect(`${process.env.FRONT_LINK}auth/login`);

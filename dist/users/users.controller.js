@@ -381,7 +381,7 @@ __decorate([
 ], UsersController.prototype, "setEmailPsw", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Verify user email' }),
-    (0, common_1.Patch)('verify-email/:Id'),
+    (0, common_1.Get)('verify-email/:Id'),
     __param(0, (0, common_1.Param)('Id')),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
