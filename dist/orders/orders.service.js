@@ -106,6 +106,7 @@ let OrdersService = class OrdersService {
             if (order.verify === false) {
                 await this.ordersModel.findByIdAndUpdate({ _id: order._id }, { verify: true, sms: null });
                 const usersArr = await this.findUserByCategory(order);
+                console.log(usersArr);
                 const sendMessagePromises = usersArr.map(async (user) => {
                     if (user.tg_chat !== null) {
                         const check = await this.checkTrialStatus(user._id);
@@ -121,7 +122,7 @@ let OrdersService = class OrdersService {
                     }
                 });
                 await Promise.all(sendMessagePromises);
-                if (usersArr.length !== 0) {
+                if (usersArr.length === 0) {
                     return usersArr;
                 }
                 else {
@@ -159,7 +160,7 @@ let OrdersService = class OrdersService {
         }
     }
     async findUserByCategory(order) {
-        const arr = order.category;
+        const orderCategories = order.category;
         function extractIds(data) {
             const ids = [];
             function recursiveExtract(obj) {
@@ -175,16 +176,16 @@ let OrdersService = class OrdersService {
             recursiveExtract(data);
             return ids;
         }
-        const subcategoriesId = extractIds(arr);
+        const subcategoriesId = extractIds(orderCategories);
         const findId = subcategoriesId[0];
         const subcategory = await this.userModel
             .find({
             'category.subcategories': {
                 $elemMatch: {
                     id: findId,
-                    location: order.location,
                 },
             },
+            location: order.location,
         })
             .exec();
         if (Array.isArray(subcategory) && subcategory.length === 0) {
@@ -196,8 +197,8 @@ let OrdersService = class OrdersService {
                     category: {
                         $elemMatch: {
                             id: findId,
-                            location: { $regex: regexLocation },
                         },
+                        location: { $regex: regexLocation },
                     },
                 })
                     .exec();
@@ -209,8 +210,8 @@ let OrdersService = class OrdersService {
                 category: {
                     $elemMatch: {
                         id: findId,
-                        location: { $regex: regexLocation },
                     },
+                    location: { $regex: regexLocation },
                 },
             })
                 .exec();

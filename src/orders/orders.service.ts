@@ -12,7 +12,6 @@ import {
   paginateArray,
   rows,
 } from 'src/users/utils/parse.user';
-import { count } from 'console';
 
 @Injectable()
 export class OrdersService {
@@ -101,7 +100,7 @@ export class OrdersService {
         );
 
         const usersArr = await this.findUserByCategory(order);
-
+        console.log(usersArr);
         const sendMessagePromises = usersArr.map(async (user) => {
           if (user.tg_chat !== null) {
             const check = await this.checkTrialStatus(user._id);
@@ -120,7 +119,7 @@ export class OrdersService {
 
         await Promise.all(sendMessagePromises);
 
-        if (usersArr.length !== 0) {
+        if (usersArr.length === 0) {
           return usersArr;
         } else {
           const message =
@@ -160,7 +159,7 @@ export class OrdersService {
   }
 
   async findUserByCategory(order: Orders) {
-    const arr = order.category;
+    const orderCategories = order.category;
 
     function extractIds(data: Categories[]) {
       const ids = [];
@@ -178,16 +177,16 @@ export class OrdersService {
       recursiveExtract(data);
       return ids;
     }
-    const subcategoriesId = extractIds(arr);
+    const subcategoriesId = extractIds(orderCategories);
     const findId = subcategoriesId[0];
     const subcategory = await this.userModel
       .find({
         'category.subcategories': {
           $elemMatch: {
             id: findId,
-            location: order.location,
           },
         },
+        location: order.location,
       })
       .exec();
     if (Array.isArray(subcategory) && subcategory.length === 0) {
@@ -199,8 +198,8 @@ export class OrdersService {
             category: {
               $elemMatch: {
                 id: findId,
-                location: { $regex: regexLocation },
               },
+              location: { $regex: regexLocation },
             },
           })
           .exec();
@@ -212,8 +211,8 @@ export class OrdersService {
           category: {
             $elemMatch: {
               id: findId,
-              location: { $regex: regexLocation },
             },
+            location: { $regex: regexLocation },
           },
         })
         .exec();

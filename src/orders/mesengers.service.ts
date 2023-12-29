@@ -435,7 +435,7 @@ export class MesengersService {
         const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
         const find = user.accepted_orders;
 
-        if (!user.tg_chat && Array.isArray(find) && find.length === 0) {
+        if (!user && Array.isArray(find) && find.length === 0) {
           this.tg_bot.sendMessage(
             chatId,
             'Ви не зареєстровані як виконавець',

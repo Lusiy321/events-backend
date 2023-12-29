@@ -30,7 +30,6 @@ import { GoogleUserDto } from './dto/google.user.dto';
 import { GoogleAuthGuard } from './utils/Guards';
 import { PasswordUserDto } from './dto/password.user.dto';
 import { MailUserDto } from './dto/email.user.dto';
-import { UpdatePasswordUserDto } from './dto/updatePassword.user.dto';
 import { Category } from './category.model';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from './cloudinary.service';
@@ -39,6 +38,8 @@ import * as path from 'path';
 import { DelUserMediaDto } from './dto/delete.user.dto';
 import { FacebookAuthGuard } from './utils/GuardFacebook';
 import { Categories } from './dto/caterory.interface';
+
+
 
 @ApiTags('User')
 @Controller('users')
