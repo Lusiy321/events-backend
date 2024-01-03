@@ -290,13 +290,12 @@ let MesengersService = class MesengersService {
                 if (user.tg_chat && Array.isArray(find) && find.length === 0) {
                     this.tg_bot.sendMessage(chatId, 'Ви не зареєстровані як замовник', optCont);
                 }
-                else {
-                    if (Array.isArray(find) && find.length === 0) {
-                        this.tg_bot.sendMessage(chatId, 'Ми не знайшли Ваших заявок, напевно ви не зареєструвались, натисніть кнопку "Відправити номер телефону" для реєстрації у боті', optCont);
-                    }
-                    else if (find || user.tg_chat === find[0].tg_chat) {
-                        find.map((finded) => {
-                            const msg = `Замовник: ${finded.name}.
+                if (Array.isArray(find) && find.length === 0) {
+                    this.tg_bot.sendMessage(chatId, 'Ми не знайшли Ваших заявок, напевно ви не зареєструвались, натисніть кнопку "Відправити номер телефону" для реєстрації у боті', optCont);
+                }
+                if (find || user.tg_chat === find[0].tg_chat) {
+                    find.map((finded) => {
+                        const msg = `Замовник: ${finded.name}.
       Дата події: ${finded.date}.
       Категорія: ${finded.category[0].subcategories[0].name}.
       Вимоги: ${finded.description}.
@@ -304,58 +303,57 @@ let MesengersService = class MesengersService {
       Гонорар: ${finded.price}.
       Кількість відгуків: ${finded.approve_count}.
       Статус: ${finded.active ? 'Активний' : 'Неактивний'}.\n`;
-                            if (finded.active === true) {
-                                const keyboard = {
-                                    inline_keyboard: [
-                                        [
-                                            {
-                                                text: 'Видалити',
-                                                callback_data: `delete:${finded._id}:${chatId}`,
-                                            },
-                                            {
-                                                text: 'Деактивувати',
-                                                callback_data: `deactive:${finded._id}:${chatId}`,
-                                            },
-                                        ],
-                                        [
-                                            {
-                                                text: 'Відгуки на пропозицію',
-                                                callback_data: `users:${finded._id}:${chatId}`,
-                                            },
-                                        ],
+                        if (finded.active === true) {
+                            const keyboard = {
+                                inline_keyboard: [
+                                    [
+                                        {
+                                            text: 'Видалити',
+                                            callback_data: `delete:${finded._id}:${chatId}`,
+                                        },
+                                        {
+                                            text: 'Деактивувати',
+                                            callback_data: `deactive:${finded._id}:${chatId}`,
+                                        },
                                     ],
-                                };
-                                this.tg_bot.sendMessage(chatId, msg, {
-                                    reply_markup: keyboard,
-                                });
-                            }
-                            else {
-                                const keyboard = {
-                                    inline_keyboard: [
-                                        [
-                                            {
-                                                text: 'Видалити',
-                                                callback_data: `delete:${finded._id}:${chatId}`,
-                                            },
-                                            {
-                                                text: 'Активувати',
-                                                callback_data: `active:${finded._id}:${chatId}`,
-                                            },
-                                        ],
-                                        [
-                                            {
-                                                text: 'Відгуки на пропозицію',
-                                                callback_data: `users:${finded._id}:${chatId}`,
-                                            },
-                                        ],
+                                    [
+                                        {
+                                            text: 'Відгуки на пропозицію',
+                                            callback_data: `users:${finded._id}:${chatId}`,
+                                        },
                                     ],
-                                };
-                                this.tg_bot.sendMessage(chatId, msg, {
-                                    reply_markup: keyboard,
-                                });
-                            }
-                        });
-                    }
+                                ],
+                            };
+                            this.tg_bot.sendMessage(chatId, msg, {
+                                reply_markup: keyboard,
+                            });
+                        }
+                        else {
+                            const keyboard = {
+                                inline_keyboard: [
+                                    [
+                                        {
+                                            text: 'Видалити',
+                                            callback_data: `delete:${finded._id}:${chatId}`,
+                                        },
+                                        {
+                                            text: 'Активувати',
+                                            callback_data: `active:${finded._id}:${chatId}`,
+                                        },
+                                    ],
+                                    [
+                                        {
+                                            text: 'Відгуки на пропозицію',
+                                            callback_data: `users:${finded._id}:${chatId}`,
+                                        },
+                                    ],
+                                ],
+                            };
+                            this.tg_bot.sendMessage(chatId, msg, {
+                                reply_markup: keyboard,
+                            });
+                        }
+                    });
                 }
             }
             catch (e) {
@@ -370,25 +368,23 @@ let MesengersService = class MesengersService {
                 if (!user && Array.isArray(find) && find.length === 0) {
                     this.tg_bot.sendMessage(chatId, 'Ви не зареєстровані як виконавець', optCont);
                 }
-                else {
-                    if (Array.isArray(find) && find.length === 0) {
-                        this.tg_bot.sendMessage(chatId, 'Ми не знайшли Ваших відгуків.', optCont);
-                    }
-                    else if (Array.isArray(find) && find.length !== 0) {
-                        find.map(async (finded) => {
-                            const findetOrder = await this.ordersModel.findOne({
-                                _id: finded,
-                            });
-                            const msg = `Замовник: ${findetOrder.name}.
+                if (Array.isArray(find) && find.length === 0) {
+                    this.tg_bot.sendMessage(chatId, 'Ми не знайшли Ваших відгуків.', optCont);
+                }
+                if (Array.isArray(find) && find.length !== 0) {
+                    find.map(async (finded) => {
+                        const findetOrder = await this.ordersModel.findOne({
+                            _id: finded,
+                        });
+                        const msg = `Замовник: ${findetOrder.name}.
       Дата події: ${findetOrder.date}.
       Категорія: ${findetOrder.category[0].subcategories[0].name}.
       Вимоги: ${findetOrder.description}.
       Локація: ${findetOrder.location}.
       Гонорар: ${findetOrder.price}.      
       Статус: ${findetOrder.active ? 'Активний' : 'Неактивний'}.\n`;
-                            this.tg_bot.sendMessage(chatId, msg, optCont);
-                        });
-                    }
+                        this.tg_bot.sendMessage(chatId, msg, optCont);
+                    });
                 }
             }
             catch (e) {
