@@ -119,7 +119,13 @@ export class OrdersService {
 
         await Promise.all(sendMessagePromises);
 
-        if (usersArr.length === 0) {
+        if (usersArr.length !== 0) {
+          const message = `Ваше замовлення було успішно опубліковано. По вашим параметрам знайшлося ${usersArr.length} виконавців.`;
+          if (order.tg_chat !== null) {
+            await this.mesengersService.sendMessageTg(order.tg_chat, message);
+          } else if (order.viber !== null) {
+            await this.mesengersService.sendMessageViber(order.viber, message);
+          }
           return usersArr;
         } else {
           const message =
