@@ -15,16 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrdersController = void 0;
 const common_1 = require("@nestjs/common");
 const orders_service_1 = require("./orders.service");
-const twilio_service_1 = require("./twilio.service");
 const swagger_1 = require("@nestjs/swagger");
 const order_model_1 = require("./order.model");
 const create_order_dto_1 = require("./dto/create.order.dto");
 const mongoose_1 = require("@nestjs/mongoose");
-const http_errors_1 = require("http-errors");
 let OrdersController = class OrdersController {
-    constructor(ordersService, twilioService, ordersModel) {
+    constructor(ordersService, ordersModel) {
         this.ordersService = ordersService;
-        this.twilioService = twilioService;
         this.ordersModel = ordersModel;
     }
     async searchUser(query) {
@@ -41,25 +38,6 @@ let OrdersController = class OrdersController {
     }
     async bot(res) {
         return res.redirect('viber://pa?chatURI=wechirka', 200);
-    }
-    async sendVerificationCode(phoneNumber) {
-        try {
-            const user = await this.ordersModel.findOne({ phone: phoneNumber });
-            if (user.verify === false) {
-                const phone = '+' + phoneNumber;
-                await this.twilioService.sendSMS(phone, `Your verification code: ${user.sms}`);
-                return user;
-            }
-            else if (user.verify === true) {
-                throw new http_errors_1.Conflict('User is verified');
-            }
-            else {
-                throw new http_errors_1.NotFound('User not found');
-            }
-        }
-        catch (e) {
-            throw new http_errors_1.BadRequest(e.message);
-        }
     }
     async verifyBySms(code) {
         await this.ordersService.verifyOrder(code);
@@ -117,16 +95,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "bot", null);
 __decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Send sms code' }),
-    (0, swagger_1.ApiResponse)({ status: 200, type: order_model_1.Orders }),
-    (0, common_1.HttpCode)(200),
-    (0, common_1.Post)('/send-code/:phone'),
-    __param(0, (0, common_1.Param)('phone')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], OrdersController.prototype, "sendVerificationCode", null);
-__decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Verivy sms order' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: order_model_1.Orders }),
     (0, common_1.HttpCode)(200),
@@ -148,9 +116,8 @@ __decorate([
 exports.OrdersController = OrdersController = __decorate([
     (0, swagger_1.ApiTags)('Orders'),
     (0, common_1.Controller)('orders'),
-    __param(2, (0, mongoose_1.InjectModel)(order_model_1.Orders.name)),
+    __param(1, (0, mongoose_1.InjectModel)(order_model_1.Orders.name)),
     __metadata("design:paramtypes", [orders_service_1.OrdersService,
-        twilio_service_1.TwilioService,
         order_model_1.Orders])
 ], OrdersController);
 //# sourceMappingURL=orders.controller.js.map

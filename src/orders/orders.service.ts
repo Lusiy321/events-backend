@@ -3,7 +3,6 @@ import { Orders } from './order.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { NotFound, BadRequest } from 'http-errors';
 import { CreateOrderDto } from './dto/create.order.dto';
-import { TwilioService } from './twilio.service';
 import { User } from 'src/users/users.model';
 import { Categories } from 'src/users/dto/caterory.interface';
 import { MesengersService } from 'src/orders/mesengers.service';
@@ -15,8 +14,7 @@ import {
 
 @Injectable()
 export class OrdersService {
-  constructor(
-    private readonly twilioService: TwilioService,
+  constructor(   
     private readonly mesengersService: MesengersService,
     @InjectModel(Orders.name)
     private ordersModel: Orders,

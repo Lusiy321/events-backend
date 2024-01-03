@@ -348,18 +348,17 @@ export class MesengersService {
         const chatId = msg.chat.id;
         const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
         const find = await this.ordersModel.find({ tg_chat: chatId }).exec();
-
-        if (user.tg_chat && Array.isArray(find) && find.length === 0) {
-          this.tg_bot.sendMessage(
-            chatId,
-            'Ви не зареєстровані як замовник',
-            optCont,
-          );
-        }
-        if (Array.isArray(find) && find.length === 0) {
+        if (!user && Array.isArray(find) && find.length === 0) {
           this.tg_bot.sendMessage(
             chatId,
             'Ми не знайшли Ваших заявок, напевно ви не зареєструвались, натисніть кнопку "Відправити номер телефону" для реєстрації у боті',
+            optCont,
+          );
+        }
+        if (user && Array.isArray(find) && find.length === 0) {
+          this.tg_bot.sendMessage(
+            chatId,
+            'Ви не зареєстровані як замовник',
             optCont,
           );
         }
@@ -433,24 +432,31 @@ export class MesengersService {
       try {
         const chatId = msg.chat.id;
         const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
-        const find = user.accepted_orders;
 
-        if (!user && Array.isArray(find) && find.length === 0) {
+        if (!user) {
           this.tg_bot.sendMessage(
             chatId,
             'Ви не зареєстровані як виконавець',
             optCont,
           );
         }
-        if (Array.isArray(find) && find.length === 0) {
+        if (
+          user &&
+          Array.isArray(user.accepted_orders) &&
+          user.accepted_orders.length === 0
+        ) {
           this.tg_bot.sendMessage(
             chatId,
             'Ми не знайшли Ваших відгуків.',
             optCont,
           );
         }
-        if (Array.isArray(find) && find.length !== 0) {
-          find.map(async (finded: Orders) => {
+        if (
+          user &&
+          Array.isArray(user.accepted_orders) &&
+          user.accepted_orders.length !== 0
+        ) {
+          user.accepted_orders.map(async (finded: Orders) => {
             const findetOrder = await this.ordersModel.findOne({
               _id: finded,
             });
@@ -1037,21 +1043,30 @@ export class MesengersService {
   async startServer() {
     const http = require('http');
     const port = 8080;
-    ngrok
-      .connect({
-        addr: port,
-        authtoken_from_env: true,
-      })
-      .then(async (listener) => {
-        console.log('publicUrl => ', listener.url());
-        await http
-          .createServer(this.viber_bot.middleware())
-          .listen(port, () => this.viber_bot.setWebhook(listener.url()));
-      })
-      .catch((error) => {
-        console.log('Can not connect to ngrok server. Is it running?');
+
+    for (let attempt = 0; attempt < 5; attempt++) {
+      try {
+        await ngrok
+          .connect({
+            addr: port,
+            authtoken_from_env: true,
+          })
+          .then(async (listener) => {
+            console.log('publicUrl => ', listener.url());
+            await http
+              .createServer(this.viber_bot.middleware())
+              .listen(port, () => this.viber_bot.setWebhook(listener.url()));
+          });
+
+        break;
+      } catch (error) {
+        console.log(
+          'Can not connect to ngrok server. Attempting to restart...',
+        );
         console.error(error);
-      });
+        await new Promise((resolve) => setTimeout(resolve, 10000));
+      }
+    }
   }
 
   //TELEGRAMM METHODS ON CLASS /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1209,6 +1224,4 @@ export class MesengersService {
       throw new Error(`Помилка надсиланння повідомлення: ${error}`);
     }
   }
-
-  async findMyOrders(chatId: string) {}
 }

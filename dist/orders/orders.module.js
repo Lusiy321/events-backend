@@ -12,7 +12,6 @@ const orders_controller_1 = require("./orders.controller");
 const orders_service_1 = require("./orders.service");
 const mongoose_1 = require("@nestjs/mongoose");
 const order_model_1 = require("./order.model");
-const twilio_service_1 = require("./twilio.service");
 const users_model_1 = require("../users/users.model");
 const mesengers_service_1 = require("./mesengers.service");
 let OrdersModule = class OrdersModule {
@@ -27,7 +26,7 @@ exports.OrdersModule = OrdersModule = __decorate([
             ]),
         ],
         controllers: [orders_controller_1.OrdersController],
-        providers: [orders_service_1.OrdersService, twilio_service_1.TwilioService, mesengers_service_1.MesengersService],
+        providers: [orders_service_1.OrdersService, mesengers_service_1.MesengersService],
     })
 ], OrdersModule);
 //# sourceMappingURL=orders.module.js.map

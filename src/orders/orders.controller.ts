@@ -9,7 +9,6 @@ import {
   Res,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { TwilioService } from './twilio.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Orders } from './order.model';
 import { CreateOrderDto } from './dto/create.order.dto';
@@ -21,7 +20,6 @@ import { Conflict, NotFound, BadRequest, Unauthorized } from 'http-errors';
 export class OrdersController {
   constructor(
     private readonly ordersService: OrdersService,
-    private readonly twilioService: TwilioService,
     @InjectModel(Orders.name)
     private ordersModel: Orders,
   ) {}
@@ -61,30 +59,6 @@ export class OrdersController {
   @Get('/bot')
   async bot(@Res() res: any) {
     return res.redirect('viber://pa?chatURI=wechirka', 200);
-  }
-
-  @ApiOperation({ summary: 'Send sms code' })
-  @ApiResponse({ status: 200, type: Orders })
-  @HttpCode(200)
-  @Post('/send-code/:phone')
-  async sendVerificationCode(@Param('phone') phoneNumber: string) {
-    try {
-      const user = await this.ordersModel.findOne({ phone: phoneNumber });
-      if (user.verify === false) {
-        const phone = '+' + phoneNumber;
-        await this.twilioService.sendSMS(
-          phone,
-          `Your verification code: ${user.sms}`,
-        );
-        return user;
-      } else if (user.verify === true) {
-        throw new Conflict('User is verified');
-      } else {
-        throw new NotFound('User not found');
-      }
-    } catch (e) {
-      throw new BadRequest(e.message);
-    }
   }
 
   @ApiOperation({ summary: 'Verivy sms order' })

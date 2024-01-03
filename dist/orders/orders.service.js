@@ -28,13 +28,11 @@ const common_1 = require("@nestjs/common");
 const order_model_1 = require("./order.model");
 const mongoose_1 = require("@nestjs/mongoose");
 const http_errors_1 = require("http-errors");
-const twilio_service_1 = require("./twilio.service");
 const users_model_1 = require("../users/users.model");
 const mesengers_service_1 = require("./mesengers.service");
 const parse_user_1 = require("../users/utils/parse.user");
 let OrdersService = class OrdersService {
-    constructor(twilioService, mesengersService, ordersModel, userModel) {
-        this.twilioService = twilioService;
+    constructor(mesengersService, ordersModel, userModel) {
         this.mesengersService = mesengersService;
         this.ordersModel = ordersModel;
         this.userModel = userModel;
@@ -486,10 +484,9 @@ let OrdersService = class OrdersService {
 exports.OrdersService = OrdersService;
 exports.OrdersService = OrdersService = __decorate([
     (0, common_1.Injectable)(),
-    __param(2, (0, mongoose_1.InjectModel)(order_model_1.Orders.name)),
-    __param(3, (0, mongoose_1.InjectModel)(users_model_1.User.name)),
-    __metadata("design:paramtypes", [twilio_service_1.TwilioService,
-        mesengers_service_1.MesengersService,
+    __param(1, (0, mongoose_1.InjectModel)(order_model_1.Orders.name)),
+    __param(2, (0, mongoose_1.InjectModel)(users_model_1.User.name)),
+    __metadata("design:paramtypes", [mesengers_service_1.MesengersService,
         order_model_1.Orders,
         users_model_1.User])
 ], OrdersService);
