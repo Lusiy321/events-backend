@@ -104,7 +104,6 @@ let OrdersService = class OrdersService {
             if (order.verify === false) {
                 await this.ordersModel.findByIdAndUpdate({ _id: order._id }, { verify: true, sms: null });
                 const usersArr = await this.findUserByCategory(order);
-                console.log(usersArr);
                 const sendMessagePromises = usersArr.map(async (user) => {
                     if (user.tg_chat !== null) {
                         const check = await this.checkTrialStatus(user._id);

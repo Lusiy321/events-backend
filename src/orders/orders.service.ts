@@ -14,7 +14,7 @@ import {
 
 @Injectable()
 export class OrdersService {
-  constructor(   
+  constructor(
     private readonly mesengersService: MesengersService,
     @InjectModel(Orders.name)
     private ordersModel: Orders,
@@ -98,22 +98,26 @@ export class OrdersService {
         );
 
         const usersArr = await this.findUserByCategory(order);
-        console.log(usersArr);
-        const sendMessagePromises = usersArr.map(async (user) => {
-          if (user.tg_chat !== null) {
-            const check = await this.checkTrialStatus(user._id);
-            if (check === true) {
-              await this.mesengersService.sendNewTgOrder(user.tg_chat, order);
+        const sendMessagePromises = usersArr.map(
+          async (user: { tg_chat: string; _id: string; viber: string }) => {
+            if (user.tg_chat !== null) {
+              const check = await this.checkTrialStatus(user._id);
+              if (check === true) {
+                await this.mesengersService.sendNewTgOrder(user.tg_chat, order);
+              }
             }
-          }
 
-          if (user.viber !== null) {
-            const check = await this.checkTrialStatus(user._id);
-            if (check === true) {
-              await this.mesengersService.sendNewViberOrder(user.viber, order);
+            if (user.viber !== null) {
+              const check = await this.checkTrialStatus(user._id);
+              if (check === true) {
+                await this.mesengersService.sendNewViberOrder(
+                  user.viber,
+                  order,
+                );
+              }
             }
-          }
-        });
+          },
+        );
 
         await Promise.all(sendMessagePromises);
 

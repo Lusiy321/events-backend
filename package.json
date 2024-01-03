@@ -53,7 +53,6 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
     "swagger-ui-express": "^4.6.3",
-    "twilio": "^4.18.1",
     "uuid": "^9.0.1",
     "viber-bot": "^1.0.18"
   },
