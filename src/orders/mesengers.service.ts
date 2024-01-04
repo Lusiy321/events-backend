@@ -1043,29 +1043,21 @@ export class MesengersService {
   async startServer() {
     const http = require('http');
     const port = 8080;
-
-    for (let attempt = 0; attempt < 5; attempt++) {
-      try {
-        await ngrok
-          .connect({
-            addr: port,
-            authtoken_from_env: true,
-          })
-          .then(async (listener) => {
-            console.log('publicUrl => ', listener.url());
-            await http
-              .createServer(this.viber_bot.middleware())
-              .listen(port, () => this.viber_bot.setWebhook(listener.url()));
-          });
-
-        break;
-      } catch (error) {
-        console.log(
-          'Can not connect to ngrok server. Attempting to restart...',
-        );
-        console.error(error);
-        await new Promise((resolve) => setTimeout(resolve, 10000));
-      }
+    try {
+      await ngrok
+        .connect({
+          addr: port,
+          authtoken_from_env: true,
+        })
+        .then(async (listener) => {
+          console.log('publicUrl => ', listener.url());
+          await http
+            .createServer(this.viber_bot.middleware())
+            .listen(port, () => this.viber_bot.setWebhook(listener.url()));
+        });
+    } catch (error) {
+      console.log('Can not connect to ngrok server. Attempting to restart...');
+      console.error(error);
     }
   }
 
