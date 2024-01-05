@@ -11,7 +11,7 @@ import { PasswordUserDto } from './dto/password.user.dto';
 import { MailUserDto } from './dto/email.user.dto';
 import { GoogleUserDto } from './dto/google.user.dto';
 import { Category } from './category.model';
-import { Categories, Subcategory } from './dto/caterory.interface';
+import { Categories } from './dto/caterory.interface';
 import { verifyEmailMsg } from './utils/email.schemas';
 import {
   mergeAndRemoveDuplicates,
@@ -385,11 +385,10 @@ export class UsersService {
           trialEnds,
           paidEnds: trialEnds,
         });
-        createdUser.setName(lowerCaseEmail);
         createdUser.setPassword(password);
         createdUser.save();
 
-        const verificationLink = `${process.env.BACK_LINK}verify-email/${createdUser._id}`;
+        const verificationLink = `${process.env.BACK_LINK}users/verify-email/${createdUser._id}`;
         await this.sendVerificationEmail(email, verificationLink);
         return await this.userModel
           .findById(createdUser._id)
@@ -489,7 +488,8 @@ export class UsersService {
           await this.checkTrialStatus(user._id);
           await this.createToken(user);
           return await this.userModel.findOne({ _id: user.id });
-        } else {
+        }
+        if (!user.googleId) {
           await this.userModel.findByIdAndUpdate(
             { _id: user.id },
             { googleId: details.googleId },
@@ -515,8 +515,8 @@ export class UsersService {
           email: details.email,
         });
 
-        await this.createToken(userUpdateToken);
-        return await this.userModel.findById({ _id: userUpdateToken._id });
+        const newUser = await this.createToken(userUpdateToken);
+        return newUser;
       }
     } catch (e) {
       throw new Error('Error validating user');
@@ -531,16 +531,17 @@ export class UsersService {
       if (user) {
         if (user.facebookId === details.facebookId) {
           await this.checkTrialStatus(user._id);
-          await this.createToken(user);
-          return await this.userModel.findOne({ _id: user.id });
-        } else {
+          const newUser = await this.createToken(user);
+          return newUser;
+        }
+        if (!user.facebookId) {
           await this.userModel.findByIdAndUpdate(
             { _id: user.id },
             { facebookId: details.facebookId },
           );
           await this.checkTrialStatus(user._id);
-          await this.createToken(user);
-          return await this.userModel.findOne({ _id: user.id });
+          const newUser = await this.createToken(user);
+          return newUser;
         }
       }
       if (!user) {
@@ -558,8 +559,8 @@ export class UsersService {
           email: details.email,
         });
         await this.checkTrialStatus(user._id);
-        await this.createToken(userUpdateToken);
-        return await this.userModel.findById({ _id: userUpdateToken._id });
+        const newUser = await this.createToken(userUpdateToken);
+        return newUser;
       }
     } catch (e) {
       throw new Error('Error validating user');
@@ -727,7 +728,18 @@ export class UsersService {
       throw new BadRequest(e.message);
     }
   }
-
+  private async addSubcategory(
+    categories: Categories[],
+    newCategory: Categories[],
+  ): Promise<Categories[]> {
+    const idSet = new Set(categories.map((obj) => obj._id));
+    newCategory.forEach((obj) => {
+      idSet.add(obj._id);
+    });
+    return Array.from(idSet).map(
+      (id) => newCategory.find((obj) => obj._id === id)!,
+    );
+  }
   async updateCategory(data: Categories, req: any): Promise<User> {
     try {
       const category = [data];
@@ -740,20 +752,7 @@ export class UsersService {
       const findUser = await this.userModel.findById(findId.id).exec();
       const arrCategory = findUser.category;
 
-      function addSubcategory(
-        categories: Categories[],
-        newCategory: Categories[],
-      ): Categories[] {
-        const idSet = new Set(categories.map((obj) => obj._id));
-        newCategory.forEach((obj) => {
-          idSet.add(obj._id);
-        });
-        return Array.from(idSet).map(
-          (id) => newCategory.find((obj) => obj._id === id)!,
-        );
-      }
-
-      const newCategoryArr = addSubcategory(arrCategory, category);
+      const newCategoryArr = this.addSubcategory(arrCategory, category);
 
       await this.userModel.updateOne(
         { _id: findId.id },

@@ -39,8 +39,6 @@ import { DelUserMediaDto } from './dto/delete.user.dto';
 import { FacebookAuthGuard } from './utils/GuardFacebook';
 import { Categories } from './dto/caterory.interface';
 
-
-
 @ApiTags('User')
 @Controller('users')
 export class UsersController {
@@ -127,7 +125,7 @@ export class UsersController {
     return this.usersService.updateCategory(data, request);
   }
 
-  @ApiOperation({ summary: 'Update user' })
+  @ApiOperation({ summary: 'Delet category' })
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')
   @Delete('/category/:id')
@@ -286,7 +284,7 @@ export class UsersController {
   async setEmailPsw(@Param('Id') id: string): Promise<any> {
     return this.usersService.sendVerificationEmail(
       id,
-      'https://show-swart.vercel.app/artists',
+      `${process.env.FRONT_LINK}artists`,
     );
   }
 

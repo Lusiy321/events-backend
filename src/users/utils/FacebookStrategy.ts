@@ -18,17 +18,20 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
   }
 
   async validate(accessToken: string, refreshToken: string, profile: Profile) {
-    const user = await this.userService.validateFacebook({
-      email: profile._json.email,
-      password: accessToken,
-      firstName: profile._json.name,
-      facebookId: profile.id,
-      avatar: {
-        publicId: '1',
-        url: profile._json.picture.data.url,
-      },
-    });
-    console.log(profile);
-    return user || null;
+    try {
+      const user = await this.userService.validateFacebook({
+        email: profile._json.email,
+        password: accessToken,
+        firstName: profile._json.name,
+        facebookId: profile.id,
+        avatar: {
+          publicId: '1',
+          url: profile._json.picture.data.url,
+        },
+      });
+      return user || null;
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

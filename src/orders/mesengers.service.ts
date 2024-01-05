@@ -1140,20 +1140,19 @@ export class MesengersService {
       Ви можете написати йому, або зателефонувати по номеру +${user.phone}. \n
       Посилання на профіль виконавця ${process.env.FRONT_LINK}artists/${user._id}.`;
         await this.sendMessageTg(order.tg_chat.toString(), msgOrder);
-        if (user.photo.length > 0) {
+        if (user.photo.length > 0 || user.video.length > 0) {
           const images = user.photo.map((photos: any) => ({
             type: 'photo',
             media: photos.url,
           }));
           await this.tg_bot.sendMediaGroup(order.tg_chat.toString(), images);
-        }
-        if (user.video.length > 0) {
           const videos = user.video.map((video: any) => ({
             type: 'video',
             media: video.url,
           }));
           await this.tg_bot.sendMediaGroup(order.tg_chat.toString(), videos);
         }
+
         return true;
       } else if (order.viber !== null && order.active === true) {
         const msgOrder =

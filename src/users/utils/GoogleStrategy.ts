@@ -27,7 +27,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
           url: profile._json.picture,
         },
       });
-      await user.save();
       return user || null;
     } catch (e) {
       console.log(e);
