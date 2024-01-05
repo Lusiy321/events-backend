@@ -69,7 +69,11 @@ let MesengersService = class MesengersService {
             avatar: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701947849/service/paanrsds5krezvpreog0.webp',
         });
         this.viber_bot.onSubscribe(async (response) => {
-            say(response, `Привіт ${response.userProfile.name}. Я бот ресурсу ${this.viber_bot.name}! Щоб отримувати сповіщеня, відправте свій номер телефону у форматі 380981231122.\n\nСюди, Вам будуть надходити сповіщеня про замовлення або пропозиції від виконавців.`);
+            const msg = `Привіт ${response.userProfile.name}. Я бот ресурсу ${this.viber_bot.name}! Щоб отримувати сповіщеня, відправте свій номер телефону у форматі 380981231122.\n\nСюди, Вам будуть надходити сповіщеня про замовлення або пропозиції від виконавців.`;
+            this.viber_bot.sendMessage({ id: response.userProfile.id }, [
+                new TextMessage(msg),
+                new KeyboardMessage(MAIN_KEYBOARD),
+            ]);
         });
         function say(response, message) {
             response.send(new KeyboardMessage(MAIN_KEYBOARD), new TextMessage(message));
@@ -169,7 +173,7 @@ let MesengersService = class MesengersService {
                         const findOrder = await this.ordersModel.findOne({ _id: phone });
                         findOrder.accepted_users.map(async (user) => {
                             const findedUser = await this.userModel.findOne({ _id: user });
-                            const msgOrder = `Замовлення:\n${findOrder.description}\nКористувач: ${findedUser.firstName}.\nКатегорія: ${findedUser.category[0].subcategories[0].name}\nОплата: ${findedUser.price}\nТелефон: +${findedUser.phone}.\nПосилання на профіль:\n${process.env.FRONT_LINK}artists/${findedUser._id}.`;
+                            const msgOrder = `*Замовлення:*\n${findOrder.description}\n*Користувач:* ${findedUser.firstName}\n*Категорія:* ${findedUser.category[0].subcategories[0].name}\n*Оплата:* ${findedUser.price}\n*Телефон:* +${findedUser.phone}.\n*Посилання на профіль:*\n${process.env.FRONT_LINK}artists/${findedUser._id}.`;
                             this.viber_bot.sendMessage({ id: chatId }, [
                                 new TextMessage(msgOrder),
                                 new KeyboardMessage(MAIN_KEYBOARD),
@@ -184,16 +188,11 @@ let MesengersService = class MesengersService {
                     const order = await this.ordersModel.findOne({
                         phone: phoneNumber,
                     });
-                    if ((user && user.viber === null) ||
-                        (order && order.viber === null)) {
+                    if (user && user.viber === null) {
                         const updatedUser = await this.userModel.findByIdAndUpdate({ _id: user.id }, {
                             viber: res.userProfile.id,
                         });
-                        const updatedOrder = await this.ordersModel.findByIdAndUpdate({ _id: order.id }, {
-                            viber: res.userProfile.id,
-                        });
                         await updatedUser.save();
-                        await updatedOrder.save();
                         this.viber_bot.sendMessage({ id: res.userProfile.id }, [
                             new TextMessage(`Дякую, ${res.userProfile.name} теперь Вам будуть надходити сповіщення про нові пропозиції у обраній категорії категорії.`),
                             new KeyboardMessage(MAIN_KEYBOARD),
@@ -204,27 +203,53 @@ let MesengersService = class MesengersService {
                                 new KeyboardMessage(MAIN_KEYBOARD),
                             ]);
                         }
-                        return updatedUser || updatedOrder;
+                        return updatedUser;
                     }
-                    else if ((user && user.viber === res.userProfile.id) ||
-                        (order && order.viber === res.userProfile.id)) {
-                        const updatedUser = await this.userModel.findByIdAndUpdate({ _id: user.id }, {
-                            viber: null,
-                        });
+                    if (order && order.viber === null) {
                         const updatedOrder = await this.ordersModel.findByIdAndUpdate({ _id: order.id }, {
-                            viber: null,
+                            viber: res.userProfile.id,
                         });
-                        await updatedUser.save();
                         await updatedOrder.save();
                         this.viber_bot.sendMessage({ id: res.userProfile.id }, [
-                            new TextMessage(`${res.userProfile.name} Ви відписалися від сповіщення про нові пропозиції.`),
+                            new TextMessage(`Дякую, *${res.userProfile.name}* теперь Вам будуть надходити сповіщення про нові пропозиції у обраній категорії категорії.`),
                             new KeyboardMessage(MAIN_KEYBOARD),
                         ]);
-                        return updatedUser || updatedOrder;
+                        if (order.verify === false) {
+                            this.viber_bot.sendMessage({ id: res.userProfile.id }, [
+                                new TextMessage(`*Ваш код верифікаціЇ*: ${order.sms}\n*Перейти на сайт*: ${process.env.CODE_LINK}`),
+                                new KeyboardMessage(MAIN_KEYBOARD),
+                            ]);
+                        }
+                        return updatedOrder;
                     }
-                    else {
+                    if ((user && user.viber === res.userProfile.id) ||
+                        (order && order.viber === res.userProfile.id)) {
+                        if (user) {
+                            const updatedUser = await this.userModel.findByIdAndUpdate({ _id: user.id }, {
+                                viber: null,
+                            });
+                            await updatedUser.save();
+                            this.viber_bot.sendMessage({ id: res.userProfile.id }, [
+                                new TextMessage(`${res.userProfile.name} Ви відписалися від сповіщення про нові пропозиції.`),
+                                new KeyboardMessage(MAIN_KEYBOARD),
+                            ]);
+                            return updatedUser;
+                        }
+                        else {
+                            const updatedOrder = await this.ordersModel.findByIdAndUpdate({ _id: order.id }, {
+                                viber: null,
+                            });
+                            await updatedOrder.save();
+                            this.viber_bot.sendMessage({ id: res.userProfile.id }, [
+                                new TextMessage(`${res.userProfile.name} Ви відписалися від сповіщення про нові пропозиції.`),
+                                new KeyboardMessage(MAIN_KEYBOARD),
+                            ]);
+                            return updatedOrder;
+                        }
+                    }
+                    if (!user && !order) {
                         this.viber_bot.sendMessage({ id: res.userProfile.id }, [
-                            new TextMessage(`Користувач з номером ${phoneNumber} не зареєстрований у нашій системі.`),
+                            new TextMessage(`Користувач з номером *+${phoneNumber}* не зареєстрований у нашій системі.`),
                             new KeyboardMessage(MAIN_KEYBOARD),
                         ]);
                     }
@@ -288,7 +313,7 @@ let MesengersService = class MesengersService {
                 const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
                 const find = await this.ordersModel.find({ tg_chat: chatId }).exec();
                 if (!user && Array.isArray(find) && find.length === 0) {
-                    this.tg_bot.sendMessage(chatId, 'Ми не знайшли Ваших заявок, напевно ви не зареєструвались, натисніть кнопку "Відправити номер телефону" для реєстрації у боті', optCont);
+                    this.tg_bot.sendMessage(chatId, 'Ми не знайшли Ваших заявок, напевно ви не зареєструвались, натисніть кнопку *"Відправити номер телефону"* для реєстрації у боті', optCont);
                 }
                 if (user && Array.isArray(find) && find.length === 0) {
                     this.tg_bot.sendMessage(chatId, 'Ви не зареєстровані як замовник', optCont);
@@ -512,12 +537,12 @@ let MesengersService = class MesengersService {
     async sendNewViberOrder(userId, order) {
         try {
             const msg = `Доброго дня, з'явилось нове повідомлення по Вашому профілю. \n
-      Замовник: ${order.name}.
-      Дата події: ${order.date}.
-      Категорія: ${order.category[0].subcategories[0].name}.
-      Вимоги замовника: ${order.description}.
-      Локація: ${order.location}.
-      Гонорар: ${order.price}`;
+      *Замовник*: ${order.name}.
+      *Дата події*: ${order.date}.
+      *Категорія*: ${order.category[0].subcategories[0].name}.
+      *Вимоги замовника*: ${order.description}.
+      *Локація*: ${order.location}.
+      *Гонорар*: ${order.price}`;
             const KEYBOARD = {
                 Type: 'keyboard',
                 Revision: 1,
@@ -571,7 +596,7 @@ let MesengersService = class MesengersService {
                 return false;
             }
             else if (viber !== null && active === true) {
-                const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"${order.description}".\n \nВ категорії:\n"${order.category[0].name} - ${order.category[0].subcategories[0].name}". \n \nОчікуйте на дзвінок або повідомлення`;
+                const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"*${order.description}*".\n \nВ категорії:\n"*${order.category[0].name} - ${order.category[0].subcategories[0].name}*". \n \nЯкщо Ваш профіль сподобаеться замовнику, він з Вами зв'яжеться. Очікуйте на дзвінок або повідомлення`;
                 user.agree_order += 1;
                 user.accepted_orders.push(order._id);
                 await this.userModel.findByIdAndUpdate(user.id, {
@@ -588,7 +613,7 @@ let MesengersService = class MesengersService {
                     new TextMessage(msgTrue),
                     new KeyboardMessage(MAIN_KEYBOARD),
                 ]);
-                const msgOrder = `Користувач ${firstName} готовий виконати ваше замовлення "${description}". \n Посилання на профіль виконавця: ${process.env.FRONT_LINK}artists/${_id}.\n Ви можете написати йому у Viber, або зателефонувати по номеру. \n` +
+                const msgOrder = `Користувач *${firstName}* готовий виконати ваше замовлення "*${description}*". \n Посилання на профіль виконавця: ${process.env.FRONT_LINK}artists/${_id}.\n Ви можете написати йому, або зателефонувати по номеру. \n` +
                     `\n Телефон: +${phone}`;
                 await this.viber_bot.sendMessage({ id: viber }, [
                     new PictureMessage(user.master_photo.url),
@@ -598,8 +623,8 @@ let MesengersService = class MesengersService {
                 return true;
             }
             else if (tg_chat !== null && order.active === true) {
-                const msgOrder = `Користувач ${user.firstName} готовий виконати ваше замовлення "${order.description}".
-      Ви можете написати йому в Viber, або зателефонувати по номеру +${user.phone}. \n
+                const msgOrder = `Користувач *${user.firstName}* готовий виконати ваше замовлення "*${order.description}*".
+      Ви можете написати йому, або зателефонувати по номеру *+${user.phone}*. \n
       Посилання на профіль виконавця ${process.env.FRONT_LINK}artists/${user._id}.`;
                 await this.sendMessageTg(order.tg_chat.toString(), msgOrder);
                 if (user.photo.length > 0) {
@@ -616,7 +641,7 @@ let MesengersService = class MesengersService {
                     }));
                     await this.tg_bot.sendMediaGroup(order.tg_chat.toString(), videos);
                 }
-                const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"${order.description}".\n \nВ категорії:\n"${order.category[0].name} - ${order.category[0].subcategories[0].name}". \n \nОчікуйте на дзвінок або повідомлення`;
+                const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"*${order.description}*".\n \nВ категорії:\n"*${order.category[0].name} - ${order.category[0].subcategories[0].name}*". \n \nЯкщо Ваш профіль сподобаеться замовнику, він з Вами зв'яжеться. Очікуйте на дзвінок або повідомлення`;
                 this.viber_bot.sendMessage({ id: userChatId }, [
                     new TextMessage(msgTrue),
                     new KeyboardMessage(MAIN_KEYBOARD),
@@ -641,14 +666,16 @@ let MesengersService = class MesengersService {
         try {
             const user = await this.userModel.findOne({ viber: chatId }).exec();
             const find = await this.ordersModel.find({ viber: chatId }).exec();
-            if ((user.viber !== null && Array.isArray(find) && find.length === 0) ||
-                find[0].viber !== user.viber) {
-                this.viber_bot.sendMessage({ id: chatId }, new TextMessage('Ви не являетесь замовником або не зареєструвались у чат-боті. Якщо Ви замовник будь ласка, відправте свій номер телефону у форматі 380981231122'));
+            if (user &&
+                user.viber !== null &&
+                Array.isArray(find) &&
+                find.length === 0) {
+                this.viber_bot.sendMessage({ id: chatId }, new TextMessage('Ви не являетесь замовником. Якщо Ви замовник будь ласка, відправте свій номер телефону у форматі 380981231122'));
             }
-            else if (!user || (Array.isArray(find) && find.length === 0)) {
+            if (!user && Array.isArray(find) && find.length === 0) {
                 this.viber_bot.sendMessage({ id: chatId }, new TextMessage('Ми не знайшли Ваших заявок, напевно ви не зарееструвались у чат боті. Будь ласка, відправте свій номер телефону у форматі 380981231122'));
             }
-            else {
+            if (find || user.viber === find[0].viber) {
                 find.map((finded) => {
                     const FIND_KEYBOARD = {
                         Type: 'keyboard',
@@ -686,13 +713,13 @@ let MesengersService = class MesengersService {
                         ],
                     };
                     const msg = `Замовник: ${finded.name}.
-      Дата події: ${finded.date}.
-      Категорія: ${finded.category[0].subcategories[0].name}.
-      Вимоги замовника: ${finded.description}.
-      Локація: ${finded.location}.
-      Гонорар: ${finded.price}.
-      Кількість відгуків: ${finded.approve_count}.
-      Статус: ${finded.active ? 'Активний' : 'Неактивний'}.\n`;
+      *Дата події*: ${finded.date}.
+      *Категорія*: ${finded.category[0].subcategories[0].name}.
+      *Вимоги замовника*: ${finded.description}.
+      *Локація*: ${finded.location}.
+      *Гонорар*: ${finded.price}.
+      *Кількість відгуків*: ${finded.approve_count}.
+      *Статус*: ${finded.active ? 'Активний' : 'Неактивний'}.\n`;
                     if (finded.active === true) {
                         const KEYBOARD = {
                             Type: 'keyboard',
@@ -805,16 +832,60 @@ let MesengersService = class MesengersService {
     async myReviewList(chatId) {
         try {
             const user = await this.userModel.findOne({ viber: chatId }).exec();
-            const orederArr = user.accepted_orders;
-            if (user.viber !== null &&
-                Array.isArray(orederArr) &&
-                orederArr.length === 0) {
-                this.viber_bot.sendMessage({ id: chatId }, new TextMessage('Ми не знайшли Ваших відгуків на замовлення'));
+            const KEYBOARD = {
+                Type: 'keyboard',
+                Revision: 1,
+                ButtonsGroupColumns: 3,
+                ButtonsGroupRows: 1,
+                Buttons: [
+                    {
+                        ActionType: 'open-url',
+                        ActionBody: 'https://www.wechirka.com',
+                        Text: '<font color="#FFFFFF" size="5">Перейти на наш сайт</font>',
+                        TextSize: 'regular',
+                        TextVAlign: 'middle',
+                        TextHAlign: 'center',
+                        BgColor: '#094356',
+                    },
+                    {
+                        ActionType: 'reply',
+                        ActionBody: `orders:${chatId}:${chatId}`,
+                        Text: '<font color="#FFFFFF" size="5">Мої заявки (лише для замовників)</font>',
+                        TextSize: 'regular',
+                        TextVAlign: 'middle',
+                        TextHAlign: 'center',
+                        BgColor: '#094356',
+                    },
+                    {
+                        ActionType: 'reply',
+                        ActionBody: `review:${chatId}:${chatId}`,
+                        Text: '<font color="#FFFFFF" size="5">Мої відгуки (лише для виконавців)</font>',
+                        TextSize: 'regular',
+                        TextVAlign: 'middle',
+                        TextHAlign: 'center',
+                        BgColor: '#094356',
+                    },
+                ],
+            };
+            if (user &&
+                user.viber !== null &&
+                Array.isArray(user.accepted_orders) &&
+                user.accepted_orders.length === 0) {
+                this.viber_bot.sendMessage({ id: chatId }, [
+                    new TextMessage('Ми не знайшли Ваших відгуків на замовлення'),
+                    new KeyboardMessage(KEYBOARD),
+                ]);
             }
-            else if (!user) {
-                this.viber_bot.sendMessage({ id: chatId }, new TextMessage('Ми не знайшли Ваших відгуків, напевно ви не зарееструвались у чат боті. Будь ласка, відправте свій номер телефону у форматі 380981231122'));
+            if (!user) {
+                this.viber_bot.sendMessage({ id: chatId }, [
+                    new TextMessage('Ми не знайшли Ваших відгуків, напевно ви не зарееструвались як виконавець.'),
+                    new KeyboardMessage(KEYBOARD),
+                ]);
             }
-            else {
+            if (user &&
+                Array.isArray(user.accepted_orders) &&
+                user.accepted_orders.length !== 0) {
+                const orederArr = user.accepted_orders;
                 orederArr.map(async (finded) => {
                     const myOrders = await this.ordersModel.findOne({ _id: finded });
                     const FIND_KEYBOARD = {
@@ -852,13 +923,13 @@ let MesengersService = class MesengersService {
                             },
                         ],
                     };
-                    const msg = `Замовник: ${myOrders.name}.
-      Дата події: ${myOrders.date}.
-      Категорія: ${myOrders.category[0].subcategories[0].name}.
-      Вимоги замовника: ${myOrders.description}.
-      Локація: ${myOrders.location}.
-      Гонорар: ${myOrders.price}.      
-      Статус: ${myOrders.active ? 'Активний' : 'Неактивний'}.\n`;
+                    const msg = `*Замовник*: ${myOrders.name}.
+      *Дата події*: ${myOrders.date}.
+      *Категорія*: ${myOrders.category[0].subcategories[0].name}.
+      *Вимоги замовника*: ${myOrders.description}.
+      *Локація*: ${myOrders.location}.
+      *Гонорар*: ${myOrders.price}.      
+      *Статус*: ${myOrders.active ? 'Активний' : 'Неактивний'}.\n`;
                     this.viber_bot.sendMessage({ id: chatId }, [
                         new TextMessage(msg),
                         new KeyboardMessage(FIND_KEYBOARD),
@@ -871,17 +942,22 @@ let MesengersService = class MesengersService {
         }
     }
     async sendMessagesToAllViberUsers(msg) {
-        const allOrders = await this.ordersModel.find({}).select('viber').exec();
-        const allUsers = await this.userModel.find({}).select('viber').exec();
-        const allViberUsers = allOrders.concat(allUsers);
-        allViberUsers.map((user) => {
-            if (user.viber !== null) {
-                this.viber_bot.sendMessage({ id: user.viber }, [
-                    new TextMessage(msg),
-                    new KeyboardMessage(MAIN_KEYBOARD),
-                ]);
-            }
-        });
+        try {
+            const allOrders = await this.ordersModel.find({}).select('viber').exec();
+            const allUsers = await this.userModel.find({}).select('viber').exec();
+            const allViberUsers = allOrders.concat(allUsers);
+            allViberUsers.map((user) => {
+                if (user.viber !== null) {
+                    this.viber_bot.sendMessage({ id: user.viber }, [
+                        new TextMessage(msg),
+                        new KeyboardMessage(MAIN_KEYBOARD),
+                    ]);
+                }
+            });
+        }
+        catch (error) {
+            throw new Error(`Помилка надсилання повідомлення: ${error}`);
+        }
     }
     async sendMessageViber(chatId, msg) {
         try {
@@ -898,26 +974,22 @@ let MesengersService = class MesengersService {
     async startServer() {
         const http = require('http');
         const port = 8080;
-        for (let attempt = 0; attempt < 5; attempt++) {
-            try {
-                await ngrok
-                    .connect({
-                    addr: port,
-                    authtoken_from_env: true,
-                })
-                    .then(async (listener) => {
-                    console.log('publicUrl => ', listener.url());
-                    await http
-                        .createServer(this.viber_bot.middleware())
-                        .listen(port, () => this.viber_bot.setWebhook(listener.url()));
-                });
-                break;
-            }
-            catch (error) {
-                console.log('Can not connect to ngrok server. Attempting to restart...');
-                console.error(error);
-                await new Promise((resolve) => setTimeout(resolve, 10000));
-            }
+        try {
+            await ngrok
+                .connect({
+                addr: port,
+                authtoken_from_env: true,
+            })
+                .then(async (listener) => {
+                console.log('publicUrl => ', listener.url());
+                await http
+                    .createServer(this.viber_bot.middleware())
+                    .listen(port, () => this.viber_bot.setWebhook(listener.url()));
+            });
+        }
+        catch (error) {
+            console.log('Can not connect to ngrok server.');
+            console.error(error);
         }
     }
     async sendMessageTg(chatId, msg) {
@@ -970,7 +1042,7 @@ let MesengersService = class MesengersService {
                 return false;
             }
             else if (order.tg_chat !== null && order.active === true) {
-                const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"${order.description}".\n \nВ категорії:\n"${order.category[0].name} - ${order.category[0].subcategories[0].name}". \n \nОчікуйте на дзвінок або повідомлення`;
+                const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"${order.description}".\n \nВ категорії:\n"${order.category[0].name} - ${order.category[0].subcategories[0].name}". \n \nЯкщо Ваш профіль сподобаеться замовнику, він з Вами зв'яжеться. Очікуйте на дзвінок або повідомлення`;
                 await this.sendMessageTg(chatId, msgTrue);
                 order.approve_count += 1;
                 user.agree_order += 1;
@@ -985,7 +1057,7 @@ let MesengersService = class MesengersService {
                     accepted_users: order.accepted_users,
                 });
                 const msgOrder = `Виконавець ${user.firstName} готовий виконати ваше замовлення "${order.description}".
-      Ви можете написати йому в телеграм @${user.telegram}, або зателефонувати по номеру ${user.phone}. \n
+      Ви можете написати йому, або зателефонувати по номеру +${user.phone}. \n
       Посилання на профіль виконавця ${process.env.FRONT_LINK}artists/${user._id}.`;
                 await this.sendMessageTg(order.tg_chat.toString(), msgOrder);
                 if (user.photo.length > 0) {
@@ -1005,14 +1077,14 @@ let MesengersService = class MesengersService {
                 return true;
             }
             else if (order.viber !== null && order.active === true) {
-                const msgOrder = `Користувач ${user.firstName} готовий виконати ваше замовлення "${order.description}". \n Посилання на профіль виконавця: ${process.env.FRONT_LINK}artists/${user._id}.\n Ви можете написати йому у Viber, або зателефонувати по номеру. \n` +
+                const msgOrder = `Користувач ${user.firstName} готовий виконати ваше замовлення "${order.description}". \n Посилання на профіль виконавця: ${process.env.FRONT_LINK}artists/${user._id}.\n Ви можете написати йому, або зателефонувати по номеру. \n` +
                     `\n Телефон: +${phone}`;
                 await this.viber_bot.sendMessage({ id: order.viber }, [
                     new PictureMessage(user.master_photo.url),
                     new TextMessage(msgOrder),
                     new KeyboardMessage(MAIN_KEYBOARD),
                 ]);
-                const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"${order.description}".\n \nВ категорії:\n"${order.category[0].name} - ${order.category[0].subcategories[0].name}". \n \nОчікуйте на дзвінок або повідомлення`;
+                const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"${order.description}".\n \nВ категорії:\n"${order.category[0].name} - ${order.category[0].subcategories[0].name}". \n \nЯкщо Ваш профіль сподобаеться замовнику, він з Вами зв'яжеться. Очікуйте на дзвінок або повідомлення`;
                 await this.sendMessageTg(chatId, msgTrue);
                 order.approve_count = +1;
                 await this.ordersModel.findByIdAndUpdate(order.id, {

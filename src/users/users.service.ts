@@ -482,8 +482,24 @@ export class UsersService {
   }
 
   async validateUser(details: GoogleUserDto) {
-    const user = await this.userModel.findOne({ googleId: details.googleId });
     try {
+      const user = await this.userModel.findOne({ email: details.email });
+      if (user) {
+        if (user.googleId === details.googleId) {
+          await this.checkTrialStatus(user._id);
+          await this.createToken(user);
+          return await this.userModel.findOne({ _id: user.id });
+        } else {
+          await this.userModel.findByIdAndUpdate(
+            { _id: user.id },
+            { googleId: details.googleId },
+          );
+          await this.checkTrialStatus(user._id);
+          await this.createToken(user);
+          return await this.userModel.findOne({ _id: user.id });
+        }
+      }
+
       if (!user) {
         const trialEnds = new Date();
         trialEnds.setMonth(trialEnds.getMonth() + 2);
@@ -502,19 +518,31 @@ export class UsersService {
         await this.createToken(userUpdateToken);
         return await this.userModel.findById({ _id: userUpdateToken._id });
       }
-      await this.checkTrialStatus(user._id);
-      await this.createToken(user);
-      return await this.userModel.findOne({ _id: user.id });
     } catch (e) {
       throw new Error('Error validating user');
     }
   }
 
   async validateFacebook(details: any) {
-    const user = await this.userModel.findOne({
-      facebookId: details.facebookId,
-    });
     try {
+      const user = await this.userModel.findOne({
+        email: details.email,
+      });
+      if (user) {
+        if (user.facebookId === details.facebookId) {
+          await this.checkTrialStatus(user._id);
+          await this.createToken(user);
+          return await this.userModel.findOne({ _id: user.id });
+        } else {
+          await this.userModel.findByIdAndUpdate(
+            { _id: user.id },
+            { facebookId: details.facebookId },
+          );
+          await this.checkTrialStatus(user._id);
+          await this.createToken(user);
+          return await this.userModel.findOne({ _id: user.id });
+        }
+      }
       if (!user) {
         const trialEnds = new Date();
         trialEnds.setMonth(trialEnds.getMonth() + 2);
@@ -533,9 +561,6 @@ export class UsersService {
         await this.createToken(userUpdateToken);
         return await this.userModel.findById({ _id: userUpdateToken._id });
       }
-
-      await this.createToken(user);
-      return await this.userModel.findOne({ _id: user.id });
     } catch (e) {
       throw new Error('Error validating user');
     }
