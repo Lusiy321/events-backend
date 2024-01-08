@@ -1,26 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.rows = exports.paginateArray = exports.mergeAndRemoveDuplicates = exports.parseUser = void 0;
-async function parseUser(user) {
-    try {
-        const parseUser = {
-            id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            phone: user.phone,
-            master_photo: user.avatarURL,
-            location: user.location,
-        };
-        return parseUser;
-    }
-    catch (error) {
-        throw new Error('Invalid user');
-    }
-}
-exports.parseUser = parseUser;
+exports.rows = exports.paginateArray = exports.mergeAndRemoveDuplicates = void 0;
 function mergeAndRemoveDuplicates(...arrays) {
     const mergedArray = [].concat(...arrays);
-    const uniqueArray = Array.from(new Set(mergedArray));
+    const uniqueArray = mergedArray.filter((v, i, a) => a.findIndex((t) => t.id === v.id) === i);
     return uniqueArray;
 }
 exports.mergeAndRemoveDuplicates = mergeAndRemoveDuplicates;

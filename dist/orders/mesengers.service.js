@@ -24,41 +24,8 @@ const PictureMessage = require('viber-bot').Message.Picture;
 const users_model_1 = require("../users/users.model");
 const order_model_1 = require("./order.model");
 const ngrok = require("@ngrok/ngrok");
-const MAIN_KEYBOARD = {
-    Type: 'keyboard',
-    Revision: 1,
-    ButtonsGroupColumns: 3,
-    ButtonsGroupRows: 1,
-    Buttons: [
-        {
-            ActionType: 'open-url',
-            ActionBody: 'https://www.wechirka.com',
-            Text: '<font color="#FFFFFF" size="5">Перейти на наш сайт</font>',
-            TextSize: 'regular',
-            TextVAlign: 'middle',
-            TextHAlign: 'center',
-            BgColor: '#094356',
-        },
-        {
-            ActionType: 'reply',
-            ActionBody: `orders`,
-            Text: '<font color="#FFFFFF" size="5">Мої заявки (лише для замовників)</font>',
-            TextSize: 'regular',
-            TextVAlign: 'middle',
-            TextHAlign: 'center',
-            BgColor: '#094356',
-        },
-        {
-            ActionType: 'reply',
-            ActionBody: `review`,
-            Text: '<font color="#FFFFFF" size="5">Мої відгуки (лише для виконавців)</font>',
-            TextSize: 'regular',
-            TextVAlign: 'middle',
-            TextHAlign: 'center',
-            BgColor: '#094356',
-        },
-    ],
-};
+const new_order_msg_1 = require("./Telegram/new.order.msg");
+const main_keyboard_1 = require("./Viber/main.keyboard");
 let MesengersService = class MesengersService {
     constructor(ordersModel, userModel) {
         this.ordersModel = ordersModel;
@@ -72,51 +39,14 @@ let MesengersService = class MesengersService {
             const msg = `Привіт ${response.userProfile.name}. Я бот ресурсу ${this.viber_bot.name}! Щоб отримувати сповіщеня, відправте свій номер телефону у форматі 380981231122.\n\nСюди, Вам будуть надходити сповіщеня про замовлення або пропозиції від виконавців.`;
             this.viber_bot.sendMessage({ id: response.userProfile.id }, [
                 new TextMessage(msg),
-                new KeyboardMessage(MAIN_KEYBOARD),
+                new KeyboardMessage(main_keyboard_1.MAIN_KEYBOARD_VIBER),
             ]);
         });
-        function say(response, message) {
-            response.send(new KeyboardMessage(MAIN_KEYBOARD), new TextMessage(message));
-        }
         this.viber_bot.onTextMessage(/./, async (msg, res) => {
             try {
                 const userProfile = res.userProfile.name;
                 const userId = res.userProfile.id;
-                const MAIN_KEYBOARD = {
-                    Type: 'keyboard',
-                    Revision: 1,
-                    ButtonsGroupColumns: 3,
-                    ButtonsGroupRows: 1,
-                    Buttons: [
-                        {
-                            ActionType: 'open-url',
-                            ActionBody: 'https://www.wechirka.com',
-                            Text: '<font color="#FFFFFF" size="5">Перейти на наш сайт</font>',
-                            TextSize: 'large',
-                            TextVAlign: 'middle',
-                            TextHAlign: 'center',
-                            BgColor: '#094356',
-                        },
-                        {
-                            ActionType: 'reply',
-                            ActionBody: `orders:${userProfile}:${userId}`,
-                            Text: '<font color="#FFFFFF" size="5">Мої заявки (лише для замовників)</font>',
-                            TextSize: 'large',
-                            TextVAlign: 'middle',
-                            TextHAlign: 'center',
-                            BgColor: '#094356',
-                        },
-                        {
-                            ActionType: 'reply',
-                            ActionBody: `review:${userProfile}:${userId}`,
-                            Text: '<font color="#FFFFFF" size="5">Мої відгуки (лише для виконавців)</font>',
-                            TextSize: 'regular',
-                            TextVAlign: 'middle',
-                            TextHAlign: 'center',
-                            BgColor: '#094356',
-                        },
-                    ],
-                };
+                const MAIN_KEYBOARD = (0, main_keyboard_1.mainKeyboardViber)(userProfile, userId);
                 this.viber_bot.sendMessage({ id: res.userProfile.id }, new KeyboardMessage(MAIN_KEYBOARD));
                 const messageText = msg.text;
                 const phoneNumber = parseInt(messageText);
@@ -132,7 +62,10 @@ let MesengersService = class MesengersService {
                         await this.userModel.findByIdAndUpdate(user.id, {
                             disagree_order: user.disagree_order,
                         });
-                        say(res, 'Ви не погодились на пропозицію.');
+                        this.viber_bot.sendMessage({ id: chatId }, [
+                            new TextMessage('Ви не погодились на пропозицію.'),
+                            new KeyboardMessage(MAIN_KEYBOARD),
+                        ]);
                         break;
                     case 'orders':
                         await this.myOrdersList(chatId);
@@ -591,7 +524,7 @@ let MesengersService = class MesengersService {
                 const msg = `Ви вже погодились на це замовлення`;
                 this.viber_bot.sendMessage({ id: userChatId }, [
                     new TextMessage(msg),
-                    new KeyboardMessage(MAIN_KEYBOARD),
+                    new KeyboardMessage(main_keyboard_1.MAIN_KEYBOARD_VIBER),
                 ]);
                 return false;
             }
@@ -611,14 +544,14 @@ let MesengersService = class MesengersService {
                 });
                 this.viber_bot.sendMessage({ id: userChatId }, [
                     new TextMessage(msgTrue),
-                    new KeyboardMessage(MAIN_KEYBOARD),
+                    new KeyboardMessage(main_keyboard_1.MAIN_KEYBOARD_VIBER),
                 ]);
                 const msgOrder = `Користувач *${firstName}* готовий виконати ваше замовлення "*${description}*". \n Посилання на профіль виконавця: ${process.env.FRONT_LINK}artists/${_id}.\n Ви можете написати йому, або зателефонувати по номеру. \n` +
                     `\n Телефон: +${phone}`;
                 await this.viber_bot.sendMessage({ id: viber }, [
                     new PictureMessage(user.master_photo.url),
                     new TextMessage(msgOrder),
-                    new KeyboardMessage(MAIN_KEYBOARD),
+                    new KeyboardMessage(main_keyboard_1.MAIN_KEYBOARD_VIBER),
                 ]);
                 return true;
             }
@@ -644,7 +577,7 @@ let MesengersService = class MesengersService {
                 const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"*${order.description}*".\n \nВ категорії:\n"*${order.category[0].name} - ${order.category[0].subcategories[0].name}*". \n \nЯкщо Ваш профіль сподобаеться замовнику, він з Вами зв'яжеться. Очікуйте на дзвінок або повідомлення`;
                 this.viber_bot.sendMessage({ id: userChatId }, [
                     new TextMessage(msgTrue),
-                    new KeyboardMessage(MAIN_KEYBOARD),
+                    new KeyboardMessage(main_keyboard_1.MAIN_KEYBOARD_VIBER),
                 ]);
             }
             else if (viber === null && tg_chat === null) {
@@ -950,7 +883,7 @@ let MesengersService = class MesengersService {
                 if (user.viber !== null) {
                     this.viber_bot.sendMessage({ id: user.viber }, [
                         new TextMessage(msg),
-                        new KeyboardMessage(MAIN_KEYBOARD),
+                        new KeyboardMessage(main_keyboard_1.MAIN_KEYBOARD_VIBER),
                     ]);
                 }
             });
@@ -963,7 +896,7 @@ let MesengersService = class MesengersService {
         try {
             const message = await this.viber_bot.sendMessage({ id: chatId }, [
                 new TextMessage(msg),
-                new KeyboardMessage(MAIN_KEYBOARD),
+                new KeyboardMessage(main_keyboard_1.MAIN_KEYBOARD_VIBER),
             ]);
             return message;
         }
@@ -1021,7 +954,7 @@ let MesengersService = class MesengersService {
             }
             else if (viber) {
                 const msg = `Ваш код верифікації: ${viber.sms}\nПерейти на сайт: ${process.env.CODE_LINK}`;
-                await this.viber_bot.sendMessage({ id: chatId }, new TextMessage(msg), new KeyboardMessage(MAIN_KEYBOARD));
+                await this.viber_bot.sendMessage({ id: chatId }, new TextMessage(msg), new KeyboardMessage(main_keyboard_1.MAIN_KEYBOARD_VIBER));
             }
             else {
                 throw new Error(`Помилка надсилання повідомлення`);
@@ -1060,14 +993,12 @@ let MesengersService = class MesengersService {
       Ви можете написати йому, або зателефонувати по номеру +${user.phone}. \n
       Посилання на профіль виконавця ${process.env.FRONT_LINK}artists/${user._id}.`;
                 await this.sendMessageTg(order.tg_chat.toString(), msgOrder);
-                if (user.photo.length > 0) {
+                if (user.photo.length > 0 || user.video.length > 0) {
                     const images = user.photo.map((photos) => ({
                         type: 'photo',
                         media: photos.url,
                     }));
                     await this.tg_bot.sendMediaGroup(order.tg_chat.toString(), images);
-                }
-                if (user.video.length > 0) {
                     const videos = user.video.map((video) => ({
                         type: 'video',
                         media: video.url,
@@ -1082,7 +1013,7 @@ let MesengersService = class MesengersService {
                 await this.viber_bot.sendMessage({ id: order.viber }, [
                     new PictureMessage(user.master_photo.url),
                     new TextMessage(msgOrder),
-                    new KeyboardMessage(MAIN_KEYBOARD),
+                    new KeyboardMessage(main_keyboard_1.MAIN_KEYBOARD_VIBER),
                 ]);
                 const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"${order.description}".\n \nВ категорії:\n"${order.category[0].name} - ${order.category[0].subcategories[0].name}". \n \nЯкщо Ваш профіль сподобаеться замовнику, він з Вами зв'яжеться. Очікуйте на дзвінок або повідомлення`;
                 await this.sendMessageTg(chatId, msgTrue);
@@ -1109,33 +1040,8 @@ let MesengersService = class MesengersService {
     }
     async sendNewTgOrder(chatId, order) {
         try {
-            const msg = `Доброго дня, з'явилось нове повідомлення за Вашим профілем. 
-      Замовник: ${order.name}.
-      Дата події: ${order.date}.
-      Категорія: ${order.category[0].subcategories[0].name}.
-      Вимоги замовника: ${order.description}.
-      Локація: ${order.location}.
-      Гонорар: ${order.price}`;
-            const keyboard = {
-                inline_keyboard: [
-                    [
-                        {
-                            text: 'Згоден',
-                            callback_data: `accept:${order.phone}:${chatId}`,
-                        },
-                        {
-                            text: 'Не цікаво',
-                            callback_data: `disagree:${order.id}:${chatId}`,
-                        },
-                    ],
-                    [
-                        {
-                            text: 'Перейти на сайт',
-                            url: 'https://www.wechirka.com/',
-                        },
-                    ],
-                ],
-            };
+            const msg = (0, new_order_msg_1.newOrderMsg)(order);
+            const keyboard = (0, new_order_msg_1.newOrderKeyboard)(order, chatId);
             const result = await this.tg_bot.sendMessage(chatId, msg, {
                 reply_markup: keyboard,
             });

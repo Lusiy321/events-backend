@@ -115,14 +115,11 @@ let UsersController = class UsersController {
         return { message: 'Email send' };
     }
     async setEmailPsw(id) {
-        return this.usersService.sendVerificationEmail(id, 'https://show-swart.vercel.app/artists');
+        return this.usersService.sendVerificationEmail(id, `${process.env.FRONT_LINK}artists`);
     }
     async verifyEmail(id, res) {
         await this.usersService.verifyUserEmail(id);
         return res.redirect(`${process.env.FRONT_LINK}auth/login`);
-    }
-    callback(data) {
-        return console.log(data);
     }
 };
 exports.UsersController = UsersController;
@@ -215,7 +212,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "updateCat", null);
 __decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Update user' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Delet category' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
     (0, common_1.Delete)('/category/:id'),
@@ -388,13 +385,6 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "verifyEmail", null);
-__decorate([
-    (0, common_1.Post)('payment/callback'),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Object)
-], UsersController.prototype, "callback", null);
 exports.UsersController = UsersController = __decorate([
     (0, swagger_1.ApiTags)('User'),
     (0, common_1.Controller)('users'),

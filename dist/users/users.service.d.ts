@@ -28,15 +28,14 @@ export declare class UsersService {
     login(user: LoginUserDto): Promise<User>;
     logout(req: any): Promise<User>;
     update(user: UpdateUserDto, req: any): Promise<User>;
+    private addSubcategory;
     updateCategory(data: Categories, req: any): Promise<User>;
     deleteCategory(id: string, req: any): Promise<any>;
     deleteUserVideo(id: string, req: any): Promise<any>;
-    findOrCreateUser(googleId: string, firstName: string, email: string): Promise<any>;
     findToken(req: any): Promise<User>;
     createToken(authUser: {
         _id: string;
     }): Promise<any>;
     refreshAccessToken(req: any): Promise<User>;
     findCategory(): Promise<Category[]>;
-    monoPayment(amount: number): Promise<void>;
 }

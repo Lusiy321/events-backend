@@ -22,7 +22,6 @@ const jsonwebtoken_1 = require("jsonwebtoken");
 const category_model_1 = require("./category.model");
 const email_schemas_1 = require("./utils/email.schemas");
 const parse_user_1 = require("./utils/parse.user");
-const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 exports.TRANSPORTER_PROVIDER = 'TRANSPORTER_PROVIDER';
 let UsersService = class UsersService {
@@ -67,7 +66,8 @@ let UsersService = class UsersService {
             if ((req === '' && loc === '') ||
                 (!req && !loc) ||
                 (cat && !subcat) ||
-                (!cat && subcat)) {
+                (!cat && subcat) ||
+                (cat && subcat)) {
                 const category = await this.userModel
                     .find({
                     category: {
@@ -343,10 +343,9 @@ let UsersService = class UsersService {
                 const trialEnds = new Date();
                 trialEnds.setMonth(trialEnds.getMonth() + 2);
                 const createdUser = await this.userModel.create(Object.assign(Object.assign({}, user), { trial: true, trialEnds, paidEnds: trialEnds }));
-                createdUser.setName(lowerCaseEmail);
                 createdUser.setPassword(password);
                 createdUser.save();
-                const verificationLink = `${process.env.BACK_LINK}verify-email/${createdUser._id}`;
+                const verificationLink = `${process.env.BACK_LINK}users/verify-email/${createdUser._id}`;
                 await this.sendVerificationEmail(email, verificationLink);
                 return await this.userModel
                     .findById(createdUser._id)
@@ -432,8 +431,21 @@ let UsersService = class UsersService {
         }
     }
     async validateUser(details) {
-        const user = await this.userModel.findOne({ googleId: details.googleId });
         try {
+            const user = await this.userModel.findOne({ email: details.email });
+            if (user) {
+                if (user.googleId === details.googleId) {
+                    await this.checkTrialStatus(user._id);
+                    await this.createToken(user);
+                    return await this.userModel.findOne({ _id: user.id });
+                }
+                if (!user.googleId) {
+                    await this.userModel.findByIdAndUpdate({ _id: user.id }, { googleId: details.googleId });
+                    await this.checkTrialStatus(user._id);
+                    await this.createToken(user);
+                    return await this.userModel.findOne({ _id: user.id });
+                }
+            }
             if (!user) {
                 const trialEnds = new Date();
                 trialEnds.setMonth(trialEnds.getMonth() + 2);
@@ -443,22 +455,32 @@ let UsersService = class UsersService {
                 const userUpdateToken = await this.userModel.findOne({
                     email: details.email,
                 });
-                await this.createToken(userUpdateToken);
-                return await this.userModel.findById({ _id: userUpdateToken._id });
+                const newUser = await this.createToken(userUpdateToken);
+                return newUser;
             }
-            await this.checkTrialStatus(user._id);
-            await this.createToken(user);
-            return await this.userModel.findOne({ _id: user.id });
         }
         catch (e) {
             throw new Error('Error validating user');
         }
     }
     async validateFacebook(details) {
-        const user = await this.userModel.findOne({
-            facebookId: details.facebookId,
-        });
         try {
+            const user = await this.userModel.findOne({
+                email: details.email,
+            });
+            if (user) {
+                if (user.facebookId === details.facebookId) {
+                    await this.checkTrialStatus(user._id);
+                    const newUser = await this.createToken(user);
+                    return newUser;
+                }
+                if (!user.facebookId) {
+                    await this.userModel.findByIdAndUpdate({ _id: user.id }, { facebookId: details.facebookId });
+                    await this.checkTrialStatus(user._id);
+                    const newUser = await this.createToken(user);
+                    return newUser;
+                }
+            }
             if (!user) {
                 const trialEnds = new Date();
                 trialEnds.setMonth(trialEnds.getMonth() + 2);
@@ -469,11 +491,9 @@ let UsersService = class UsersService {
                     email: details.email,
                 });
                 await this.checkTrialStatus(user._id);
-                await this.createToken(userUpdateToken);
-                return await this.userModel.findById({ _id: userUpdateToken._id });
+                const newUser = await this.createToken(userUpdateToken);
+                return newUser;
             }
-            await this.createToken(user);
-            return await this.userModel.findOne({ _id: user.id });
         }
         catch (e) {
             throw new Error('Error validating user');
@@ -607,6 +627,13 @@ let UsersService = class UsersService {
             throw new http_errors_1.BadRequest(e.message);
         }
     }
+    async addSubcategory(categories, newCategory) {
+        const idSet = new Set(categories.map((obj) => obj._id));
+        newCategory.forEach((obj) => {
+            idSet.add(obj._id);
+        });
+        return Array.from(idSet).map((id) => newCategory.find((obj) => obj._id === id));
+    }
     async updateCategory(data, req) {
         try {
             const category = [data];
@@ -616,14 +643,7 @@ let UsersService = class UsersService {
             }
             const findUser = await this.userModel.findById(findId.id).exec();
             const arrCategory = findUser.category;
-            function addSubcategory(categories, newCategory) {
-                const idSet = new Set(categories.map((obj) => obj._id));
-                newCategory.forEach((obj) => {
-                    idSet.add(obj._id);
-                });
-                return Array.from(idSet).map((id) => newCategory.find((obj) => obj._id === id));
-            }
-            const newCategoryArr = addSubcategory(arrCategory, category);
+            const newCategoryArr = this.addSubcategory(arrCategory, category);
             await this.userModel.updateOne({ _id: findId.id }, {
                 $set: { category: newCategoryArr },
             });
@@ -683,23 +703,6 @@ let UsersService = class UsersService {
         }
         catch (e) {
             throw new http_errors_1.BadRequest(e.message);
-        }
-    }
-    async findOrCreateUser(googleId, firstName, email) {
-        try {
-            let user = await this.userModel.findOne({ googleId });
-            if (!user) {
-                user = await this.userModel.create({
-                    googleId,
-                    firstName,
-                    email,
-                });
-                user.setPassword(googleId);
-                return user.save();
-            }
-        }
-        catch (e) {
-            throw new http_errors_1.NotFound('User not found');
         }
     }
     async findToken(req) {
@@ -772,41 +775,6 @@ let UsersService = class UsersService {
         catch (e) {
             throw new http_errors_1.NotFound('User not found');
         }
-    }
-    async monoPayment(amount) {
-        const privateKey = 'ufV_RSdULOS - VD7HnIJGQCVCxdsn1VsPn6x6WgS5DfzM';
-        let pubKeyBase64 = 'LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFQUc1LzZ3NnZubGJZb0ZmRHlYWE4vS29CbVVjTgo3NWJSUWg4MFBhaEdldnJoanFCQnI3OXNSS0JSbnpHODFUZVQ5OEFOakU1c0R3RmZ5Znhub0ZJcmZBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==';
-        let xSignBase64 = 'MEUCIQC/mVKhi8FKoayul2Mim3E2oaIOCNJk5dEXxTqbkeJSOQIgOM0hsW0qcP2H8iXy1aQYpmY0SJWEaWur7nQXlKDCFxA=';
-        let message = `{
-    "invoiceId": "p2_9ZgpZVsl3",
-    "status": "created",
-    "failureReason": "string",
-    "amount": 4200,
-    "ccy": 980,
-    "finalAmount": 4200,
-    "createdDate": "2019-08-24T14:15:22Z",
-    "modifiedDate": "2019-08-24T14:15:22Z",
-    "reference": "84d0070ee4e44667b31371d8f8813947",
-    "cancelList": [
-      {
-        "status": "processing",
-        "amount": 4200,
-        "ccy": 980,
-        "createdDate": "2019-08-24T14:15:22Z",
-        "modifiedDate": "2019-08-24T14:15:22Z",
-        "approvalCode": "662476",
-        "rrn": "060189181768",
-        "extRef": "635ace02599849e981b2cd7a65f417fe"
-      }
-    ]
-  }`;
-        let signatureBuf = Buffer.from(xSignBase64, 'base64');
-        let publicKeyBuf = Buffer.from(pubKeyBase64, 'base64');
-        let verify = crypto.createVerify('SHA256');
-        verify.write(message);
-        verify.end();
-        let result = verify.verify(publicKeyBuf, signatureBuf);
-        console.log(result === true ? 'OK' : 'NOT OK');
     }
 };
 exports.UsersService = UsersService;

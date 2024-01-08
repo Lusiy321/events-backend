@@ -36,7 +36,6 @@ let GoogleStrategy = class GoogleStrategy extends (0, passport_1.PassportStrateg
                     url: profile._json.picture,
                 },
             });
-            await user.save();
             return user || null;
         }
         catch (e) {

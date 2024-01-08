@@ -76,7 +76,8 @@ export class UsersService {
         (req === '' && loc === '') ||
         (!req && !loc) ||
         (cat && !subcat) ||
-        (!cat && subcat)
+        (!cat && subcat) ||
+        (cat && subcat)
       ) {
         const category = await this.userModel
           .find({
@@ -103,6 +104,7 @@ export class UsersService {
           throw new NotFound('Users not found');
         } else {
           const result = paginateArray(resultArray, curentPage);
+
           const totalPages = Math.ceil(resultArray.length / limit);
           return {
             totalPages: totalPages,
@@ -829,26 +831,6 @@ export class UsersService {
     }
   }
 
-  async findOrCreateUser(
-    googleId: string,
-    firstName: string,
-    email: string,
-  ): Promise<any> {
-    try {
-      let user = await this.userModel.findOne({ googleId });
-      if (!user) {
-        user = await this.userModel.create({
-          googleId,
-          firstName,
-          email,
-        });
-        user.setPassword(googleId);
-        return user.save();
-      }
-    } catch (e) {
-      throw new NotFound('User not found');
-    }
-  }
   // JWT TOKEN
   async findToken(req: any): Promise<User> {
     try {
@@ -925,50 +907,50 @@ export class UsersService {
     }
   }
 
-  async monoPayment(amount: number) {
-    const privateKey = 'ufV_RSdULOS - VD7HnIJGQCVCxdsn1VsPn6x6WgS5DfzM';
-    let pubKeyBase64 =
-      'LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFQUc1LzZ3NnZubGJZb0ZmRHlYWE4vS29CbVVjTgo3NWJSUWg4MFBhaEdldnJoanFCQnI3OXNSS0JSbnpHODFUZVQ5OEFOakU1c0R3RmZ5Znhub0ZJcmZBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==';
+  // async monoPayment(amount: number) {
+  //   const privateKey = 'ufV_RSdULOS - VD7HnIJGQCVCxdsn1VsPn6x6WgS5DfzM';
+  //   let pubKeyBase64 =
+  //     'LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFQUc1LzZ3NnZubGJZb0ZmRHlYWE4vS29CbVVjTgo3NWJSUWg4MFBhaEdldnJoanFCQnI3OXNSS0JSbnpHODFUZVQ5OEFOakU1c0R3RmZ5Znhub0ZJcmZBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==';
 
-    let xSignBase64 =
-      'MEUCIQC/mVKhi8FKoayul2Mim3E2oaIOCNJk5dEXxTqbkeJSOQIgOM0hsW0qcP2H8iXy1aQYpmY0SJWEaWur7nQXlKDCFxA=';
+  //   let xSignBase64 =
+  //     'MEUCIQC/mVKhi8FKoayul2Mim3E2oaIOCNJk5dEXxTqbkeJSOQIgOM0hsW0qcP2H8iXy1aQYpmY0SJWEaWur7nQXlKDCFxA=';
 
-    let message = `{
-    "invoiceId": "p2_9ZgpZVsl3",
-    "status": "created",
-    "failureReason": "string",
-    "amount": 4200,
-    "ccy": 980,
-    "finalAmount": 4200,
-    "createdDate": "2019-08-24T14:15:22Z",
-    "modifiedDate": "2019-08-24T14:15:22Z",
-    "reference": "84d0070ee4e44667b31371d8f8813947",
-    "cancelList": [
-      {
-        "status": "processing",
-        "amount": 4200,
-        "ccy": 980,
-        "createdDate": "2019-08-24T14:15:22Z",
-        "modifiedDate": "2019-08-24T14:15:22Z",
-        "approvalCode": "662476",
-        "rrn": "060189181768",
-        "extRef": "635ace02599849e981b2cd7a65f417fe"
-      }
-    ]
-  }`;
+  //   let message = `{
+  //   "invoiceId": "p2_9ZgpZVsl3",
+  //   "status": "created",
+  //   "failureReason": "string",
+  //   "amount": 4200,
+  //   "ccy": 980,
+  //   "finalAmount": 4200,
+  //   "createdDate": "2019-08-24T14:15:22Z",
+  //   "modifiedDate": "2019-08-24T14:15:22Z",
+  //   "reference": "84d0070ee4e44667b31371d8f8813947",
+  //   "cancelList": [
+  //     {
+  //       "status": "processing",
+  //       "amount": 4200,
+  //       "ccy": 980,
+  //       "createdDate": "2019-08-24T14:15:22Z",
+  //       "modifiedDate": "2019-08-24T14:15:22Z",
+  //       "approvalCode": "662476",
+  //       "rrn": "060189181768",
+  //       "extRef": "635ace02599849e981b2cd7a65f417fe"
+  //     }
+  //   ]
+  // }`;
 
-    let signatureBuf = Buffer.from(xSignBase64, 'base64');
-    let publicKeyBuf = Buffer.from(pubKeyBase64, 'base64');
+  //   let signatureBuf = Buffer.from(xSignBase64, 'base64');
+  //   let publicKeyBuf = Buffer.from(pubKeyBase64, 'base64');
 
-    let verify = crypto.createVerify('SHA256');
+  //   let verify = crypto.createVerify('SHA256');
 
-    verify.write(message);
-    verify.end();
+  //   verify.write(message);
+  //   verify.end();
 
-    let result = verify.verify(publicKeyBuf, signatureBuf);
+  //   let result = verify.verify(publicKeyBuf, signatureBuf);
 
-    console.log(result === true ? 'OK' : 'NOT OK');
-  }
+  //   console.log(result === true ? 'OK' : 'NOT OK');
+  // }
 }
 
 UserSchema.methods.setPassword = async function (password: string) {

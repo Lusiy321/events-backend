@@ -186,7 +186,6 @@ export class UsersController {
   ): Promise<User> {
     const user = await this.usersService.findToken(req);
     await this.cloudinaryService.uploadAvatar(user, images);
-    // await this.cloudinaryService.deleteFilesInUploadsFolder();
     return await this.usersService.findById(user.id);
   }
 
@@ -293,10 +292,5 @@ export class UsersController {
   async verifyEmail(@Param('Id') id: string, @Res() res: any) {
     await this.usersService.verifyUserEmail(id);
     return res.redirect(`${process.env.FRONT_LINK}auth/login`);
-  }
-
-  @Post('payment/callback')
-  callback(@Body() data: any): any {
-    return console.log(data);
   }
 }

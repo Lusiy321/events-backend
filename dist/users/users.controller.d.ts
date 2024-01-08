@@ -40,5 +40,4 @@ export declare class UsersController {
     }>;
     setEmailPsw(id: string): Promise<any>;
     verifyEmail(id: string, res: any): Promise<any>;
-    callback(data: any): any;
 }
