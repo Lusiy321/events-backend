@@ -359,7 +359,7 @@ export class UsersService {
   async findById(id: string): Promise<User> {
     try {
       const find = await this.userModel.findById(id).select('-password').exec();
-      await this.checkTrialStatus(id);
+      // await this.checkTrialStatus(id);
       return find;
     } catch (e) {
       throw new NotFound('User not found');
