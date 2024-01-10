@@ -730,15 +730,35 @@ export class UsersService {
     categories: Categories[],
     newCategory: Categories[],
   ): Promise<Categories[]> {
-    const idSet = new Set(categories.map((obj) => obj._id));
+    const idSet = new Set<string>();
+
+    // Добавляем все _id из categories в множество
+    categories.forEach((obj) => {
+      if (obj._id) {
+        idSet.add(obj._id);
+      }
+    });
+
+    // Добавляем все _id из newCategory в множество
     newCategory.forEach((obj) => {
       if (obj._id) {
         idSet.add(obj._id);
       }
     });
-    return Array.from(idSet).map((id) =>
-      newCategory.find((obj) => obj._id === id),
-    );
+
+    // Создаем новый массив, включая только объекты с уникальными _id
+    const uniqueObjects = Array.from(idSet).map((id) => {
+      // Находим первый объект в newCategory с соответствующим _id
+      const matchingObject = newCategory.find((obj) => obj._id === id);
+
+      // Если объект найден, возвращаем его
+      return matchingObject || null;
+    });
+
+    // Отфильтровываем возможные значения null
+    const result = uniqueObjects.filter((obj) => obj !== null);
+
+    return result as Categories[];
   }
 
   async updateCategory(data: Categories, req: any): Promise<User> {

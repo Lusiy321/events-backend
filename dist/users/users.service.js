@@ -627,13 +627,23 @@ let UsersService = class UsersService {
         }
     }
     async addSubcategory(categories, newCategory) {
-        const idSet = new Set(categories.map((obj) => obj._id));
+        const idSet = new Set();
+        categories.forEach((obj) => {
+            if (obj._id) {
+                idSet.add(obj._id);
+            }
+        });
         newCategory.forEach((obj) => {
             if (obj._id) {
                 idSet.add(obj._id);
             }
         });
-        return Array.from(idSet).map((id) => newCategory.find((obj) => obj._id === id));
+        const uniqueObjects = Array.from(idSet).map((id) => {
+            const matchingObject = newCategory.find((obj) => obj._id === id);
+            return matchingObject || null;
+        });
+        const result = uniqueObjects.filter((obj) => obj !== null);
+        return result;
     }
     async updateCategory(data, req) {
         try {
