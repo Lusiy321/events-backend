@@ -732,14 +732,18 @@ export class UsersService {
   ): Promise<Categories[]> {
     const idSet = new Set(categories.map((obj) => obj._id));
     newCategory.forEach((obj) => {
-      idSet.add(obj._id);
+      if (obj._id) {
+        idSet.add(obj._id);
+      }
     });
-    return Array.from(idSet).map(
-      (id) => newCategory.find((obj) => obj._id === id)!,
+    return Array.from(idSet).map((id) =>
+      newCategory.find((obj) => obj._id === id),
     );
   }
+
   async updateCategory(data: Categories, req: any): Promise<User> {
     try {
+      console.log(data);
       const category = [data];
       const findId = await this.findToken(req);
 
@@ -751,6 +755,7 @@ export class UsersService {
       const arrCategory = findUser.category;
 
       const newCategoryArr = await this.addSubcategory(arrCategory, category);
+      console.log(newCategoryArr);
       await this.userModel.updateOne(
         { _id: findId.id },
         {

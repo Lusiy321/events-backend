@@ -629,12 +629,15 @@ let UsersService = class UsersService {
     async addSubcategory(categories, newCategory) {
         const idSet = new Set(categories.map((obj) => obj._id));
         newCategory.forEach((obj) => {
-            idSet.add(obj._id);
+            if (obj._id) {
+                idSet.add(obj._id);
+            }
         });
         return Array.from(idSet).map((id) => newCategory.find((obj) => obj._id === id));
     }
     async updateCategory(data, req) {
         try {
+            console.log(data);
             const category = [data];
             const findId = await this.findToken(req);
             if (!findId) {
@@ -643,6 +646,7 @@ let UsersService = class UsersService {
             const findUser = await this.userModel.findById(findId.id).exec();
             const arrCategory = findUser.category;
             const newCategoryArr = await this.addSubcategory(arrCategory, category);
+            console.log(newCategoryArr);
             await this.userModel.updateOne({ _id: findId.id }, {
                 $set: { category: newCategoryArr },
             });
