@@ -279,12 +279,9 @@ export class UsersController {
   })
   @ApiResponse({ status: 200, type: Object })
   @HttpCode(200)
-  @Post('/send-email/:Id')
-  async setEmailPsw(@Param('Id') id: string): Promise<any> {
-    return this.usersService.sendVerificationEmail(
-      id,
-      `${process.env.FRONT_LINK}artists`,
-    );
+  @Post('/send-email/:email')
+  async setEmailPsw(@Param('email') email: string): Promise<any> {
+    return this.usersService.sendVerificationEmail(email);
   }
 
   @ApiOperation({ summary: 'Verify user email' })

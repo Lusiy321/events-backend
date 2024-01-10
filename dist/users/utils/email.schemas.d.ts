@@ -1,1 +1,1 @@
-export declare function verifyEmailMsg(verificationLink: string): Promise<string>;
+export declare function verifyEmailMsg(id: string): Promise<string>;

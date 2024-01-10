@@ -38,6 +38,6 @@ export declare class UsersController {
     forgotPwd(email: MailUserDto): Promise<{
         message: string;
     }>;
-    setEmailPsw(id: string): Promise<any>;
+    setEmailPsw(email: string): Promise<any>;
     verifyEmail(id: string, res: any): Promise<any>;
 }

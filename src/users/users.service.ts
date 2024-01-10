@@ -389,9 +389,7 @@ export class UsersService {
         });
         createdUser.setPassword(password);
         createdUser.save();
-
-        const verificationLink = `${process.env.BACK_LINK}users/verify-email/${createdUser._id}`;
-        await this.sendVerificationEmail(email, verificationLink);
+        await this.sendVerificationEmail(email);
         return await this.userModel
           .findById(createdUser._id)
           .select(rows)
@@ -419,12 +417,10 @@ export class UsersService {
     }
   }
 
-  async sendVerificationEmail(
-    email: string,
-    verificationLink: string,
-  ): Promise<void> {
+  async sendVerificationEmail(email: string): Promise<void> {
     try {
-      const body = await verifyEmailMsg(verificationLink);
+      const user = this.userModel.findOne({ email: email });
+      const body = await verifyEmailMsg(user.id);
       const msg = {
         from: process.env.NOREPLY_MAIL,
         to: email,
@@ -754,8 +750,7 @@ export class UsersService {
       const findUser = await this.userModel.findById(findId.id).exec();
       const arrCategory = findUser.category;
 
-      const newCategoryArr = this.addSubcategory(arrCategory, category);
-
+      const newCategoryArr = await this.addSubcategory(arrCategory, category);
       await this.userModel.updateOne(
         { _id: findId.id },
         {

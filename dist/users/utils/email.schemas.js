@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyEmailMsg = void 0;
-async function verifyEmailMsg(verificationLink) {
+async function verifyEmailMsg(id) {
     return `<!DOCTYPE html>
 <html lang="ua">
 
@@ -65,7 +65,7 @@ async function verifyEmailMsg(verificationLink) {
         <h1>Вітаємо з реєстрацією на WECHIRKA.COM</h1>
         <p>Дякуємо за реєстрацію на нашій платформі.</p>
         <p>Щоб завершити реєстрацію, натисніть кнопку нижче, щоб підтвердити свою електронну адресу:</p>
-        <a href="${verificationLink}" class="button">Підтвердити E-mail</a>
+        <a href="${process.env.BACK_LINK}users/verify-email/${id}" class="button">Підтвердити E-mail</a>
         <p>Якщо ви не зареєструвалися на нашій платформі, не звертайте уваги на цей електронний лист.</p>
         <p>З найкращими побажаннями,<br><br>Команда <a href="https://www.wechirka.com/">wechirka</a></p>
     </div>

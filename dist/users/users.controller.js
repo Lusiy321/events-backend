@@ -114,8 +114,8 @@ let UsersController = class UsersController {
         await this.usersService.restorePassword(email);
         return { message: 'Email send' };
     }
-    async setEmailPsw(id) {
-        return this.usersService.sendVerificationEmail(id, `${process.env.FRONT_LINK}artists`);
+    async setEmailPsw(email) {
+        return this.usersService.sendVerificationEmail(email);
     }
     async verifyEmail(id, res) {
         await this.usersService.verifyUserEmail(id);
@@ -370,8 +370,8 @@ __decorate([
     }),
     (0, swagger_1.ApiResponse)({ status: 200, type: Object }),
     (0, common_1.HttpCode)(200),
-    (0, common_1.Post)('/send-email/:Id'),
-    __param(0, (0, common_1.Param)('Id')),
+    (0, common_1.Post)('/send-email/:email'),
+    __param(0, (0, common_1.Param)('email')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)

@@ -19,7 +19,7 @@ export declare class UsersService {
     findById(id: string): Promise<User>;
     create(user: CreateUserDto): Promise<User>;
     checkTrialStatus(id: string): Promise<boolean>;
-    sendVerificationEmail(email: string, verificationLink: string): Promise<void>;
+    sendVerificationEmail(email: string): Promise<void>;
     verifyUserEmail(id: any): Promise<void>;
     changePassword(req: any, newPass: PasswordUserDto): Promise<User>;
     validateUser(details: GoogleUserDto): Promise<any>;
