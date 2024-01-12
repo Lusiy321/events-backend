@@ -206,7 +206,7 @@ export class User extends Model<User> {
     type: Array<Object>,
     default: [],
   })
-  category: Array<Categories>;
+  category: Categories[];
 
   @ApiProperty({ example: 'true', description: 'User status' })
   @Prop({

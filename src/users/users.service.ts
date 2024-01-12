@@ -728,43 +728,30 @@ export class UsersService {
   }
   private async addSubcategory(
     categories: Categories[],
-    newCategory: Categories[],
+    newCategory: Categories,
   ): Promise<Categories[]> {
-    const idSet = new Set<string>();
-
-    // Добавляем все _id из categories в множество
-    categories.forEach((obj) => {
-      if (obj._id) {
-        idSet.add(obj._id);
+    const updatedCategories = categories.map((category) => {
+      if (category._id === newCategory._id) {
+        category.subcategories = [
+          ...category.subcategories,
+          ...newCategory.subcategories,
+        ];
       }
+
+      return category;
     });
 
-    // Добавляем все _id из newCategory в множество
-    newCategory.forEach((obj) => {
-      if (obj._id) {
-        idSet.add(obj._id);
-      }
-    });
+    if (!categories.some((category) => category._id === newCategory._id)) {
+      updatedCategories.push(newCategory);
+    }
 
-    // Создаем новый массив, включая только объекты с уникальными _id
-    const uniqueObjects = Array.from(idSet).map((id) => {
-      // Находим первый объект в newCategory с соответствующим _id
-      const matchingObject = newCategory.find((obj) => obj._id === id);
-
-      // Если объект найден, возвращаем его
-      return matchingObject || null;
-    });
-
-    // Отфильтровываем возможные значения null
-    const result = uniqueObjects.filter((obj) => obj !== null);
-
-    return result as Categories[];
+    return updatedCategories;
   }
 
   async updateCategory(data: Categories, req: any): Promise<User> {
     try {
-      console.log(data);
-      const category = [data];
+      const newCategory = data;
+
       const findId = await this.findToken(req);
 
       if (!findId) {
@@ -774,8 +761,10 @@ export class UsersService {
       const findUser = await this.userModel.findById(findId.id).exec();
       const arrCategory = findUser.category;
 
-      const newCategoryArr = await this.addSubcategory(arrCategory, category);
-      console.log(newCategoryArr);
+      const newCategoryArr = await this.addSubcategory(
+        arrCategory,
+        newCategory,
+      );
       await this.userModel.updateOne(
         { _id: findId.id },
         {

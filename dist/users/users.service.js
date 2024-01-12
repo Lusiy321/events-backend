@@ -627,36 +627,30 @@ let UsersService = class UsersService {
         }
     }
     async addSubcategory(categories, newCategory) {
-        const idSet = new Set();
-        categories.forEach((obj) => {
-            if (obj._id) {
-                idSet.add(obj._id);
+        const updatedCategories = categories.map((category) => {
+            if (category._id === newCategory._id) {
+                category.subcategories = [
+                    ...category.subcategories,
+                    ...newCategory.subcategories,
+                ];
             }
+            return category;
         });
-        newCategory.forEach((obj) => {
-            if (obj._id) {
-                idSet.add(obj._id);
-            }
-        });
-        const uniqueObjects = Array.from(idSet).map((id) => {
-            const matchingObject = newCategory.find((obj) => obj._id === id);
-            return matchingObject || null;
-        });
-        const result = uniqueObjects.filter((obj) => obj !== null);
-        return result;
+        if (!categories.some((category) => category._id === newCategory._id)) {
+            updatedCategories.push(newCategory);
+        }
+        return updatedCategories;
     }
     async updateCategory(data, req) {
         try {
-            console.log(data);
-            const category = [data];
+            const newCategory = data;
             const findId = await this.findToken(req);
             if (!findId) {
                 throw new http_errors_1.Unauthorized('jwt expired');
             }
             const findUser = await this.userModel.findById(findId.id).exec();
             const arrCategory = findUser.category;
-            const newCategoryArr = await this.addSubcategory(arrCategory, category);
-            console.log(newCategoryArr);
+            const newCategoryArr = await this.addSubcategory(arrCategory, newCategory);
             await this.userModel.updateOne({ _id: findId.id }, {
                 $set: { category: newCategoryArr },
             });

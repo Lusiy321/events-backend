@@ -42,7 +42,7 @@ export declare class User extends Model<User> {
     avatar: Photo;
     photo: Photo[];
     video: Photo[];
-    category: Array<Categories>;
+    category: Categories[];
     isOnline: boolean;
     paid: boolean;
     trial: boolean;
