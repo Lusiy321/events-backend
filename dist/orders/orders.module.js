@@ -14,6 +14,7 @@ const mongoose_1 = require("@nestjs/mongoose");
 const order_model_1 = require("./order.model");
 const users_model_1 = require("../users/users.model");
 const mesengers_service_1 = require("./mesengers.service");
+const order_archive_model_1 = require("./order.archive.model");
 let OrdersModule = class OrdersModule {
 };
 exports.OrdersModule = OrdersModule;
@@ -23,6 +24,11 @@ exports.OrdersModule = OrdersModule = __decorate([
             mongoose_1.MongooseModule.forFeature([
                 { name: order_model_1.Orders.name, schema: order_model_1.OrderSchema, collection: 'orders' },
                 { name: users_model_1.User.name, schema: users_model_1.UserSchema, collection: 'users' },
+                {
+                    name: order_archive_model_1.OrdersArchive.name,
+                    schema: order_archive_model_1.OrdersArchiveSchema,
+                    collection: 'orders-archive',
+                },
             ]),
         ],
         controllers: [orders_controller_1.OrdersController],

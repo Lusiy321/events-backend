@@ -22,29 +22,30 @@
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
-import * as TelegramBot from 'node-telegram-bot-api';
-export declare const ViberBot: any;
-import { User } from 'src/users/users.model';
-import { Orders } from 'src/orders/order.model';
-import { OrdersArchive } from './order.archive.model';
 import { Model } from 'mongoose';
-export declare class MesengersService {
-    private ordersModel;
-    private ordersArchiveModel;
-    private userModel;
-    private viber_bot;
-    private tg_bot;
-    constructor(ordersModel: Orders, ordersArchiveModel: Model<OrdersArchive>, userModel: User);
-    sendNewViberOrder(userId: string, order: Orders): Promise<void>;
-    sendViberAgreement(orderPhone: string, userChatId: string): Promise<boolean>;
-    myOrdersList(chatId: string): Promise<void>;
-    myReviewList(chatId: string): Promise<void>;
-    sendMessagesToAllViberUsers(msg: string): Promise<void>;
-    sendMessageViber(chatId: string, msg: string): Promise<any>;
-    startServer(): Promise<void>;
-    sendMessageTg(chatId: string, msg: string): Promise<TelegramBot.Message>;
-    sendMessagesToAllTgUsers(msg: string): Promise<void>;
-    sendCode(chatId: string): Promise<void>;
-    sendTgAgreement(phone: string, chatId: string): Promise<boolean>;
-    sendNewTgOrder(chatId: string, order: Orders): Promise<TelegramBot.Message>;
+import { Categories } from 'src/users/dto/caterory.interface';
+export type OrdersDocument = OrdersArchive & Document;
+export declare class OrdersArchive extends Model<OrdersArchive> {
+    phone: string;
+    name: string;
+    description: string;
+    category: Array<Categories>;
+    telegram: string;
+    tg_chat: number;
+    botLink: string;
+    exactLocation: string;
+    viber: string;
+    location: string;
+    price: string;
+    date: string;
+    active: boolean;
+    sms: number;
+    verify: boolean;
+    approve_count: number;
+    accepted_users: Array<string>;
 }
+export declare const OrdersArchiveSchema: import("mongoose").Schema<OrdersArchive, Model<OrdersArchive, any, any, any, import("mongoose").Document<unknown, any, OrdersArchive> & OrdersArchive & {
+    _id: import("mongoose").Types.ObjectId;
+}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, OrdersArchive, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<OrdersArchive>> & import("mongoose").FlatRecord<OrdersArchive> & {
+    _id: import("mongoose").Types.ObjectId;
+}>;

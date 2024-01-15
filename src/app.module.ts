@@ -14,6 +14,12 @@ import { AdminModule } from './admin/admin.module';
 import { Admin, AdminSchema } from './admin/admin.model';
 import { PostsModule } from './posts/posts.module';
 import { BannersModule } from './banners/banners.module';
+import {
+  OrdersArchive,
+  OrdersArchiveSchema,
+} from './orders/order.archive.model';
+import { Banner, BannerSchema } from './banners/banners.model';
+import { PostSchema, Posts } from './posts/posts.model';
 
 @Module({
   controllers: [UsersController, AdminController],
@@ -25,15 +31,17 @@ import { BannersModule } from './banners/banners.module';
     MongooseModule.forRoot(process.env.DB_HOST),
     MongooseModule.forFeature([
       { name: Admin.name, schema: AdminSchema, collection: 'admins' },
-    ]),
-    MongooseModule.forFeature([
       { name: User.name, schema: UserSchema, collection: 'users' },
-    ]),
-    MongooseModule.forFeature([
       { name: Category.name, schema: CategorySchema, collection: 'categories' },
-    ]),
-    MongooseModule.forFeature([
       { name: Orders.name, schema: OrderSchema, collection: 'orders' },
+      { name: Banner.name, schema: BannerSchema, collection: 'banners' },
+      { name: Posts.name, schema: PostSchema, collection: 'posts' },
+
+      {
+        name: OrdersArchive.name,
+        schema: OrdersArchiveSchema,
+        collection: 'orders-archive',
+      },
     ]),
     UsersModule,
     OrdersModule,

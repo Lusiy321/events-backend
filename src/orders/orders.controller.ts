@@ -13,7 +13,6 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Orders } from './order.model';
 import { CreateOrderDto } from './dto/create.order.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Conflict, NotFound, BadRequest, Unauthorized } from 'http-errors';
 
 @ApiTags('Orders')
 @Controller('orders')

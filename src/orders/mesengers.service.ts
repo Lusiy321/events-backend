@@ -12,6 +12,8 @@ import { Orders } from 'src/orders/order.model';
 import * as ngrok from '@ngrok/ngrok';
 import { newOrderKeyboard, newOrderMsg } from './Telegram/new.order.msg';
 import { MAIN_KEYBOARD_VIBER, mainKeyboardViber } from './Viber/main.keyboard';
+import { OrdersArchive } from './order.archive.model';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class MesengersService {
@@ -20,6 +22,8 @@ export class MesengersService {
   constructor(
     @InjectModel(Orders.name)
     private ordersModel: Orders,
+    @InjectModel(OrdersArchive.name)
+    private ordersArchiveModel: Model<OrdersArchive>,
     @InjectModel(User.name)
     private userModel: User,
   ) {
@@ -27,8 +31,7 @@ export class MesengersService {
     this.viber_bot = new ViberBot({
       authToken: process.env.VIBER_ACCESS_TOKEN,
       name: 'Wechirka',
-      avatar:
-        'https://res.cloudinary.com/dciy3u6un/image/upload/v1701947849/service/paanrsds5krezvpreog0.webp',
+      avatar: process.env.VIBER_AVATAR,
     });
 
     // MSG ON BOT STARTED
@@ -80,13 +83,13 @@ export class MesengersService {
             await this.myReviewList(chatId);
             break;
           case 'delete':
-            const delOrder = await this.ordersModel.findById(phone);
+            const order = await this.ordersModel.findById(phone);
             this.viber_bot.sendMessage({ id: chatId }, [
-              new TextMessage(
-                `Ви видалили замевлення: ${delOrder.description}.`,
-              ),
+              new TextMessage(`Ви видалили замевлення: ${order.description}.`),
               new KeyboardMessage(MAIN_KEYBOARD),
             ]);
+            const archivedOrder = new this.ordersArchiveModel(order.toObject());
+            await archivedOrder.save();
             await this.userModel.updateMany(
               { accepted_orders: phone },
               { $pull: { accepted_orders: phone } },
@@ -511,6 +514,10 @@ export class MesengersService {
               `Ви видалили замевлення: ${delOrder.description}.`,
               optURL,
             );
+            const archivedOrder = new this.ordersArchiveModel(
+              delOrder.toObject(),
+            );
+            await archivedOrder.save();
             await this.userModel.updateMany(
               { accepted_orders: phone },
               { $pull: { accepted_orders: phone } },

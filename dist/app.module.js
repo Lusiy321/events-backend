@@ -23,6 +23,9 @@ const admin_module_1 = require("./admin/admin.module");
 const admin_model_1 = require("./admin/admin.model");
 const posts_module_1 = require("./posts/posts.module");
 const banners_module_1 = require("./banners/banners.module");
+const order_archive_model_1 = require("./orders/order.archive.model");
+const banners_model_1 = require("./banners/banners.model");
+const posts_model_1 = require("./posts/posts.model");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -37,15 +40,16 @@ exports.AppModule = AppModule = __decorate([
             mongoose_1.MongooseModule.forRoot(process.env.DB_HOST),
             mongoose_1.MongooseModule.forFeature([
                 { name: admin_model_1.Admin.name, schema: admin_model_1.AdminSchema, collection: 'admins' },
-            ]),
-            mongoose_1.MongooseModule.forFeature([
                 { name: users_model_1.User.name, schema: users_model_1.UserSchema, collection: 'users' },
-            ]),
-            mongoose_1.MongooseModule.forFeature([
                 { name: category_model_1.Category.name, schema: category_model_1.CategorySchema, collection: 'categories' },
-            ]),
-            mongoose_1.MongooseModule.forFeature([
                 { name: order_model_1.Orders.name, schema: order_model_1.OrderSchema, collection: 'orders' },
+                { name: banners_model_1.Banner.name, schema: banners_model_1.BannerSchema, collection: 'banners' },
+                { name: posts_model_1.Posts.name, schema: posts_model_1.PostSchema, collection: 'posts' },
+                {
+                    name: order_archive_model_1.OrdersArchive.name,
+                    schema: order_archive_model_1.OrdersArchiveSchema,
+                    collection: 'orders-archive',
+                },
             ]),
             users_module_1.UsersModule,
             orders_module_1.OrdersModule,

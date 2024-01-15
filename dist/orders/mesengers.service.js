@@ -26,14 +26,17 @@ const order_model_1 = require("./order.model");
 const ngrok = require("@ngrok/ngrok");
 const new_order_msg_1 = require("./Telegram/new.order.msg");
 const main_keyboard_1 = require("./Viber/main.keyboard");
+const order_archive_model_1 = require("./order.archive.model");
+const mongoose_2 = require("mongoose");
 let MesengersService = class MesengersService {
-    constructor(ordersModel, userModel) {
+    constructor(ordersModel, ordersArchiveModel, userModel) {
         this.ordersModel = ordersModel;
+        this.ordersArchiveModel = ordersArchiveModel;
         this.userModel = userModel;
         this.viber_bot = new exports.ViberBot({
             authToken: process.env.VIBER_ACCESS_TOKEN,
             name: 'Wechirka',
-            avatar: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701947849/service/paanrsds5krezvpreog0.webp',
+            avatar: process.env.VIBER_AVATAR,
         });
         this.viber_bot.onSubscribe(async (response) => {
             const msg = `Привіт ${response.userProfile.name}. Я бот ресурсу ${this.viber_bot.name}! Щоб отримувати сповіщеня, відправте свій номер телефону у форматі 380981231122.\n\nСюди, Вам будуть надходити сповіщеня про замовлення або пропозиції від виконавців.`;
@@ -74,11 +77,13 @@ let MesengersService = class MesengersService {
                         await this.myReviewList(chatId);
                         break;
                     case 'delete':
-                        const delOrder = await this.ordersModel.findById(phone);
+                        const order = await this.ordersModel.findById(phone);
                         this.viber_bot.sendMessage({ id: chatId }, [
-                            new TextMessage(`Ви видалили замевлення: ${delOrder.description}.`),
+                            new TextMessage(`Ви видалили замевлення: ${order.description}.`),
                             new KeyboardMessage(MAIN_KEYBOARD),
                         ]);
+                        const archivedOrder = new this.ordersArchiveModel(order.toObject());
+                        await archivedOrder.save();
                         await this.userModel.updateMany({ accepted_orders: phone }, { $pull: { accepted_orders: phone } });
                         await this.ordersModel.findByIdAndRemove(phone);
                         break;
@@ -410,6 +415,8 @@ let MesengersService = class MesengersService {
                     case 'delete':
                         const delOrder = await this.ordersModel.findById(phone);
                         this.tg_bot.sendMessage(chatId, `Ви видалили замевлення: ${delOrder.description}.`, optURL);
+                        const archivedOrder = new this.ordersArchiveModel(delOrder.toObject());
+                        await archivedOrder.save();
                         await this.userModel.updateMany({ accepted_orders: phone }, { $pull: { accepted_orders: phone } });
                         await this.ordersModel.findByIdAndRemove(phone);
                         break;
@@ -1056,8 +1063,10 @@ exports.MesengersService = MesengersService;
 exports.MesengersService = MesengersService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(order_model_1.Orders.name)),
-    __param(1, (0, mongoose_1.InjectModel)(users_model_1.User.name)),
+    __param(1, (0, mongoose_1.InjectModel)(order_archive_model_1.OrdersArchive.name)),
+    __param(2, (0, mongoose_1.InjectModel)(users_model_1.User.name)),
     __metadata("design:paramtypes", [order_model_1.Orders,
+        mongoose_2.Model,
         users_model_1.User])
 ], MesengersService);
 //# sourceMappingURL=mesengers.service.js.map
