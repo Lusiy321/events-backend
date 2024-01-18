@@ -100,7 +100,11 @@ export class UsersService {
           .exec();
         const resultArray = mergeAndRemoveDuplicates(category, subcategory);
         if (Array.isArray(resultArray) && resultArray.length === 0) {
-          throw new NotFound('Users not found');
+          return {
+            totalPages: totalPages,
+            currentPage: curentPage,
+            data: resultArray,
+          };
         } else {
           const result = paginateArray(resultArray, curentPage);
 
@@ -191,7 +195,11 @@ export class UsersService {
           findName,
         );
         if (Array.isArray(resultArray) && resultArray.length === 0) {
-          throw new NotFound('Users not found');
+          return {
+            totalPages: totalPages,
+            currentPage: curentPage,
+            data: resultArray,
+          };
         } else {
           const result = paginateArray(resultArray, curentPage);
           const totalPages = Math.ceil(resultArray.length / limit);
@@ -239,7 +247,11 @@ export class UsersService {
         );
 
         if (Array.isArray(resultArray) && findLocation.length === 0) {
-          throw new NotFound('User not found');
+          return {
+            totalPages: totalPages,
+            currentPage: curentPage,
+            data: resultArray,
+          };
         } else {
           const result = paginateArray(resultArray, curentPage);
           const totalPages = Math.ceil(resultArray.length / limit);
@@ -330,7 +342,11 @@ export class UsersService {
         );
 
         if (Array.isArray(resultArray) && resultArray.length === 0) {
-          throw new NotFound('User not found');
+          return {
+            totalPages: totalPages,
+            currentPage: curentPage,
+            data: resultArray,
+          };
         } else {
           const result = paginateArray(resultArray, curentPage);
           const totalPages = Math.ceil(resultArray.length / limit);
@@ -342,7 +358,7 @@ export class UsersService {
         }
       }
     } catch (e) {
-      throw new NotFound('User not found');
+      throw new NotFound('Not found');
     }
   }
 

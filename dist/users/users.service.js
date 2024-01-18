@@ -90,7 +90,11 @@ let UsersService = class UsersService {
                     .exec();
                 const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(category, subcategory);
                 if (Array.isArray(resultArray) && resultArray.length === 0) {
-                    throw new http_errors_1.NotFound('Users not found');
+                    return {
+                        totalPages: totalPages,
+                        currentPage: curentPage,
+                        data: resultArray,
+                    };
                 }
                 else {
                     const result = (0, parse_user_1.paginateArray)(resultArray, curentPage);
@@ -170,7 +174,11 @@ let UsersService = class UsersService {
                     .exec();
                 const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(findTitle, findDescr, category, subcategory, findCat, findSubcat, findLocation, findName);
                 if (Array.isArray(resultArray) && resultArray.length === 0) {
-                    throw new http_errors_1.NotFound('Users not found');
+                    return {
+                        totalPages: totalPages,
+                        currentPage: curentPage,
+                        data: resultArray,
+                    };
                 }
                 else {
                     const result = (0, parse_user_1.paginateArray)(resultArray, curentPage);
@@ -213,7 +221,11 @@ let UsersService = class UsersService {
                     .exec();
                 const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(category, subcategory, findLocation);
                 if (Array.isArray(resultArray) && findLocation.length === 0) {
-                    throw new http_errors_1.NotFound('User not found');
+                    return {
+                        totalPages: totalPages,
+                        currentPage: curentPage,
+                        data: resultArray,
+                    };
                 }
                 else {
                     const result = (0, parse_user_1.paginateArray)(resultArray, curentPage);
@@ -293,7 +305,11 @@ let UsersService = class UsersService {
                     .exec();
                 const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(findTitle, findDescr, category, subcategory, findCat, findSubcat, findName);
                 if (Array.isArray(resultArray) && resultArray.length === 0) {
-                    throw new http_errors_1.NotFound('User not found');
+                    return {
+                        totalPages: totalPages,
+                        currentPage: curentPage,
+                        data: resultArray,
+                    };
                 }
                 else {
                     const result = (0, parse_user_1.paginateArray)(resultArray, curentPage);
@@ -307,7 +323,7 @@ let UsersService = class UsersService {
             }
         }
         catch (e) {
-            throw new http_errors_1.NotFound('User not found');
+            throw new http_errors_1.NotFound('Not found');
         }
     }
     async findAllUsers() {

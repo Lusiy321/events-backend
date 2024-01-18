@@ -50,7 +50,8 @@ let UsersController = class UsersController {
     async findCat() {
         return this.usersService.findCategory();
     }
-    async login(user) {
+    async login(user, request) {
+        console.log(request);
         return await this.usersService.login(user);
     }
     async logout(request) {
@@ -174,8 +175,9 @@ __decorate([
     (0, common_1.HttpCode)(200),
     (0, common_1.Post)('login'),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_user_dto_1.CreateUserDto]),
+    __metadata("design:paramtypes", [create_user_dto_1.CreateUserDto, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "login", null);
 __decorate([

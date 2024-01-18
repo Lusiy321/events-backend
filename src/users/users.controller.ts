@@ -90,7 +90,8 @@ export class UsersController {
   @ApiResponse({ status: 200, type: User })
   @HttpCode(200)
   @Post('login')
-  async login(@Body() user: CreateUserDto): Promise<User> {
+  async login(@Body() user: CreateUserDto, @Req() request: any): Promise<User> {
+    console.log(request);
     return await this.usersService.login(user);
   }
 

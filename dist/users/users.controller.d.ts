@@ -19,7 +19,7 @@ export declare class UsersController {
     findUsers(): Promise<User[]>;
     findById(id: string): Promise<User>;
     findCat(): Promise<Category[]>;
-    login(user: CreateUserDto): Promise<User>;
+    login(user: CreateUserDto, request: any): Promise<User>;
     logout(request: any): Promise<User>;
     update(data: UpdateUserDto, request: any): Promise<User>;
     updateCat(data: Categories, request: any): Promise<User>;
