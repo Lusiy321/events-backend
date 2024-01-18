@@ -101,8 +101,8 @@ export class UsersService {
         const resultArray = mergeAndRemoveDuplicates(category, subcategory);
         if (Array.isArray(resultArray) && resultArray.length === 0) {
           return {
-            totalPages: totalPages,
-            currentPage: curentPage,
+            totalPages: 0,
+            currentPage: 0,
             data: resultArray,
           };
         } else {
@@ -196,8 +196,8 @@ export class UsersService {
         );
         if (Array.isArray(resultArray) && resultArray.length === 0) {
           return {
-            totalPages: totalPages,
-            currentPage: curentPage,
+            totalPages: 0,
+            currentPage: 0,
             data: resultArray,
           };
         } else {
@@ -248,8 +248,8 @@ export class UsersService {
 
         if (Array.isArray(resultArray) && findLocation.length === 0) {
           return {
-            totalPages: totalPages,
-            currentPage: curentPage,
+            totalPages: 0,
+            currentPage: 0,
             data: resultArray,
           };
         } else {
@@ -343,8 +343,8 @@ export class UsersService {
 
         if (Array.isArray(resultArray) && resultArray.length === 0) {
           return {
-            totalPages: totalPages,
-            currentPage: curentPage,
+            totalPages: 0,
+            currentPage: 0,
             data: resultArray,
           };
         } else {
@@ -899,7 +899,7 @@ export class UsersService {
       }
 
       const SECRET_KEY = process.env.SECRET_KEY;
-      const user = await this.userModel.findOne({ token: token });
+      const user = await this.findToken(req);
 
       if (!user) {
         throw new NotFound('User not found');

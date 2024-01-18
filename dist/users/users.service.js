@@ -91,8 +91,8 @@ let UsersService = class UsersService {
                 const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(category, subcategory);
                 if (Array.isArray(resultArray) && resultArray.length === 0) {
                     return {
-                        totalPages: totalPages,
-                        currentPage: curentPage,
+                        totalPages: 0,
+                        currentPage: 0,
                         data: resultArray,
                     };
                 }
@@ -175,8 +175,8 @@ let UsersService = class UsersService {
                 const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(findTitle, findDescr, category, subcategory, findCat, findSubcat, findLocation, findName);
                 if (Array.isArray(resultArray) && resultArray.length === 0) {
                     return {
-                        totalPages: totalPages,
-                        currentPage: curentPage,
+                        totalPages: 0,
+                        currentPage: 0,
                         data: resultArray,
                     };
                 }
@@ -222,8 +222,8 @@ let UsersService = class UsersService {
                 const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(category, subcategory, findLocation);
                 if (Array.isArray(resultArray) && findLocation.length === 0) {
                     return {
-                        totalPages: totalPages,
-                        currentPage: curentPage,
+                        totalPages: 0,
+                        currentPage: 0,
                         data: resultArray,
                     };
                 }
@@ -306,8 +306,8 @@ let UsersService = class UsersService {
                 const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(findTitle, findDescr, category, subcategory, findCat, findSubcat, findName);
                 if (Array.isArray(resultArray) && resultArray.length === 0) {
                     return {
-                        totalPages: totalPages,
-                        currentPage: curentPage,
+                        totalPages: 0,
+                        currentPage: 0,
                         data: resultArray,
                     };
                 }
@@ -769,7 +769,7 @@ let UsersService = class UsersService {
                 throw new http_errors_1.Unauthorized('Not authorized');
             }
             const SECRET_KEY = process.env.SECRET_KEY;
-            const user = await this.userModel.findOne({ token: token });
+            const user = await this.findToken(req);
             if (!user) {
                 throw new http_errors_1.NotFound('User not found');
             }
