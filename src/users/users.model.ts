@@ -84,6 +84,12 @@ export class User extends Model<User> {
   })
   viber: string;
 
+  @Prop({
+    type: String,
+    default: null,
+  })
+  viber_chat: string;
+
   @ApiProperty({
     example: '+380987894556',
     description: 'User whatsapp phone number',
@@ -250,6 +256,14 @@ export class User extends Model<User> {
   })
   @Prop({ type: String, default: null })
   token: string;
+
+  @ApiProperty({
+    example:
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0N2EzNzhiNGU4MTk3ODYzMzkwMTUyYSIsImlhdCI6MTY4NTczMTIxNCwiZXhwIjoxNjg1ODE3NjE0fQ.rxH3-wVl3VGGX675UCqOFrLx-1xNH-GObq9v7GbZj0s',
+    description: 'JWT token',
+  })
+  @Prop({ type: String, default: null })
+  refresh_token: string;
 
   @ApiProperty({ example: 'new', description: 'User moderate status' })
   @Prop({

@@ -90,8 +90,7 @@ export class UsersController {
   @ApiResponse({ status: 200, type: User })
   @HttpCode(200)
   @Post('login')
-  async login(@Body() user: CreateUserDto, @Req() request: any): Promise<User> {
-    console.log(request);
+  async login(@Body() user: CreateUserDto): Promise<User> {
     return await this.usersService.login(user);
   }
 
@@ -112,7 +111,7 @@ export class UsersController {
     @Body() data: UpdateUserDto,
     @Req() request: any,
   ): Promise<User> {
-    return this.usersService.update(data, request);
+    return this.usersService.updateUser(data, request);
   }
 
   @ApiOperation({ summary: 'Update user' })
@@ -256,8 +255,8 @@ export class UsersController {
   @ApiOperation({ summary: 'Refresh Access Token' })
   @ApiBearerAuth('BearerAuthMethod')
   @Patch('refresh')
-  async refresh(@Req() request: any) {
-    return await this.usersService.refreshAccessToken(request);
+  async refresh(@Body() token: object) {
+    return await this.usersService.refreshAccessToken(token);
   }
 
   @ApiOperation({ summary: 'Change password' })

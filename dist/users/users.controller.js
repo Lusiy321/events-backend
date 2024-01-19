@@ -50,15 +50,14 @@ let UsersController = class UsersController {
     async findCat() {
         return this.usersService.findCategory();
     }
-    async login(user, request) {
-        console.log(request);
+    async login(user) {
         return await this.usersService.login(user);
     }
     async logout(request) {
         return this.usersService.logout(request);
     }
     async update(data, request) {
-        return this.usersService.update(data, request);
+        return this.usersService.updateUser(data, request);
     }
     async updateCat(data, request) {
         return this.usersService.updateCategory(data, request);
@@ -105,8 +104,8 @@ let UsersController = class UsersController {
         const user = await this.usersService.findById(userId);
         return res.redirect(`${process.env.FRONT_LINK}?token=${user.token}`);
     }
-    async refresh(request) {
-        return await this.usersService.refreshAccessToken(request);
+    async refresh(token) {
+        return await this.usersService.refreshAccessToken(token);
     }
     async cangePwd(request, password) {
         return await this.usersService.changePassword(request, password);
@@ -175,9 +174,8 @@ __decorate([
     (0, common_1.HttpCode)(200),
     (0, common_1.Post)('login'),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_user_dto_1.CreateUserDto, Object]),
+    __metadata("design:paramtypes", [create_user_dto_1.CreateUserDto]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "login", null);
 __decorate([
@@ -342,7 +340,7 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Refresh Access Token' }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
     (0, common_1.Patch)('refresh'),
-    __param(0, (0, common_1.Req)()),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)

@@ -2,6 +2,7 @@
 /node_modules
 *.env
 .development.env
+.production.env
 index.html
 # Logs
 logs

@@ -422,7 +422,6 @@ export class UsersService {
     if (!user) {
       throw new NotFound('User not found');
     }
-
     if (user.trial && user.trialEnds > new Date()) {
       return true;
     } else {
@@ -654,7 +653,7 @@ export class UsersService {
     }
   }
 
-  async update(user: UpdateUserDto, req: any): Promise<User> {
+  async updateUser(user: UpdateUserDto, req: any): Promise<User> {
     try {
       const {
         firstName,
@@ -738,7 +737,7 @@ export class UsersService {
           .exec();
       }
     } catch (e) {
-      throw new BadRequest(e.message);
+      throw new BadRequest(`Error: ${e.message}`);
     }
   }
   private async addSubcategory(
@@ -759,23 +758,18 @@ export class UsersService {
     if (!categories.some((category) => category._id === newCategory._id)) {
       updatedCategories.push(newCategory);
     }
-
     return updatedCategories;
   }
 
   async updateCategory(data: Categories, req: any): Promise<User> {
     try {
       const newCategory = data;
-
       const findId = await this.findToken(req);
-
       if (!findId) {
         throw new Unauthorized('jwt expired');
       }
-
       const findUser = await this.userModel.findById(findId.id).exec();
       const arrCategory = findUser.category;
-
       const newCategoryArr = await this.addSubcategory(
         arrCategory,
         newCategory,
@@ -802,7 +796,6 @@ export class UsersService {
       if (!user) {
         throw new Unauthorized('jwt expired');
       }
-
       const updatedCategories = user.category
         .map((category) => {
           if (category._id === id) {
@@ -822,7 +815,6 @@ export class UsersService {
           $set: { category: updatedCategories },
         },
       );
-
       return await this.userModel
         .findById({ _id: user.id })
         .select(rows)
@@ -879,7 +871,11 @@ export class UsersService {
     };
     const SECRET_KEY = process.env.SECRET_KEY;
     const token = sign(payload, SECRET_KEY, { expiresIn: '10m' });
-    await this.userModel.findByIdAndUpdate(authUser._id, { token });
+    const refreshToken = sign(payload, SECRET_KEY);
+    await this.userModel.findByIdAndUpdate(authUser._id, {
+      token: token,
+      refresh_token: refreshToken,
+    });
     const authentificationUser = await this.userModel
       .findById({
         _id: authUser._id,
@@ -889,18 +885,12 @@ export class UsersService {
     return authentificationUser;
   }
 
-  async refreshAccessToken(req: any): Promise<User> {
+  async refreshAccessToken(token: any): Promise<User> {
     try {
-      const { authorization = '' } = req.headers;
-      const [bearer, token] = authorization.split(' ');
-
-      if (bearer !== 'Bearer') {
-        throw new Unauthorized('Not authorized');
-      }
-
       const SECRET_KEY = process.env.SECRET_KEY;
-      const user = await this.findToken(req);
-
+      const user = await this.userModel.findOne({
+        refresh_token: token.token,
+      });
       if (!user) {
         throw new NotFound('User not found');
       }

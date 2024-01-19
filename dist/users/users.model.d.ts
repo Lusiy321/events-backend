@@ -36,6 +36,7 @@ export declare class User extends Model<User> {
     telegram: string;
     tg_chat: number;
     viber: string;
+    viber_chat: string;
     whatsapp: string;
     location: string;
     master_photo: Photo;
@@ -49,6 +50,7 @@ export declare class User extends Model<User> {
     price: string;
     social: Social;
     token: string;
+    refresh_token: string;
     verified: verify;
     verify: boolean;
     googleId: string;

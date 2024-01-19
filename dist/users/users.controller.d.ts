@@ -19,7 +19,7 @@ export declare class UsersController {
     findUsers(): Promise<User[]>;
     findById(id: string): Promise<User>;
     findCat(): Promise<Category[]>;
-    login(user: CreateUserDto, request: any): Promise<User>;
+    login(user: CreateUserDto): Promise<User>;
     logout(request: any): Promise<User>;
     update(data: UpdateUserDto, request: any): Promise<User>;
     updateCat(data: Categories, request: any): Promise<User>;
@@ -33,7 +33,7 @@ export declare class UsersController {
     googleAuthRedirect(res: any, req: any): Promise<any>;
     facebookLogin(): void;
     facebookAuthRedirect(res: any, req: any): Promise<any>;
-    refresh(request: any): Promise<User>;
+    refresh(token: object): Promise<User>;
     cangePwd(request: any, password: PasswordUserDto): Promise<User>;
     forgotPwd(email: MailUserDto): Promise<{
         message: string;

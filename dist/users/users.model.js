@@ -102,6 +102,13 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "viber", void 0);
 __decorate([
+    (0, mongoose_1.Prop)({
+        type: String,
+        default: null,
+    }),
+    __metadata("design:type", String)
+], User.prototype, "viber_chat", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({
         example: '+380987894556',
         description: 'User whatsapp phone number',
@@ -280,6 +287,14 @@ __decorate([
     (0, mongoose_1.Prop)({ type: String, default: null }),
     __metadata("design:type", String)
 ], User.prototype, "token", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0N2EzNzhiNGU4MTk3ODYzMzkwMTUyYSIsImlhdCI6MTY4NTczMTIxNCwiZXhwIjoxNjg1ODE3NjE0fQ.rxH3-wVl3VGGX675UCqOFrLx-1xNH-GObq9v7GbZj0s',
+        description: 'JWT token',
+    }),
+    (0, mongoose_1.Prop)({ type: String, default: null }),
+    __metadata("design:type", String)
+], User.prototype, "refresh_token", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'new', description: 'User moderate status' }),
     (0, mongoose_1.Prop)({

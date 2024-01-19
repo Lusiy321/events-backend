@@ -60,7 +60,7 @@ let MesengersService = class MesengersService {
                         await this.sendViberAgreement(phone, chatId);
                         break;
                     case 'disagree':
-                        const user = await this.userModel.findOne({ viber: chatId });
+                        const user = await this.userModel.findOne({ viber_chat: chatId });
                         user.disagree_order += 1;
                         await this.userModel.findByIdAndUpdate(user.id, {
                             disagree_order: user.disagree_order,
@@ -126,9 +126,9 @@ let MesengersService = class MesengersService {
                     const order = await this.ordersModel.findOne({
                         phone: phoneNumber,
                     });
-                    if (user && user.viber === null) {
+                    if (user && user.viber_chat === null) {
                         const updatedUser = await this.userModel.findByIdAndUpdate({ _id: user.id }, {
-                            viber: res.userProfile.id,
+                            viber_chat: res.userProfile.id,
                         });
                         await updatedUser.save();
                         this.viber_bot.sendMessage({ id: res.userProfile.id }, [
@@ -143,9 +143,9 @@ let MesengersService = class MesengersService {
                         }
                         return updatedUser;
                     }
-                    if (order && order.viber === null) {
+                    if (order && order.viber_chat === null) {
                         const updatedOrder = await this.ordersModel.findByIdAndUpdate({ _id: order.id }, {
-                            viber: res.userProfile.id,
+                            viber_chat: res.userProfile.id,
                         });
                         await updatedOrder.save();
                         this.viber_bot.sendMessage({ id: res.userProfile.id }, [
@@ -160,11 +160,11 @@ let MesengersService = class MesengersService {
                         }
                         return updatedOrder;
                     }
-                    if ((user && user.viber === res.userProfile.id) ||
-                        (order && order.viber === res.userProfile.id)) {
+                    if ((user && user.viber_chat === res.userProfile.id) ||
+                        (order && order.viber_chat === res.userProfile.id)) {
                         if (user) {
                             const updatedUser = await this.userModel.findByIdAndUpdate({ _id: user.id }, {
-                                viber: null,
+                                viber_chat: null,
                             });
                             await updatedUser.save();
                             this.viber_bot.sendMessage({ id: res.userProfile.id }, [
@@ -175,7 +175,7 @@ let MesengersService = class MesengersService {
                         }
                         else {
                             const updatedOrder = await this.ordersModel.findByIdAndUpdate({ _id: order.id }, {
-                                viber: null,
+                                viber_chat: null,
                             });
                             await updatedOrder.save();
                             this.viber_bot.sendMessage({ id: res.userProfile.id }, [
@@ -523,8 +523,8 @@ let MesengersService = class MesengersService {
             const order = await this.ordersModel.findOne({
                 phone: orderPhone,
             });
-            const user = await this.userModel.findOne({ viber: userChatId });
-            const { viber, active, description, tg_chat } = order;
+            const user = await this.userModel.findOne({ viber_chat: userChatId });
+            const { viber_chat, active, description, tg_chat } = order;
             const { firstName, phone, _id } = user;
             const accept = user.accepted_orders;
             if (accept.includes(order._id)) {
@@ -535,7 +535,7 @@ let MesengersService = class MesengersService {
                 ]);
                 return false;
             }
-            else if (viber !== null && active === true) {
+            else if (viber_chat !== null && active === true) {
                 const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"*${order.description}*".\n \nВ категорії:\n"*${order.category[0].name} - ${order.category[0].subcategories[0].name}*". \n \nЯкщо Ваш профіль сподобаеться замовнику, він з Вами зв'яжеться. Очікуйте на дзвінок або повідомлення`;
                 user.agree_order += 1;
                 user.accepted_orders.push(order._id);
@@ -555,7 +555,7 @@ let MesengersService = class MesengersService {
                 ]);
                 const msgOrder = `Користувач *${firstName}* готовий виконати ваше замовлення "*${description}*". \n Посилання на профіль виконавця: ${process.env.FRONT_LINK}artists/${_id}.\n Ви можете написати йому, або зателефонувати по номеру. \n` +
                     `\n Телефон: +${phone}`;
-                await this.viber_bot.sendMessage({ id: viber }, [
+                await this.viber_bot.sendMessage({ id: viber_chat }, [
                     new PictureMessage(user.master_photo.url),
                     new TextMessage(msgOrder),
                     new KeyboardMessage(main_keyboard_1.MAIN_KEYBOARD_VIBER),
@@ -587,7 +587,7 @@ let MesengersService = class MesengersService {
                     new KeyboardMessage(main_keyboard_1.MAIN_KEYBOARD_VIBER),
                 ]);
             }
-            else if (viber === null && tg_chat === null) {
+            else if (viber_chat === null && tg_chat === null) {
                 const msg = `Замовник ще не активував чат-бот, спробуйте пізніше`;
                 this.viber_bot.sendMessage(userChatId, msg);
                 return false;
@@ -604,10 +604,10 @@ let MesengersService = class MesengersService {
     }
     async myOrdersList(chatId) {
         try {
-            const user = await this.userModel.findOne({ viber: chatId }).exec();
-            const find = await this.ordersModel.find({ viber: chatId }).exec();
+            const user = await this.userModel.findOne({ viber_chat: chatId }).exec();
+            const find = await this.ordersModel.find({ viber_chat: chatId }).exec();
             if (user &&
-                user.viber !== null &&
+                user.viber_chat !== null &&
                 Array.isArray(find) &&
                 find.length === 0) {
                 this.viber_bot.sendMessage({ id: chatId }, new TextMessage('Ви не являетесь замовником. Якщо Ви замовник будь ласка, відправте свій номер телефону у форматі 380981231122'));
@@ -615,7 +615,7 @@ let MesengersService = class MesengersService {
             if (!user && Array.isArray(find) && find.length === 0) {
                 this.viber_bot.sendMessage({ id: chatId }, new TextMessage('Ми не знайшли Ваших заявок, напевно ви не зарееструвались у чат боті. Будь ласка, відправте свій номер телефону у форматі 380981231122'));
             }
-            if (find || user.viber === find[0].viber) {
+            if (find || user.viber_chat === find[0].viber_chat) {
                 find.map((finded) => {
                     const FIND_KEYBOARD = {
                         Type: 'keyboard',
@@ -634,7 +634,7 @@ let MesengersService = class MesengersService {
                             },
                             {
                                 ActionType: 'reply',
-                                ActionBody: `orders:${finded.name}:${finded.viber}`,
+                                ActionBody: `orders:${finded.name}:${finded.viber_chat}`,
                                 Text: '<font color="#FFFFFF" size="5">Мої заявки (лише для замовників)</font>',
                                 TextSize: 'regular',
                                 TextVAlign: 'middle',
@@ -669,7 +669,7 @@ let MesengersService = class MesengersService {
                             Buttons: [
                                 {
                                     ActionType: 'reply',
-                                    ActionBody: `delete:${finded._id}:${finded.viber}`,
+                                    ActionBody: `delete:${finded._id}:${finded.viber_chat}`,
                                     Text: '<font color="#FFFFFF" size="5">Видалити</font>',
                                     TextSize: 'regular',
                                     TextVAlign: 'middle',
@@ -678,7 +678,7 @@ let MesengersService = class MesengersService {
                                 },
                                 {
                                     ActionType: 'reply',
-                                    ActionBody: `deactive:${finded._id}:${finded.viber}`,
+                                    ActionBody: `deactive:${finded._id}:${finded.viber_chat}`,
                                     Text: '<font color="#FFFFFF" size="5">Деактивувати</font>',
                                     TextSize: 'regular',
                                     TextVAlign: 'middle',
@@ -695,7 +695,7 @@ let MesengersService = class MesengersService {
                             Buttons: [
                                 {
                                     ActionType: 'reply',
-                                    ActionBody: `users:${finded._id}:${finded.viber}`,
+                                    ActionBody: `users:${finded._id}:${finded.viber_chat}`,
                                     Text: '<font color="#FFFFFF" size="5">Відгуки на пропозицію</font>',
                                     TextSize: 'regular',
                                     TextVAlign: 'middle',
@@ -720,7 +720,7 @@ let MesengersService = class MesengersService {
                             Buttons: [
                                 {
                                     ActionType: 'reply',
-                                    ActionBody: `delete:${finded._id}:${finded.viber}`,
+                                    ActionBody: `delete:${finded._id}:${finded.viber_chat}`,
                                     Text: '<font color="#FFFFFF" size="5">Видалити</font>',
                                     TextSize: 'regular',
                                     TextVAlign: 'middle',
@@ -729,7 +729,7 @@ let MesengersService = class MesengersService {
                                 },
                                 {
                                     ActionType: 'reply',
-                                    ActionBody: `active:${finded._id}:${finded.viber}`,
+                                    ActionBody: `active:${finded._id}:${finded.viber_chat}`,
                                     Text: '<font color="#FFFFFF" size="5">Активувати</font>',
                                     TextSize: 'regular',
                                     TextVAlign: 'middle',
@@ -746,7 +746,7 @@ let MesengersService = class MesengersService {
                             Buttons: [
                                 {
                                     ActionType: 'reply',
-                                    ActionBody: `users:${finded._id}:${finded.viber}`,
+                                    ActionBody: `users:${finded._id}:${finded.viber_chat}`,
                                     Text: '<font color="#FFFFFF" size="5">Відгуки на пропозицію</font>',
                                     TextSize: 'regular',
                                     TextVAlign: 'middle',
@@ -771,7 +771,7 @@ let MesengersService = class MesengersService {
     }
     async myReviewList(chatId) {
         try {
-            const user = await this.userModel.findOne({ viber: chatId }).exec();
+            const user = await this.userModel.findOne({ viber_chat: chatId }).exec();
             const KEYBOARD = {
                 Type: 'keyboard',
                 Revision: 1,
@@ -808,7 +808,7 @@ let MesengersService = class MesengersService {
                 ],
             };
             if (user &&
-                user.viber !== null &&
+                user.viber_chat !== null &&
                 Array.isArray(user.accepted_orders) &&
                 user.accepted_orders.length === 0) {
                 this.viber_bot.sendMessage({ id: chatId }, [
@@ -845,7 +845,7 @@ let MesengersService = class MesengersService {
                             },
                             {
                                 ActionType: 'reply',
-                                ActionBody: `orders:${user.name}:${user.viber}`,
+                                ActionBody: `orders:${user.name}:${user.viber_chat}`,
                                 Text: '<font color="#FFFFFF" size="5">Мої заявки (лише для замовників)</font>',
                                 TextSize: 'regular',
                                 TextVAlign: 'middle',
@@ -854,7 +854,7 @@ let MesengersService = class MesengersService {
                             },
                             {
                                 ActionType: 'reply',
-                                ActionBody: `review:${user.viber}:${user.viber}`,
+                                ActionBody: `review:${user.viber_chat}:${user.viber_chat}`,
                                 Text: '<font color="#FFFFFF" size="5">Мої відгуки (лише для виконавців)</font>',
                                 TextSize: 'regular',
                                 TextVAlign: 'middle',
@@ -883,12 +883,18 @@ let MesengersService = class MesengersService {
     }
     async sendMessagesToAllViberUsers(msg) {
         try {
-            const allOrders = await this.ordersModel.find({}).select('viber').exec();
-            const allUsers = await this.userModel.find({}).select('viber').exec();
+            const allOrders = await this.ordersModel
+                .find({})
+                .select('viber_chat')
+                .exec();
+            const allUsers = await this.userModel
+                .find({})
+                .select('viber_chat')
+                .exec();
             const allViberUsers = allOrders.concat(allUsers);
             allViberUsers.map((user) => {
-                if (user.viber !== null) {
-                    this.viber_bot.sendMessage({ id: user.viber }, [
+                if (user.viber_chat !== null) {
+                    this.viber_bot.sendMessage({ id: user.viber_chat }, [
                         new TextMessage(msg),
                         new KeyboardMessage(main_keyboard_1.MAIN_KEYBOARD_VIBER),
                     ]);
@@ -954,7 +960,7 @@ let MesengersService = class MesengersService {
     async sendCode(chatId) {
         try {
             const telegram = await this.ordersModel.findOne({ tg_chat: chatId });
-            const viber = await this.ordersModel.findOne({ viber: chatId });
+            const viber = await this.ordersModel.findOne({ viber_chat: chatId });
             if (telegram) {
                 const msg = `Ваш код верифікації: ${telegram.sms}\nПерейти на сайт: ${process.env.CODE_LINK}`;
                 await this.sendMessageTg(chatId, msg);
@@ -1014,10 +1020,10 @@ let MesengersService = class MesengersService {
                 }
                 return true;
             }
-            else if (order.viber !== null && order.active === true) {
+            else if (order.viber_chat !== null && order.active === true) {
                 const msgOrder = `Користувач ${user.firstName} готовий виконати ваше замовлення "${order.description}". \n Посилання на профіль виконавця: ${process.env.FRONT_LINK}artists/${user._id}.\n Ви можете написати йому, або зателефонувати по номеру. \n` +
                     `\n Телефон: +${phone}`;
-                await this.viber_bot.sendMessage({ id: order.viber }, [
+                await this.viber_bot.sendMessage({ id: order.viber_chat }, [
                     new PictureMessage(user.master_photo.url),
                     new TextMessage(msgOrder),
                     new KeyboardMessage(main_keyboard_1.MAIN_KEYBOARD_VIBER),
@@ -1030,7 +1036,7 @@ let MesengersService = class MesengersService {
                 });
                 return true;
             }
-            else if (order.tg_chat === null && order.viber === null) {
+            else if (order.tg_chat === null && order.viber_chat === null) {
                 const msg = `Замовник ще не активував чат-бот, спробуйте пізніше`;
                 await this.sendMessageTg(chatId, msg);
                 return false;

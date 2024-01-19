@@ -27,7 +27,7 @@ export declare class UsersService {
     restorePassword(email: MailUserDto): Promise<any>;
     login(user: LoginUserDto): Promise<User>;
     logout(req: any): Promise<User>;
-    update(user: UpdateUserDto, req: any): Promise<User>;
+    updateUser(user: UpdateUserDto, req: any): Promise<User>;
     private addSubcategory;
     updateCategory(data: Categories, req: any): Promise<User>;
     deleteCategory(id: string, req: any): Promise<any>;
@@ -36,6 +36,6 @@ export declare class UsersService {
     createToken(authUser: {
         _id: string;
     }): Promise<any>;
-    refreshAccessToken(req: any): Promise<User>;
+    refreshAccessToken(token: any): Promise<User>;
     findCategory(): Promise<Category[]>;
 }

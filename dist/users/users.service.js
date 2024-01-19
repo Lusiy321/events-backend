@@ -583,7 +583,7 @@ let UsersService = class UsersService {
             throw new http_errors_1.BadRequest(e.message);
         }
     }
-    async update(user, req) {
+    async updateUser(user, req) {
         try {
             const { firstName, social, title, description, phone, telegram, whatsapp, location, master_photo, video, price, } = user;
             const findId = await this.findToken(req);
@@ -639,7 +639,7 @@ let UsersService = class UsersService {
             }
         }
         catch (e) {
-            throw new http_errors_1.BadRequest(e.message);
+            throw new http_errors_1.BadRequest(`Error: ${e.message}`);
         }
     }
     async addSubcategory(categories, newCategory) {
@@ -752,7 +752,11 @@ let UsersService = class UsersService {
         };
         const SECRET_KEY = process.env.SECRET_KEY;
         const token = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY, { expiresIn: '10m' });
-        await this.userModel.findByIdAndUpdate(authUser._id, { token });
+        const refreshToken = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY);
+        await this.userModel.findByIdAndUpdate(authUser._id, {
+            token: token,
+            refresh_token: refreshToken,
+        });
         const authentificationUser = await this.userModel
             .findById({
             _id: authUser._id,
@@ -761,15 +765,12 @@ let UsersService = class UsersService {
             .exec();
         return authentificationUser;
     }
-    async refreshAccessToken(req) {
+    async refreshAccessToken(token) {
         try {
-            const { authorization = '' } = req.headers;
-            const [bearer, token] = authorization.split(' ');
-            if (bearer !== 'Bearer') {
-                throw new http_errors_1.Unauthorized('Not authorized');
-            }
             const SECRET_KEY = process.env.SECRET_KEY;
-            const user = await this.findToken(req);
+            const user = await this.userModel.findOne({
+                refresh_token: token.token,
+            });
             if (!user) {
                 throw new http_errors_1.NotFound('User not found');
             }
