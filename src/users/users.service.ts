@@ -20,10 +20,12 @@ import {
 } from './utils/parse.user';
 import * as nodemailer from 'nodemailer';
 import { LoginUserDto } from './dto/login.user.dto';
+import { Lambda } from 'aws-sdk';
 export const TRANSPORTER_PROVIDER = 'TRANSPORTER_PROVIDER';
 
 @Injectable()
 export class UsersService {
+  private readonly lambda: Lambda;
   constructor(
     @InjectModel(User.name)
     private userModel: User,
@@ -40,8 +42,27 @@ export class UsersService {
         pass: process.env.NOREPLY_PASSWORD,
       },
     });
+    this.lambda = new Lambda({
+      region: process.env.REGION,
+      accessKeyId: process.env.ACCESS_KEY_ID,
+      secretAccessKey: process.env.SECRET_ACCESS_KEY,
+    });
   }
   // USER
+
+  async authorize(token: string, methodArn: string): Promise<any> {
+    const result = await this.lambda
+      .invoke({
+        FunctionName: 'wechirka-server-v1-dev-main',
+        Payload: JSON.stringify({
+          authorizationToken: `Bearer ${token}`,
+          methodArn,
+        }),
+      })
+      .promise();
+
+    return JSON.parse(result.Payload?.toString());
+  }
 
   async searchUsers(query: any): Promise<search_result> {
     const { req, loc, page, cat, subcat } = query;
@@ -86,6 +107,7 @@ export class UsersService {
               },
             },
           })
+          .sort({ createdAt: -1 })
           .select(rows)
           .exec();
         const subcategory = await this.userModel
@@ -96,6 +118,7 @@ export class UsersService {
               },
             },
           })
+          .sort({ createdAt: -1 })
           .select(rows)
           .exec();
         const resultArray = mergeAndRemoveDuplicates(category, subcategory);
@@ -122,6 +145,7 @@ export class UsersService {
           .find({
             title: { $regex: regexReq },
           })
+          .sort({ createdAt: -1 })
           .select(rows)
           .exec();
         const findCat = await this.userModel
@@ -132,6 +156,7 @@ export class UsersService {
               },
             },
           })
+          .sort({ createdAt: -1 })
           .select(rows)
           .exec();
         const findSubcat = await this.userModel
@@ -142,13 +167,14 @@ export class UsersService {
               },
             },
           })
+          .sort({ createdAt: -1 })
           .select(rows)
           .exec();
         const findDescr = await this.userModel
           .find({
             description: { $regex: regexReq },
-            location: { $regex: regexLoc },
           })
+          .sort({ createdAt: -1 })
           .select(rows)
           .exec();
         const category = await this.userModel
@@ -159,6 +185,7 @@ export class UsersService {
               },
             },
           })
+          .sort({ createdAt: -1 })
           .select(rows)
           .exec();
         const subcategory = await this.userModel
@@ -169,18 +196,21 @@ export class UsersService {
               },
             },
           })
+          .sort({ createdAt: -1 })
           .select(rows)
           .exec();
         const findLocation = await this.userModel
           .find({
             location: { $regex: regexReq },
           })
+          .sort({ createdAt: -1 })
           .select(rows)
           .exec();
         const findName = await this.userModel
           .find({
             firstName: { $regex: regexReq },
           })
+          .sort({ createdAt: -1 })
           .select(rows)
           .exec();
 
@@ -215,6 +245,7 @@ export class UsersService {
           .find({
             location: { $regex: regexLoc },
           })
+          .sort({ createdAt: -1 })
           .select(rows)
           .skip(offset)
           .limit(limit)
@@ -226,7 +257,9 @@ export class UsersService {
                 _id: cat,
               },
             },
+            location: { $regex: regexLoc },
           })
+          .sort({ createdAt: -1 })
           .select(rows)
           .exec();
         const subcategory = await this.userModel
@@ -236,7 +269,9 @@ export class UsersService {
                 id: subcat,
               },
             },
+            location: { $regex: regexLoc },
           })
+          .sort({ createdAt: -1 })
           .select(rows)
           .exec();
 
@@ -261,6 +296,7 @@ export class UsersService {
             data: result,
           };
         }
+        // Если есть локация и запрос
       } else if (req !== '' && loc !== '') {
         const findTitle = await this.userModel
           .find({
@@ -413,21 +449,25 @@ export class UsersService {
         throw new BadRequest('Missing parameters');
       }
     } catch (e) {
-      throw new BadRequest(e.message);
+      throw new Conflict(e.message);
     }
   }
 
   async checkTrialStatus(id: string): Promise<boolean> {
-    const user = await this.userModel.findById(id).select('-password').exec();
-    if (!user) {
+    try {
+      const user = await this.userModel.findById(id).select('-password').exec();
+      if (!user) {
+        throw new NotFound('User not found');
+      }
+      if (user.trial && user.trialEnds > new Date()) {
+        return true;
+      } else {
+        user.trial = false;
+        await user.save();
+        return false;
+      }
+    } catch (e) {
       throw new NotFound('User not found');
-    }
-    if (user.trial && user.trialEnds > new Date()) {
-      return true;
-    } else {
-      user.trial = false;
-      await user.save();
-      return false;
     }
   }
 
@@ -580,8 +620,8 @@ export class UsersService {
   }
 
   async restorePassword(email: MailUserDto) {
-    const restoreMail: User = await this.userModel.findOne(email);
     try {
+      const restoreMail: User = await this.userModel.findOne(email);
       if (restoreMail) {
         function generatePassword() {
           const length = 8;

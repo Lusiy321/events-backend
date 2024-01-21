@@ -21,7 +21,14 @@ async function start() {
       },
     }),
   );
-  app.enableCors();
+  app
+    .enableCors
+    // {
+    // origin: 'https://show-swart.vercel.app',
+    // methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    // credentials: true,
+    // }
+    ();
   const config = new DocumentBuilder()
     .setTitle('Wechirka.com SERVER')
     .setDescription('Wechirka REAST API Documentation')

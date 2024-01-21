@@ -23,6 +23,7 @@ const category_model_1 = require("./category.model");
 const email_schemas_1 = require("./utils/email.schemas");
 const parse_user_1 = require("./utils/parse.user");
 const nodemailer = require("nodemailer");
+const aws_sdk_1 = require("aws-sdk");
 exports.TRANSPORTER_PROVIDER = 'TRANSPORTER_PROVIDER';
 let UsersService = class UsersService {
     constructor(userModel, categoryModel, transporter) {
@@ -38,6 +39,24 @@ let UsersService = class UsersService {
                 pass: process.env.NOREPLY_PASSWORD,
             },
         });
+        this.lambda = new aws_sdk_1.Lambda({
+            region: process.env.REGION,
+            accessKeyId: process.env.ACCESS_KEY_ID,
+            secretAccessKey: process.env.SECRET_ACCESS_KEY,
+        });
+    }
+    async authorize(token, methodArn) {
+        var _a;
+        const result = await this.lambda
+            .invoke({
+            FunctionName: 'wechirka-server-v1-dev-main',
+            Payload: JSON.stringify({
+                authorizationToken: `Bearer ${token}`,
+                methodArn,
+            }),
+        })
+            .promise();
+        return JSON.parse((_a = result.Payload) === null || _a === void 0 ? void 0 : _a.toString());
     }
     async searchUsers(query) {
         const { req, loc, page, cat, subcat } = query;
@@ -76,6 +95,7 @@ let UsersService = class UsersService {
                         },
                     },
                 })
+                    .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
                 const subcategory = await this.userModel
@@ -86,6 +106,7 @@ let UsersService = class UsersService {
                         },
                     },
                 })
+                    .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
                 const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(category, subcategory);
@@ -111,6 +132,7 @@ let UsersService = class UsersService {
                     .find({
                     title: { $regex: regexReq },
                 })
+                    .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
                 const findCat = await this.userModel
@@ -121,6 +143,7 @@ let UsersService = class UsersService {
                         },
                     },
                 })
+                    .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
                 const findSubcat = await this.userModel
@@ -131,13 +154,14 @@ let UsersService = class UsersService {
                         },
                     },
                 })
+                    .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
                 const findDescr = await this.userModel
                     .find({
                     description: { $regex: regexReq },
-                    location: { $regex: regexLoc },
                 })
+                    .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
                 const category = await this.userModel
@@ -148,6 +172,7 @@ let UsersService = class UsersService {
                         },
                     },
                 })
+                    .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
                 const subcategory = await this.userModel
@@ -158,18 +183,21 @@ let UsersService = class UsersService {
                         },
                     },
                 })
+                    .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
                 const findLocation = await this.userModel
                     .find({
                     location: { $regex: regexReq },
                 })
+                    .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
                 const findName = await this.userModel
                     .find({
                     firstName: { $regex: regexReq },
                 })
+                    .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
                 const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(findTitle, findDescr, category, subcategory, findCat, findSubcat, findLocation, findName);
@@ -195,6 +223,7 @@ let UsersService = class UsersService {
                     .find({
                     location: { $regex: regexLoc },
                 })
+                    .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .skip(offset)
                     .limit(limit)
@@ -206,7 +235,9 @@ let UsersService = class UsersService {
                             _id: cat,
                         },
                     },
+                    location: { $regex: regexLoc },
                 })
+                    .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
                 const subcategory = await this.userModel
@@ -216,7 +247,9 @@ let UsersService = class UsersService {
                             id: subcat,
                         },
                     },
+                    location: { $regex: regexLoc },
                 })
+                    .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
                 const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(category, subcategory, findLocation);
@@ -371,21 +404,26 @@ let UsersService = class UsersService {
             }
         }
         catch (e) {
-            throw new http_errors_1.BadRequest(e.message);
+            throw new http_errors_1.Conflict(e.message);
         }
     }
     async checkTrialStatus(id) {
-        const user = await this.userModel.findById(id).select('-password').exec();
-        if (!user) {
+        try {
+            const user = await this.userModel.findById(id).select('-password').exec();
+            if (!user) {
+                throw new http_errors_1.NotFound('User not found');
+            }
+            if (user.trial && user.trialEnds > new Date()) {
+                return true;
+            }
+            else {
+                user.trial = false;
+                await user.save();
+                return false;
+            }
+        }
+        catch (e) {
             throw new http_errors_1.NotFound('User not found');
-        }
-        if (user.trial && user.trialEnds > new Date()) {
-            return true;
-        }
-        else {
-            user.trial = false;
-            await user.save();
-            return false;
         }
     }
     async sendVerificationEmail(email) {
@@ -515,8 +553,8 @@ let UsersService = class UsersService {
         }
     }
     async restorePassword(email) {
-        const restoreMail = await this.userModel.findOne(email);
         try {
+            const restoreMail = await this.userModel.findOne(email);
             if (restoreMail) {
                 function generatePassword() {
                     const length = 8;
