@@ -15,7 +15,6 @@ export declare class UsersService {
     private transporter;
     private readonly lambda;
     constructor(userModel: User, categoryModel: Category, transporter: nodemailer.Transporter);
-    authorize(token: string, methodArn: string): Promise<any>;
     searchUsers(query: any): Promise<search_result>;
     findAllUsers(): Promise<User[]>;
     findById(id: string): Promise<User>;
@@ -38,6 +37,6 @@ export declare class UsersService {
     createToken(authUser: {
         _id: string;
     }): Promise<any>;
-    refreshAccessToken(token: any): Promise<User>;
+    refreshAccessToken(req: any): Promise<User>;
     findCategory(): Promise<Category[]>;
 }

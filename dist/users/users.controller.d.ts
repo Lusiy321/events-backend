@@ -33,7 +33,7 @@ export declare class UsersController {
     googleAuthRedirect(res: any, req: any): Promise<any>;
     facebookLogin(): void;
     facebookAuthRedirect(res: any, req: any): Promise<any>;
-    refresh(token: object): Promise<User>;
+    refresh(req: any): Promise<User>;
     cangePwd(request: any, password: PasswordUserDto): Promise<User>;
     forgotPwd(email: MailUserDto): Promise<{
         message: string;

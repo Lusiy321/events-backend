@@ -10,33 +10,40 @@ import serverlessExpress from '@vendia/serverless-express';
 let server: Handler;
 
 async function start() {
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(express), {
-    cors: true,
-  });
-  app.use(
-    session({
-      secret: process.env.GOOGLE_CLIENT_SECRET,
-      resave: false,
-      saveUninitialized: false,
-      cookie: {
-        maxAge: 60000,
+  try {
+    const app = await NestFactory.create(
+      AppModule,
+      new ExpressAdapter(express),
+      {
+        cors: true,
       },
-    }),
-  );
-  app
-    .enableCors
-    // {
-    // origin: 'https://www.wechirka.com',
-    // methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    // credentials: true,
-    // }
-    ();
-  const mesengersService = app.get(MesengersService);
+    );
 
-  await mesengersService.startServer();
-  await app.init();
-  const expressApp = app.getHttpAdapter().getInstance();
-  return serverlessExpress({ app: expressApp });
+    app.use(
+      session({
+        secret: process.env.GOOGLE_CLIENT_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+          maxAge: 60000,
+        },
+      }),
+    );
+
+    app.enableCors();
+
+    const mesengersService = app.get(MesengersService);
+
+    await mesengersService.startServer();
+    await app.init();
+
+    const expressApp = app.getHttpAdapter().getInstance();
+
+    return serverlessExpress({ app: expressApp });
+  } catch (error) {
+    console.error('Error starting Nest application:', error);
+    throw error;
+  }
 }
 
 export const handler: Handler = async (
@@ -47,3 +54,4 @@ export const handler: Handler = async (
   server = server ?? (await start());
   return server(event, context, callback);
 };
+// const serverless_express_1 = __importDefault(require('@vendia/serverless-express'));

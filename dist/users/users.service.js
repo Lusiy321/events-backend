@@ -16,14 +16,13 @@ exports.UsersService = exports.TRANSPORTER_PROVIDER = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const users_model_1 = require("./users.model");
-const bcrypt_1 = require("bcrypt");
+const bcryptjs_1 = require("bcryptjs");
 const http_errors_1 = require("http-errors");
 const jsonwebtoken_1 = require("jsonwebtoken");
 const category_model_1 = require("./category.model");
 const email_schemas_1 = require("./utils/email.schemas");
 const parse_user_1 = require("./utils/parse.user");
 const nodemailer = require("nodemailer");
-const aws_sdk_1 = require("aws-sdk");
 exports.TRANSPORTER_PROVIDER = 'TRANSPORTER_PROVIDER';
 let UsersService = class UsersService {
     constructor(userModel, categoryModel, transporter) {
@@ -39,24 +38,6 @@ let UsersService = class UsersService {
                 pass: process.env.NOREPLY_PASSWORD,
             },
         });
-        this.lambda = new aws_sdk_1.Lambda({
-            region: process.env.REGION,
-            accessKeyId: process.env.ACCESS_KEY_ID,
-            secretAccessKey: process.env.SECRET_ACCESS_KEY,
-        });
-    }
-    async authorize(token, methodArn) {
-        var _a;
-        const result = await this.lambda
-            .invoke({
-            FunctionName: 'wechirka-server-v1-dev-main',
-            Payload: JSON.stringify({
-                authorizationToken: `Bearer ${token}`,
-                methodArn,
-            }),
-        })
-            .promise();
-        return JSON.parse((_a = result.Payload) === null || _a === void 0 ? void 0 : _a.toString());
     }
     async searchUsers(query) {
         const { req, loc, page, cat, subcat } = query;
@@ -356,7 +337,7 @@ let UsersService = class UsersService {
             }
         }
         catch (e) {
-            throw new http_errors_1.NotFound('Not found');
+            throw e;
         }
     }
     async findAllUsers() {
@@ -404,7 +385,7 @@ let UsersService = class UsersService {
             }
         }
         catch (e) {
-            throw new http_errors_1.Conflict(e.message);
+            throw e;
         }
     }
     async checkTrialStatus(id) {
@@ -423,7 +404,7 @@ let UsersService = class UsersService {
             }
         }
         catch (e) {
-            throw new http_errors_1.NotFound('User not found');
+            throw e;
         }
     }
     async sendVerificationEmail(email) {
@@ -451,7 +432,7 @@ let UsersService = class UsersService {
             await this.userModel.findByIdAndUpdate({ _id: id }, { verify: true });
         }
         catch (e) {
-            throw new http_errors_1.BadRequest(e.message);
+            throw e;
         }
     }
     async changePassword(req, newPass) {
@@ -480,7 +461,7 @@ let UsersService = class UsersService {
             throw new http_errors_1.BadRequest('Password is not avaible');
         }
         catch (e) {
-            throw new http_errors_1.BadRequest(e.message);
+            throw e;
         }
     }
     async validateUser(details) {
@@ -602,7 +583,7 @@ let UsersService = class UsersService {
                 .exec();
         }
         catch (e) {
-            throw new http_errors_1.BadRequest(e.message);
+            throw e;
         }
     }
     async logout(req) {
@@ -618,7 +599,7 @@ let UsersService = class UsersService {
                 .exec();
         }
         catch (e) {
-            throw new http_errors_1.BadRequest(e.message);
+            throw e;
         }
     }
     async updateUser(user, req) {
@@ -677,7 +658,7 @@ let UsersService = class UsersService {
             }
         }
         catch (e) {
-            throw new http_errors_1.BadRequest(`Error: ${e.message}`);
+            throw e;
         }
     }
     async addSubcategory(categories, newCategory) {
@@ -714,7 +695,7 @@ let UsersService = class UsersService {
                 .exec();
         }
         catch (e) {
-            throw new http_errors_1.BadRequest(e.message);
+            throw e;
         }
     }
     async deleteCategory(id, req) {
@@ -743,7 +724,7 @@ let UsersService = class UsersService {
                 .exec();
         }
         catch (e) {
-            throw new http_errors_1.BadRequest(e.message);
+            throw e;
         }
     }
     async deleteUserVideo(id, req) {
@@ -763,7 +744,7 @@ let UsersService = class UsersService {
                 .exec();
         }
         catch (e) {
-            throw new http_errors_1.BadRequest(e.message);
+            throw e;
         }
     }
     async findToken(req) {
@@ -781,33 +762,43 @@ let UsersService = class UsersService {
             }
         }
         catch (e) {
-            throw new http_errors_1.Unauthorized('jwt expired');
+            throw e;
         }
     }
     async createToken(authUser) {
-        const payload = {
-            id: authUser._id,
-        };
-        const SECRET_KEY = process.env.SECRET_KEY;
-        const token = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY, { expiresIn: '10m' });
-        const refreshToken = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY);
-        await this.userModel.findByIdAndUpdate(authUser._id, {
-            token: token,
-            refresh_token: refreshToken,
-        });
-        const authentificationUser = await this.userModel
-            .findById({
-            _id: authUser._id,
-        })
-            .select('-password')
-            .exec();
-        return authentificationUser;
-    }
-    async refreshAccessToken(token) {
         try {
+            const payload = {
+                id: authUser._id,
+            };
+            const SECRET_KEY = process.env.SECRET_KEY;
+            const token = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY, { expiresIn: '10m' });
+            const refreshToken = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY);
+            await this.userModel.findByIdAndUpdate(authUser._id, {
+                token: token,
+                refresh_token: refreshToken,
+            });
+            const authentificationUser = await this.userModel
+                .findById({
+                _id: authUser._id,
+            })
+                .select('-password')
+                .exec();
+            return authentificationUser;
+        }
+        catch (e) {
+            throw e;
+        }
+    }
+    async refreshAccessToken(req) {
+        try {
+            const { authorization = '' } = req.headers;
+            const [bearer, token] = authorization.split(' ');
+            if (bearer !== 'Bearer') {
+                throw new http_errors_1.Unauthorized('jwt expired');
+            }
             const SECRET_KEY = process.env.SECRET_KEY;
             const user = await this.userModel.findOne({
-                refresh_token: token.token,
+                refresh_token: token,
             });
             if (!user) {
                 throw new http_errors_1.NotFound('User not found');
@@ -826,7 +817,7 @@ let UsersService = class UsersService {
             return authentificationUser;
         }
         catch (error) {
-            throw new http_errors_1.BadRequest('Invalid refresh token');
+            throw error;
         }
     }
     async findCategory() {
@@ -849,13 +840,13 @@ exports.UsersService = UsersService = __decorate([
         category_model_1.Category, Object])
 ], UsersService);
 users_model_1.UserSchema.methods.setPassword = async function (password) {
-    return (this.password = (0, bcrypt_1.hashSync)(password, 10));
+    return (this.password = (0, bcryptjs_1.hashSync)(password, 10));
 };
 users_model_1.UserSchema.methods.setName = function (email) {
     const parts = email.split('@');
     this.firstName = parts[0];
 };
 users_model_1.UserSchema.methods.comparePassword = function (password) {
-    return (0, bcrypt_1.compareSync)(password, this.password);
+    return (0, bcryptjs_1.compareSync)(password, this.password);
 };
 //# sourceMappingURL=users.service.js.map

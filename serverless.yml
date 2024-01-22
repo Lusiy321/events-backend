@@ -6,7 +6,7 @@ plugins:
 provider:
   name: aws
   runtime: nodejs18.x
-  memorySize: 512
+  memorySize: 1024
   stage: dev
   timeout: 15
   region: eu-central-1

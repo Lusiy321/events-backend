@@ -27,7 +27,7 @@ exports.AdminService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const http_errors_1 = require("http-errors");
-const bcrypt_1 = require("bcrypt");
+const bcryptjs_1 = require("bcryptjs");
 const jsonwebtoken_1 = require("jsonwebtoken");
 const admin_model_1 = require("./admin.model");
 const uuid_1 = require("uuid");
@@ -431,9 +431,9 @@ exports.AdminService = AdminService = __decorate([
         category_model_1.Category])
 ], AdminService);
 admin_model_1.AdminSchema.methods.setPassword = async function (password) {
-    return (this.password = (0, bcrypt_1.hashSync)(password, 10));
+    return (this.password = (0, bcryptjs_1.hashSync)(password, 10));
 };
 admin_model_1.AdminSchema.methods.comparePassword = function (password) {
-    return (0, bcrypt_1.compareSync)(password, this.password);
+    return (0, bcryptjs_1.compareSync)(password, this.password);
 };
 //# sourceMappingURL=admin.service.js.map

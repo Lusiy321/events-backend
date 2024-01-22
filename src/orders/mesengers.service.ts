@@ -9,7 +9,7 @@ const KeyboardMessage = require('viber-bot').Message.Keyboard;
 const PictureMessage = require('viber-bot').Message.Picture;
 import { User } from 'src/users/users.model';
 import { Orders } from 'src/orders/order.model';
-import * as ngrok from '@ngrok/ngrok';
+const ngrok = require('@ngrok/ngrok');
 import { newOrderKeyboard, newOrderMsg } from './Telegram/new.order.msg';
 import { MAIN_KEYBOARD_VIBER, mainKeyboardViber } from './Viber/main.keyboard';
 import { OrdersArchive } from './order.archive.model';

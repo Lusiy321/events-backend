@@ -3,7 +3,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserSchema } from './users.model';
 import { CreateUserDto } from './dto/create.user.dto';
-import { compareSync, hashSync } from 'bcrypt';
+import { compareSync, hashSync } from 'bcryptjs';
 import { Conflict, NotFound, BadRequest, Unauthorized } from 'http-errors';
 import { UpdateUserDto, search_result } from './dto/update.user.dto';
 import { sign, verify, JwtPayload } from 'jsonwebtoken';
@@ -42,27 +42,8 @@ export class UsersService {
         pass: process.env.NOREPLY_PASSWORD,
       },
     });
-    this.lambda = new Lambda({
-      region: process.env.REGION,
-      accessKeyId: process.env.ACCESS_KEY_ID,
-      secretAccessKey: process.env.SECRET_ACCESS_KEY,
-    });
   }
   // USER
-
-  async authorize(token: string, methodArn: string): Promise<any> {
-    const result = await this.lambda
-      .invoke({
-        FunctionName: 'wechirka-server-v1-dev-main',
-        Payload: JSON.stringify({
-          authorizationToken: `Bearer ${token}`,
-          methodArn,
-        }),
-      })
-      .promise();
-
-    return JSON.parse(result.Payload?.toString());
-  }
 
   async searchUsers(query: any): Promise<search_result> {
     const { req, loc, page, cat, subcat } = query;
@@ -394,7 +375,7 @@ export class UsersService {
         }
       }
     } catch (e) {
-      throw new NotFound('Not found');
+      throw e;
     }
   }
 
@@ -449,7 +430,7 @@ export class UsersService {
         throw new BadRequest('Missing parameters');
       }
     } catch (e) {
-      throw new Conflict(e.message);
+      throw e;
     }
   }
 
@@ -467,7 +448,7 @@ export class UsersService {
         return false;
       }
     } catch (e) {
-      throw new NotFound('User not found');
+      throw e;
     }
   }
 
@@ -496,7 +477,7 @@ export class UsersService {
       }
       await this.userModel.findByIdAndUpdate({ _id: id }, { verify: true });
     } catch (e) {
-      throw new BadRequest(e.message);
+      throw e;
     }
   }
 
@@ -528,7 +509,7 @@ export class UsersService {
       }
       throw new BadRequest('Password is not avaible');
     } catch (e) {
-      throw new BadRequest(e.message);
+      throw e;
     }
   }
 
@@ -673,7 +654,7 @@ export class UsersService {
         .select('-password')
         .exec();
     } catch (e) {
-      throw new BadRequest(e.message);
+      throw e;
     }
   }
 
@@ -689,7 +670,7 @@ export class UsersService {
         .select('-password')
         .exec();
     } catch (e) {
-      throw new BadRequest(e.message);
+      throw e;
     }
   }
 
@@ -777,7 +758,7 @@ export class UsersService {
           .exec();
       }
     } catch (e) {
-      throw new BadRequest(`Error: ${e.message}`);
+      throw e;
     }
   }
   private async addSubcategory(
@@ -826,7 +807,7 @@ export class UsersService {
         .select(rows)
         .exec();
     } catch (e) {
-      throw new BadRequest(e.message);
+      throw e;
     }
   }
 
@@ -860,7 +841,7 @@ export class UsersService {
         .select(rows)
         .exec();
     } catch (e) {
-      throw new BadRequest(e.message);
+      throw e;
     }
   }
 
@@ -883,7 +864,7 @@ export class UsersService {
         .select(rows)
         .exec();
     } catch (e) {
-      throw new BadRequest(e.message);
+      throw e;
     }
   }
 
@@ -901,35 +882,44 @@ export class UsersService {
         return user;
       }
     } catch (e) {
-      throw new Unauthorized('jwt expired');
+      throw e;
     }
   }
 
   async createToken(authUser: { _id: string }) {
-    const payload = {
-      id: authUser._id,
-    };
-    const SECRET_KEY = process.env.SECRET_KEY;
-    const token = sign(payload, SECRET_KEY, { expiresIn: '10m' });
-    const refreshToken = sign(payload, SECRET_KEY);
-    await this.userModel.findByIdAndUpdate(authUser._id, {
-      token: token,
-      refresh_token: refreshToken,
-    });
-    const authentificationUser = await this.userModel
-      .findById({
-        _id: authUser._id,
-      })
-      .select('-password')
-      .exec();
-    return authentificationUser;
+    try {
+      const payload = {
+        id: authUser._id,
+      };
+      const SECRET_KEY = process.env.SECRET_KEY;
+      const token = sign(payload, SECRET_KEY, { expiresIn: '10m' });
+      const refreshToken = sign(payload, SECRET_KEY);
+      await this.userModel.findByIdAndUpdate(authUser._id, {
+        token: token,
+        refresh_token: refreshToken,
+      });
+      const authentificationUser = await this.userModel
+        .findById({
+          _id: authUser._id,
+        })
+        .select('-password')
+        .exec();
+      return authentificationUser;
+    } catch (e) {
+      throw e;
+    }
   }
 
-  async refreshAccessToken(token: any): Promise<User> {
+  async refreshAccessToken(req: any): Promise<User> {
     try {
+      const { authorization = '' } = req.headers;
+      const [bearer, token] = authorization.split(' ');
+      if (bearer !== 'Bearer') {
+        throw new Unauthorized('jwt expired');
+      }
       const SECRET_KEY = process.env.SECRET_KEY;
       const user = await this.userModel.findOne({
-        refresh_token: token.token,
+        refresh_token: token,
       });
       if (!user) {
         throw new NotFound('User not found');
@@ -947,7 +937,7 @@ export class UsersService {
         .exec();
       return authentificationUser;
     } catch (error) {
-      throw new BadRequest('Invalid refresh token');
+      throw error;
     }
   }
   // CATEGORY

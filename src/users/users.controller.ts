@@ -137,21 +137,6 @@ export class UsersController {
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')
   @Post('upload')
-  @UseInterceptors(
-    FilesInterceptor('file', 5, {
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, cb) => {
-          const filename =
-            path.parse(file.originalname).name.replace(/\s/g, '') +
-            '-' +
-            Date.now();
-          const extension = path.parse(file.originalname).ext;
-          cb(null, `${filename}${extension}`);
-        },
-      }),
-    }),
-  )
   async uploadPhoto(
     @Req() req: any,
     @UploadedFiles() images: Express.Multer.File[],
@@ -165,21 +150,6 @@ export class UsersController {
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')
   @Post('avatar')
-  @UseInterceptors(
-    FilesInterceptor('file', 1, {
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, cb) => {
-          const filename =
-            path.parse(file.originalname).name.replace(/\s/g, '') +
-            '-' +
-            Date.now();
-          const extension = path.parse(file.originalname).ext;
-          cb(null, `${filename}${extension}`);
-        },
-      }),
-    }),
-  )
   async uploadUserAvatar(
     @Req() req: any,
     @UploadedFiles() images: Express.Multer.File[],
@@ -255,8 +225,8 @@ export class UsersController {
   @ApiOperation({ summary: 'Refresh Access Token' })
   @ApiBearerAuth('BearerAuthMethod')
   @Patch('refresh')
-  async refresh(@Body() token: object) {
-    return await this.usersService.refreshAccessToken(token);
+  async refresh(@Req() req: any) {
+    return await this.usersService.refreshAccessToken(req);
   }
 
   @ApiOperation({ summary: 'Change password' })

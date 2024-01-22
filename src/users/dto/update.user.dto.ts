@@ -61,7 +61,7 @@ export class UpdateUserDto {
   })
   readonly photo: Photo[];
   @ApiProperty({
-    example: 'https://www.instagram.com/herlastsightband/',
+    example: { Facebook: 'https://www.facebook.com/psmirnyj/' },
     description: 'User social links',
   })
   readonly social: Social;

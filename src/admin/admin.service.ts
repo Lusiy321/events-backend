@@ -2,7 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Conflict, NotFound, BadRequest, Unauthorized } from 'http-errors';
-import { compareSync, hashSync } from 'bcrypt';
+import { compareSync, hashSync } from 'bcryptjs';
 import { sign, verify, JwtPayload } from 'jsonwebtoken';
 import { CreateAdminDto } from './dto/create.admin.dto';
 import { Admin, AdminSchema } from './admin.model';
