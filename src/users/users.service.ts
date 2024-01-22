@@ -675,91 +675,94 @@ export class UsersService {
   }
 
   async updateUser(user: UpdateUserDto, req: any): Promise<User> {
-    // try {
-    const {
-      firstName,
-      social,
-      title,
-      description,
-      phone,
-      telegram,
-      whatsapp,
-      location,
-      master_photo,
-      video,
-      price,
-    } = user;
-    const findId = await this.findToken(req);
+    try {
+      const {
+        firstName,
+        social,
+        title,
+        description,
+        phone,
+        telegram,
+        whatsapp,
+        location,
+        master_photo,
+        video,
+        price,
+        viber,
+      } = user;
+      const findId = await this.findToken(req);
 
-    if (!findId) {
-      throw new Unauthorized('jwt expired');
-    }
+      if (!findId) {
+        throw new Unauthorized('jwt expired');
+      }
 
-    if (
-      firstName ||
-      title ||
-      description ||
-      phone ||
-      telegram ||
-      whatsapp ||
-      location ||
-      master_photo ||
-      video ||
-      price ||
-      social
-    ) {
-      if (video) {
+      if (
+        firstName ||
+        title ||
+        description ||
+        phone ||
+        telegram ||
+        whatsapp ||
+        location ||
+        master_photo ||
+        video ||
+        price ||
+        social ||
+        viber
+      ) {
+        if (video) {
+          await this.userModel.findByIdAndUpdate(
+            { _id: findId.id },
+            {
+              $push: { video: { $each: video, $slice: 5 } },
+            },
+          );
+          return await this.userModel
+            .findById({ _id: findId.id })
+            .select(rows)
+            .exec();
+        }
+        if (social) {
+          const updatedSocial = { ...findId.social, ...social };
+
+          const sanitizedSocial = Object.entries(updatedSocial)
+            .filter(([key, value]) => key && value)
+            .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+
+          await this.userModel.findByIdAndUpdate(
+            { _id: findId.id },
+            { $set: { social: sanitizedSocial } },
+          );
+
+          return await this.userModel
+            .findById({ _id: findId.id })
+            .select(rows)
+            .exec();
+        }
         await this.userModel.findByIdAndUpdate(
           { _id: findId.id },
           {
-            $push: { video: { $each: video, $slice: 5 } },
+            firstName,
+            title,
+            description,
+            phone,
+            telegram,
+            whatsapp,
+            location,
+            master_photo,
+            price,
+            viber,
           },
         );
-        return await this.userModel
-          .findById({ _id: findId.id })
-          .select(rows)
-          .exec();
-      }
-      if (social) {
-        const updatedSocial = { ...findId.social, ...social };
-
-        const sanitizedSocial = Object.entries(updatedSocial)
-          .filter(([key, value]) => key && value)
-          .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
-
-        await this.userModel.findByIdAndUpdate(
-          { _id: findId.id },
-          { $set: { social: sanitizedSocial } },
-        );
 
         return await this.userModel
           .findById({ _id: findId.id })
           .select(rows)
           .exec();
       }
-      await this.userModel.findByIdAndUpdate(
-        { _id: findId.id },
-        {
-          firstName,
-          title,
-          description,
-          phone,
-          telegram,
-          whatsapp,
-          location,
-          master_photo,
-          price,
-        },
-      );
-
-      return await this.userModel
-        .findById({ _id: findId.id })
-        .select(rows)
-        .exec();
+    } catch (e) {
+      throw e;
     }
-    // } catch (e) {
-    //   throw e;
-    // }
   }
   private async addSubcategory(
     categories: Categories[],

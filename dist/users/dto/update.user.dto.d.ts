@@ -6,6 +6,7 @@ export declare class UpdateUserDto {
     readonly description: string;
     readonly phone: string;
     readonly telegram: string;
+    readonly viber: string;
     readonly whatsapp: string;
     readonly location: string;
     readonly master_photo: Photo;

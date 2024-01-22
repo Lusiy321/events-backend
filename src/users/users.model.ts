@@ -80,7 +80,6 @@ export class User extends Model<User> {
   })
   @Prop({
     type: String,
-    default: null,
   })
   viber: string;
 

@@ -36,6 +36,10 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "telegram", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'YourLogin', description: 'User viber login' }),
+    __metadata("design:type", String)
+], UpdateUserDto.prototype, "viber", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({
         example: '380984561225',
         description: 'User whatsapp phone number',

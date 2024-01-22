@@ -97,7 +97,6 @@ __decorate([
     }),
     (0, mongoose_1.Prop)({
         type: String,
-        default: null,
     }),
     __metadata("design:type", String)
 ], User.prototype, "viber", void 0);

@@ -15,6 +15,8 @@ export class UpdateUserDto {
   readonly phone: string;
   @ApiProperty({ example: 'YourLogin', description: 'User telegram login' })
   readonly telegram: string;
+  @ApiProperty({ example: 'YourLogin', description: 'User viber login' })
+  readonly viber: string;
   @ApiProperty({
     example: '380984561225',
     description: 'User whatsapp phone number',
