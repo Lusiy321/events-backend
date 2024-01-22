@@ -603,62 +603,57 @@ let UsersService = class UsersService {
         }
     }
     async updateUser(user, req) {
-        try {
-            const { firstName, social, title, description, phone, telegram, whatsapp, location, master_photo, video, price, } = user;
-            const findId = await this.findToken(req);
-            if (!findId) {
-                throw new http_errors_1.Unauthorized('jwt expired');
-            }
-            if (firstName ||
-                title ||
-                description ||
-                phone ||
-                telegram ||
-                whatsapp ||
-                location ||
-                master_photo ||
-                video ||
-                price ||
-                social) {
-                if (video) {
-                    await this.userModel.findByIdAndUpdate({ _id: findId.id }, {
-                        $push: { video: { $each: video, $slice: 5 } },
-                    });
-                    return await this.userModel
-                        .findById({ _id: findId.id })
-                        .select(parse_user_1.rows)
-                        .exec();
-                }
-                if (social) {
-                    const updatedSocial = Object.assign(Object.assign({}, findId.social), social);
-                    const sanitizedSocial = Object.entries(updatedSocial)
-                        .filter(([key, value]) => key && value)
-                        .reduce((acc, [key, value]) => (Object.assign(Object.assign({}, acc), { [key]: value })), {});
-                    await this.userModel.findByIdAndUpdate({ _id: findId.id }, { $set: { social: sanitizedSocial } });
-                    return await this.userModel
-                        .findById({ _id: findId.id })
-                        .select(parse_user_1.rows)
-                        .exec();
-                }
+        const { firstName, social, title, description, phone, telegram, whatsapp, location, master_photo, video, price, } = user;
+        const findId = await this.findToken(req);
+        if (!findId) {
+            throw new http_errors_1.Unauthorized('jwt expired');
+        }
+        if (firstName ||
+            title ||
+            description ||
+            phone ||
+            telegram ||
+            whatsapp ||
+            location ||
+            master_photo ||
+            video ||
+            price ||
+            social) {
+            if (video) {
                 await this.userModel.findByIdAndUpdate({ _id: findId.id }, {
-                    firstName,
-                    title,
-                    description,
-                    phone,
-                    telegram,
-                    whatsapp,
-                    location,
-                    master_photo,
-                    price,
+                    $push: { video: { $each: video, $slice: 5 } },
                 });
                 return await this.userModel
                     .findById({ _id: findId.id })
                     .select(parse_user_1.rows)
                     .exec();
             }
-        }
-        catch (e) {
-            throw e;
+            if (social) {
+                const updatedSocial = Object.assign(Object.assign({}, findId.social), social);
+                const sanitizedSocial = Object.entries(updatedSocial)
+                    .filter(([key, value]) => key && value)
+                    .reduce((acc, [key, value]) => (Object.assign(Object.assign({}, acc), { [key]: value })), {});
+                await this.userModel.findByIdAndUpdate({ _id: findId.id }, { $set: { social: sanitizedSocial } });
+                return await this.userModel
+                    .findById({ _id: findId.id })
+                    .select(parse_user_1.rows)
+                    .exec();
+            }
+            await this.userModel.findByIdAndUpdate({ _id: findId.id }, {
+                firstName,
+                title,
+                description,
+                phone,
+                telegram,
+                whatsapp,
+                location,
+                master_photo,
+                price,
+            });
+            return await this.userModel
+                .findById({ _id: findId.id })
+                .select(parse_user_1.rows)
+                .exec();
         }
     }
     async addSubcategory(categories, newCategory) {
