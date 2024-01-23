@@ -3,6 +3,7 @@
 *.env
 .development.env
 .production.env
+/.serverless
 index.html
 # Logs
 logs

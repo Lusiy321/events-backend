@@ -13,7 +13,6 @@ export declare class UsersService {
     private userModel;
     private categoryModel;
     private transporter;
-    private readonly lambda;
     constructor(userModel: User, categoryModel: Category, transporter: nodemailer.Transporter);
     searchUsers(query: any): Promise<search_result>;
     findAllUsers(): Promise<User[]>;

@@ -20,12 +20,10 @@ import {
 } from './utils/parse.user';
 import * as nodemailer from 'nodemailer';
 import { LoginUserDto } from './dto/login.user.dto';
-import { Lambda } from 'aws-sdk';
 export const TRANSPORTER_PROVIDER = 'TRANSPORTER_PROVIDER';
 
 @Injectable()
 export class UsersService {
-  private readonly lambda: Lambda;
   constructor(
     @InjectModel(User.name)
     private userModel: User,
@@ -103,6 +101,7 @@ export class UsersService {
           .select(rows)
           .exec();
         const resultArray = mergeAndRemoveDuplicates(category, subcategory);
+        //написать обработку если есть и категория и подкатегория чтоб выдавало только подкатегорию
         if (Array.isArray(resultArray) && resultArray.length === 0) {
           return {
             totalPages: 0,
@@ -885,7 +884,11 @@ export class UsersService {
         return user;
       }
     } catch (e) {
-      throw e;
+      if (e.message === 'jwt expired') {
+        throw new Unauthorized('jwt expired');
+      } else {
+        throw e;
+      }
     }
   }
 
@@ -895,7 +898,7 @@ export class UsersService {
         id: authUser._id,
       };
       const SECRET_KEY = process.env.SECRET_KEY;
-      const token = sign(payload, SECRET_KEY, { expiresIn: '10m' });
+      const token = sign(payload, SECRET_KEY, { expiresIn: '1m' });
       const refreshToken = sign(payload, SECRET_KEY);
       await this.userModel.findByIdAndUpdate(authUser._id, {
         token: token,
@@ -939,8 +942,8 @@ export class UsersService {
         .select('-password')
         .exec();
       return authentificationUser;
-    } catch (error) {
-      throw error;
+    } catch (e) {
+      throw e;
     }
   }
   // CATEGORY

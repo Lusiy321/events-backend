@@ -764,7 +764,12 @@ let UsersService = class UsersService {
             }
         }
         catch (e) {
-            throw e;
+            if (e.message === 'jwt expired') {
+                throw new http_errors_1.Unauthorized('jwt expired');
+            }
+            else {
+                throw e;
+            }
         }
     }
     async createToken(authUser) {
@@ -773,7 +778,7 @@ let UsersService = class UsersService {
                 id: authUser._id,
             };
             const SECRET_KEY = process.env.SECRET_KEY;
-            const token = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY, { expiresIn: '10m' });
+            const token = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY, { expiresIn: '1m' });
             const refreshToken = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY);
             await this.userModel.findByIdAndUpdate(authUser._id, {
                 token: token,
@@ -818,8 +823,8 @@ let UsersService = class UsersService {
                 .exec();
             return authentificationUser;
         }
-        catch (error) {
-            throw error;
+        catch (e) {
+            throw e;
         }
     }
     async findCategory() {
