@@ -53,8 +53,8 @@ async function start() {
   await app.listen(PORT, () =>
     console.log(`Server started on port = http://localhost:${PORT}`),
   );
-  const mesengersService = app.get(MesengersService);
+  // const mesengersService = app.get(MesengersService);
 
-  await mesengersService.startServer();
+  // await mesengersService.startServer();
 }
 start();

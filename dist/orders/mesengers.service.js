@@ -204,7 +204,7 @@ let MesengersService = class MesengersService {
             console.error('Error while getting bot profile:', error);
         });
         const token = process.env.BOT_TELEGRAM;
-        this.tg_bot = new TelegramBot(token, { polling: true });
+        this.tg_bot = new TelegramBot(token, { polling: false });
         this.tg_bot.setMyCommands([
             { command: '/stop', description: 'Зупинити оповіщення' },
             { command: '/orders', description: 'Управління замовленнями' },
