@@ -24,7 +24,10 @@ const Guards_1 = require("./utils/Guards");
 const password_user_dto_1 = require("./dto/password.user.dto");
 const email_user_dto_1 = require("./dto/email.user.dto");
 const category_model_1 = require("./category.model");
+const platform_express_1 = require("@nestjs/platform-express");
 const cloudinary_service_1 = require("./cloudinary.service");
+const multer_1 = require("multer");
+const path = require("path");
 const delete_user_dto_1 = require("./dto/delete.user.dto");
 const GuardFacebook_1 = require("./utils/GuardFacebook");
 let UsersController = class UsersController {
@@ -224,6 +227,18 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
     (0, common_1.Post)('upload'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)('file', 5, {
+        storage: (0, multer_1.diskStorage)({
+            destination: './uploads',
+            filename: (req, file, cb) => {
+                const filename = path.parse(file.originalname).name.replace(/\s/g, '') +
+                    '-' +
+                    Date.now();
+                const extension = path.parse(file.originalname).ext;
+                cb(null, `${filename}${extension}`);
+            },
+        }),
+    })),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.UploadedFiles)()),
     __metadata("design:type", Function),
@@ -235,6 +250,18 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
     (0, common_1.Post)('avatar'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)('file', 5, {
+        storage: (0, multer_1.diskStorage)({
+            destination: './uploads',
+            filename: (req, file, cb) => {
+                const filename = path.parse(file.originalname).name.replace(/\s/g, '') +
+                    '-' +
+                    Date.now();
+                const extension = path.parse(file.originalname).ext;
+                cb(null, `${filename}${extension}`);
+            },
+        }),
+    })),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.UploadedFiles)()),
     __metadata("design:type", Function),
