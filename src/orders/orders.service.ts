@@ -91,7 +91,9 @@ export class OrdersService {
   async verifyOrder(code: string) {
     try {
       const order = await this.ordersModel.findOne({ sms: code });
-      if (order.verify === false) {
+      if (!order) {
+        throw new NotFound('Order not found');
+      } else if (order.verify === false) {
         await this.ordersModel.findByIdAndUpdate(
           { _id: order._id },
           { verify: true, sms: null },
@@ -141,12 +143,11 @@ export class OrdersService {
 
           return usersArr;
         }
-      }
-      if (!order) {
-        throw new NotFound('Order not found');
+      } else {
+        throw new BadRequest('Order not found');
       }
     } catch (e) {
-      throw new BadRequest(e.message);
+      throw e;
     }
   }
 

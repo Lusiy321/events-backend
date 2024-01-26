@@ -65,8 +65,7 @@ export class OrdersController {
   @HttpCode(200)
   @Post('/verify/:code')
   async verifyBySms(@Param('code') code: string): Promise<Orders> {
-    await this.ordersService.verifyOrder(code);
-    return await this.ordersModel.findOne({ sms: code });
+    return await this.ordersService.verifyOrder(code);
   }
 
   @ApiOperation({ summary: 'Get all user orders' })

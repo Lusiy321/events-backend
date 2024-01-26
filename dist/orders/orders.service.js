@@ -101,7 +101,10 @@ let OrdersService = class OrdersService {
     async verifyOrder(code) {
         try {
             const order = await this.ordersModel.findOne({ sms: code });
-            if (order.verify === false) {
+            if (!order) {
+                throw new http_errors_1.NotFound('Order not found');
+            }
+            else if (order.verify === false) {
                 await this.ordersModel.findByIdAndUpdate({ _id: order._id }, { verify: true, sms: null });
                 const usersArr = await this.findUserByCategory(order);
                 const sendMessagePromises = usersArr.map(async (user) => {
@@ -140,12 +143,12 @@ let OrdersService = class OrdersService {
                     return usersArr;
                 }
             }
-            if (!order) {
-                throw new http_errors_1.NotFound('Order not found');
+            else {
+                throw new http_errors_1.BadRequest('Order not found');
             }
         }
         catch (e) {
-            throw new http_errors_1.BadRequest(e.message);
+            throw e;
         }
     }
     async checkTrialStatus(id) {

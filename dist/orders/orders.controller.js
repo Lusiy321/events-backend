@@ -40,8 +40,7 @@ let OrdersController = class OrdersController {
         return res.redirect('viber://pa?chatURI=wechirka', 200);
     }
     async verifyBySms(code) {
-        await this.ordersService.verifyOrder(code);
-        return await this.ordersModel.findOne({ sms: code });
+        return await this.ordersService.verifyOrder(code);
     }
     async findPhoneUser(phone) {
         return this.ordersService.findOrderByPhone(phone);
