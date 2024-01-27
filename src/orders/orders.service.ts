@@ -11,6 +11,7 @@ import {
   paginateArray,
   rows,
 } from 'src/users/utils/parse.user';
+import { emit } from 'process';
 
 @Injectable()
 export class OrdersService {
@@ -72,19 +73,22 @@ export class OrdersService {
       if (Array.isArray(allOrders) && allOrders.length !== 0) {
         const tgChat = allOrders[0].tg_chat;
         const viber = allOrders[0].viber_chat;
+        if (tgChat && viber === null) {
+          return order;
+        }
         if (tgChat !== null) {
           await this.mesengersService.sendCode(tgChat);
           return order;
-        } else if (viber !== null) {
+        }
+        if (viber !== null) {
           await this.mesengersService.sendCode(viber);
           return order;
-        } else {
-          return order;
         }
+        return order;
       }
       return order;
     } catch (e) {
-      throw new BadRequest(e.message);
+      throw e;
     }
   }
 
