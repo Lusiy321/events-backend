@@ -148,6 +148,9 @@ let OrdersService = class OrdersService {
             }
         }
         catch (e) {
+            if (e.message === 'ETELEGRAM: 400 Bad Request: chat not found') {
+                return [];
+            }
             throw e;
         }
     }

@@ -154,6 +154,9 @@ export class OrdersService {
         throw new BadRequest('Order not found');
       }
     } catch (e) {
+      if (e.message === 'ETELEGRAM: 400 Bad Request: chat not found') {
+        return [];
+      }
       throw e;
     }
   }
