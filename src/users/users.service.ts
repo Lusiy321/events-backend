@@ -54,7 +54,6 @@ export class UsersService {
       const offset = (curentPage - 1) * limit;
       // Если ничего не задано в строке
       if (!req && !loc && !cat && !subcat) {
-        console.log('tyt 0');
         const result = await this.userModel
           .find() // добавить поиск по verify
           .select(rows)
@@ -77,7 +76,6 @@ export class UsersService {
         (cat && !subcat && !loc) ||
         (cat && subcat && !loc)
       ) {
-        console.log('tyt 1');
         const category = await this.userModel
           .find({
             category: {
@@ -120,7 +118,6 @@ export class UsersService {
       }
       // Если есть запрос без локации
       if (req && !loc && !cat && !subcat) {
-        console.log('tyt 2');
         const findTitle = await this.userModel
           .find({
             title: { $regex: regexReq },
@@ -197,7 +194,6 @@ export class UsersService {
         }
         //Если нет запроса, но есть локация
       } else if (!req && loc && cat && subcat) {
-        console.log('tyt 3');
         const subcategory = await this.userModel
           .find({
             'category.subcategories': {
@@ -226,8 +222,31 @@ export class UsersService {
             data: result,
           };
         }
+      } else if (!req && loc && !cat && !subcat) {
+        const location = await this.userModel
+          .find({
+            location: { $regex: regexLoc },
+          })
+          .sort({ createdAt: -1 })
+          .select(rows)
+          .exec();
+
+        if (Array.isArray(location) && location.length === 0) {
+          return {
+            totalPages: 0,
+            currentPage: 0,
+            data: location,
+          };
+        } else {
+          const result = paginateArray(location, curentPage);
+          const totalPages = Math.ceil(location.length / limit);
+          return {
+            totalPages: totalPages,
+            currentPage: curentPage,
+            data: result,
+          };
+        }
       } else if (!req && loc && cat && !subcat) {
-        console.log('tyt 3/1');
         const category = await this.userModel
           .find({
             category: {
@@ -261,7 +280,6 @@ export class UsersService {
         (req && loc && cat && subcat) ||
         (req && loc && cat && !subcat)
       ) {
-        console.log('tyt 4');
         const findTitle = await this.userModel
           .find({
             title: { $regex: regexReq },

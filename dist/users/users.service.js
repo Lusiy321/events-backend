@@ -48,7 +48,6 @@ let UsersService = class UsersService {
             const totalPages = Math.ceil(totalCount / limit);
             const offset = (curentPage - 1) * limit;
             if (!req && !loc && !cat && !subcat) {
-                console.log('tyt 0');
                 const result = await this.userModel
                     .find()
                     .select(parse_user_1.rows)
@@ -67,7 +66,6 @@ let UsersService = class UsersService {
             if ((!req && !loc) ||
                 (cat && !subcat && !loc) ||
                 (cat && subcat && !loc)) {
-                console.log('tyt 1');
                 const category = await this.userModel
                     .find({
                     category: {
@@ -109,7 +107,6 @@ let UsersService = class UsersService {
                 }
             }
             if (req && !loc && !cat && !subcat) {
-                console.log('tyt 2');
                 const findTitle = await this.userModel
                     .find({
                     title: { $regex: regexReq },
@@ -179,7 +176,6 @@ let UsersService = class UsersService {
                 }
             }
             else if (!req && loc && cat && subcat) {
-                console.log('tyt 3');
                 const subcategory = await this.userModel
                     .find({
                     'category.subcategories': {
@@ -209,8 +205,32 @@ let UsersService = class UsersService {
                     };
                 }
             }
+            else if (!req && loc && !cat && !subcat) {
+                const location = await this.userModel
+                    .find({
+                    location: { $regex: regexLoc },
+                })
+                    .sort({ createdAt: -1 })
+                    .select(parse_user_1.rows)
+                    .exec();
+                if (Array.isArray(location) && location.length === 0) {
+                    return {
+                        totalPages: 0,
+                        currentPage: 0,
+                        data: location,
+                    };
+                }
+                else {
+                    const result = (0, parse_user_1.paginateArray)(location, curentPage);
+                    const totalPages = Math.ceil(location.length / limit);
+                    return {
+                        totalPages: totalPages,
+                        currentPage: curentPage,
+                        data: result,
+                    };
+                }
+            }
             else if (!req && loc && cat && !subcat) {
-                console.log('tyt 3/1');
                 const category = await this.userModel
                     .find({
                     category: {
@@ -242,7 +262,6 @@ let UsersService = class UsersService {
             }
             else if ((req && loc && cat && subcat) ||
                 (req && loc && cat && !subcat)) {
-                console.log('tyt 4');
                 const findTitle = await this.userModel
                     .find({
                     title: { $regex: regexReq },
