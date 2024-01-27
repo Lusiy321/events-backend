@@ -5,6 +5,7 @@ const app_module_1 = require("./app.module");
 const platform_express_1 = require("@nestjs/platform-express");
 const express_1 = require("express");
 const swagger_1 = require("@nestjs/swagger");
+const mesengers_service_1 = require("./orders/mesengers.service");
 const session = require("express-session");
 async function start() {
     const PORT = process.env.PORT || 5000;
@@ -38,6 +39,8 @@ async function start() {
     const document = swagger_1.SwaggerModule.createDocument(app, config);
     swagger_1.SwaggerModule.setup('docs', app, document);
     await app.listen(PORT, () => console.log(`Server started on port = http://localhost:${PORT}`));
+    const mesengersService = app.get(mesengers_service_1.MesengersService);
+    await mesengersService.startServer();
 }
 start();
 //# sourceMappingURL=main.js.map
