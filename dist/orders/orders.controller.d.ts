@@ -10,6 +10,6 @@ export declare class OrdersController {
     findIdOrders(id: string): Promise<Orders>;
     create(user: CreateOrderDto): Promise<Orders>;
     bot(res: any): Promise<any>;
-    verifyBySms(code: string): Promise<Orders>;
+    verifyBySms(code: number): Promise<Orders>;
     findPhoneUser(phone: string): Promise<Orders[]>;
 }

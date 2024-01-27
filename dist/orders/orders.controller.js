@@ -100,7 +100,7 @@ __decorate([
     (0, common_1.Post)('/verify/:code'),
     __param(0, (0, common_1.Param)('code')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "verifyBySms", null);
 __decorate([

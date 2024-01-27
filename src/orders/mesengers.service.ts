@@ -14,6 +14,7 @@ import { newOrderKeyboard, newOrderMsg } from './Telegram/new.order.msg';
 import { MAIN_KEYBOARD_VIBER, mainKeyboardViber } from './Viber/main.keyboard';
 import { OrdersArchive } from './order.archive.model';
 import { Model } from 'mongoose';
+import { NotFound, BadRequest } from 'http-errors';
 
 @Injectable()
 export class MesengersService {
@@ -1198,7 +1199,7 @@ export class MesengersService {
     }
   }
 
-  async sendNewTgOrder(chatId: string, order: Orders) {
+  async sendNewTgOrder(chatId: number, order: Orders) {
     try {
       const msg = newOrderMsg(order);
       const keyboard = newOrderKeyboard(order, chatId);
@@ -1207,7 +1208,7 @@ export class MesengersService {
       });
       return result;
     } catch (error) {
-      throw new Error(`Помилка надсиланння повідомлення: ${error}`);
+      throw new BadRequest(`Помилка надсиланння повідомлення: ${error}`);
     }
   }
 }

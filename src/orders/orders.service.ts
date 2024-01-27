@@ -71,7 +71,7 @@ export class OrdersService {
       const allOrders = await this.ordersModel.find({ phone: order.phone });
       if (Array.isArray(allOrders) && allOrders.length !== 0) {
         const tgChat = allOrders[0].tg_chat;
-        const viber = allOrders[0].viber;
+        const viber = allOrders[0].viber_chat;
         if (tgChat !== null) {
           await this.mesengersService.sendCode(tgChat);
           return order;
@@ -88,10 +88,10 @@ export class OrdersService {
     }
   }
 
-  async verifyOrder(code: string) {
+  async verifyOrder(code: number) {
     try {
       const order = await this.ordersModel.findOne({ sms: code });
-      if (!order) {
+      if (order === null) {
         throw new NotFound('Order not found');
       } else if (order.verify === false) {
         await this.ordersModel.findByIdAndUpdate(
@@ -101,34 +101,38 @@ export class OrdersService {
 
         const usersArr = await this.findUserByCategory(order);
         const sendMessagePromises = usersArr.map(
-          async (user: { tg_chat: string; _id: string; viber: string }) => {
+          async (user: {
+            tg_chat: number;
+            _id: string;
+            viber_chat: string;
+          }) => {
             if (user.tg_chat !== null) {
               const check = await this.checkTrialStatus(user._id);
               if (check === true) {
                 await this.mesengersService.sendNewTgOrder(user.tg_chat, order);
               }
             }
-
-            if (user.viber !== null) {
+            if (user.viber_chat !== null) {
               const check = await this.checkTrialStatus(user._id);
               if (check === true) {
                 await this.mesengersService.sendNewViberOrder(
-                  user.viber,
+                  user.viber_chat,
                   order,
                 );
               }
             }
           },
         );
-
         await Promise.all(sendMessagePromises);
-
         if (usersArr.length !== 0) {
           const message = `Ваше замовлення було успішно опубліковано. По вашим параметрам знайшлося ${usersArr.length} виконавців.`;
           if (order.tg_chat !== null) {
             await this.mesengersService.sendMessageTg(order.tg_chat, message);
-          } else if (order.viber !== null) {
-            await this.mesengersService.sendMessageViber(order.viber, message);
+          } else if (order.viber_chat !== null) {
+            await this.mesengersService.sendMessageViber(
+              order.viber_chat,
+              message,
+            );
           }
           return usersArr;
         } else {
@@ -137,8 +141,11 @@ export class OrdersService {
 
           if (order.tg_chat !== null) {
             await this.mesengersService.sendMessageTg(order.tg_chat, message);
-          } else if (order.viber !== null) {
-            await this.mesengersService.sendMessageViber(order.viber, message);
+          } else if (order.viber_chat !== null) {
+            await this.mesengersService.sendMessageViber(
+              order.viber_chat,
+              message,
+            );
           }
 
           return usersArr;
@@ -204,30 +211,30 @@ export class OrdersService {
         const regexLocation = new RegExp('Київська область', 'i');
         const category = await this.userModel
           .find({
-            category: {
+            'category.subcategories': {
               $elemMatch: {
                 id: findId,
               },
-              location: { $regex: regexLocation },
             },
+            location: { $regex: regexLocation },
+          })
+          .exec();
+        return category;
+      } else {
+        const regexLocation = new RegExp(region, 'i');
+        const category = await this.userModel
+          .find({
+            'category.subcategories': {
+              $elemMatch: {
+                id: findId,
+              },
+            },
+            location: { $regex: regexLocation },
           })
           .exec();
         return category;
       }
-      const regexLocation = new RegExp(region, 'i');
-      const category = await this.userModel
-        .find({
-          category: {
-            $elemMatch: {
-              id: findId,
-            },
-            location: { $regex: regexLocation },
-          },
-        })
-        .exec();
-      return category;
     }
-
     return subcategory;
   }
 

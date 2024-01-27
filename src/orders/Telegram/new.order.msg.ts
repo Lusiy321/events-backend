@@ -15,7 +15,7 @@ export function newOrderMsg(order: Orders) {
 
 export function newOrderKeyboard(
   order: Orders,
-  chatId: string,
+  chatId: number,
 ): InlineKeyboardMarkup {
   const keyboard: InlineKeyboardMarkup = {
     inline_keyboard: [

@@ -28,6 +28,7 @@ const new_order_msg_1 = require("./Telegram/new.order.msg");
 const main_keyboard_1 = require("./Viber/main.keyboard");
 const order_archive_model_1 = require("./order.archive.model");
 const mongoose_2 = require("mongoose");
+const http_errors_1 = require("http-errors");
 let MesengersService = class MesengersService {
     constructor(ordersModel, ordersArchiveModel, userModel) {
         this.ordersModel = ordersModel;
@@ -1061,7 +1062,7 @@ let MesengersService = class MesengersService {
             return result;
         }
         catch (error) {
-            throw new Error(`Помилка надсиланння повідомлення: ${error}`);
+            throw new http_errors_1.BadRequest(`Помилка надсиланння повідомлення: ${error}`);
         }
     }
 };

@@ -79,7 +79,7 @@ let OrdersService = class OrdersService {
             const allOrders = await this.ordersModel.find({ phone: order.phone });
             if (Array.isArray(allOrders) && allOrders.length !== 0) {
                 const tgChat = allOrders[0].tg_chat;
-                const viber = allOrders[0].viber;
+                const viber = allOrders[0].viber_chat;
                 if (tgChat !== null) {
                     await this.mesengersService.sendCode(tgChat);
                     return order;
@@ -101,7 +101,7 @@ let OrdersService = class OrdersService {
     async verifyOrder(code) {
         try {
             const order = await this.ordersModel.findOne({ sms: code });
-            if (!order) {
+            if (order === null) {
                 throw new http_errors_1.NotFound('Order not found');
             }
             else if (order.verify === false) {
@@ -114,10 +114,10 @@ let OrdersService = class OrdersService {
                             await this.mesengersService.sendNewTgOrder(user.tg_chat, order);
                         }
                     }
-                    if (user.viber !== null) {
+                    if (user.viber_chat !== null) {
                         const check = await this.checkTrialStatus(user._id);
                         if (check === true) {
-                            await this.mesengersService.sendNewViberOrder(user.viber, order);
+                            await this.mesengersService.sendNewViberOrder(user.viber_chat, order);
                         }
                     }
                 });
@@ -127,8 +127,8 @@ let OrdersService = class OrdersService {
                     if (order.tg_chat !== null) {
                         await this.mesengersService.sendMessageTg(order.tg_chat, message);
                     }
-                    else if (order.viber !== null) {
-                        await this.mesengersService.sendMessageViber(order.viber, message);
+                    else if (order.viber_chat !== null) {
+                        await this.mesengersService.sendMessageViber(order.viber_chat, message);
                     }
                     return usersArr;
                 }
@@ -137,8 +137,8 @@ let OrdersService = class OrdersService {
                     if (order.tg_chat !== null) {
                         await this.mesengersService.sendMessageTg(order.tg_chat, message);
                     }
-                    else if (order.viber !== null) {
-                        await this.mesengersService.sendMessageViber(order.viber, message);
+                    else if (order.viber_chat !== null) {
+                        await this.mesengersService.sendMessageViber(order.viber_chat, message);
                     }
                     return usersArr;
                 }
@@ -201,28 +201,30 @@ let OrdersService = class OrdersService {
                 const regexLocation = new RegExp('Київська область', 'i');
                 const category = await this.userModel
                     .find({
-                    category: {
+                    'category.subcategories': {
                         $elemMatch: {
                             id: findId,
                         },
-                        location: { $regex: regexLocation },
                     },
+                    location: { $regex: regexLocation },
                 })
                     .exec();
                 return category;
             }
-            const regexLocation = new RegExp(region, 'i');
-            const category = await this.userModel
-                .find({
-                category: {
-                    $elemMatch: {
-                        id: findId,
+            else {
+                const regexLocation = new RegExp(region, 'i');
+                const category = await this.userModel
+                    .find({
+                    'category.subcategories': {
+                        $elemMatch: {
+                            id: findId,
+                        },
                     },
                     location: { $regex: regexLocation },
-                },
-            })
-                .exec();
-            return category;
+                })
+                    .exec();
+                return category;
+            }
         }
         return subcategory;
     }

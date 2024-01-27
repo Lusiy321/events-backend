@@ -64,7 +64,7 @@ export class OrdersController {
   @ApiResponse({ status: 200, type: Orders })
   @HttpCode(200)
   @Post('/verify/:code')
-  async verifyBySms(@Param('code') code: string): Promise<Orders> {
+  async verifyBySms(@Param('code') code: number): Promise<Orders> {
     return await this.ordersService.verifyOrder(code);
   }
 

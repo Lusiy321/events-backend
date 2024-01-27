@@ -48,6 +48,7 @@ let UsersService = class UsersService {
             const totalPages = Math.ceil(totalCount / limit);
             const offset = (curentPage - 1) * limit;
             if (!req && !loc && !cat && !subcat) {
+                console.log('tyt 0');
                 const result = await this.userModel
                     .find()
                     .select(parse_user_1.rows)
@@ -63,11 +64,10 @@ let UsersService = class UsersService {
             }
             const regexReq = new RegExp(req, 'i');
             const regexLoc = new RegExp(loc, 'i');
-            if ((req === '' && loc === '') ||
-                (!req && !loc) ||
-                (cat && !subcat) ||
-                (!cat && subcat) ||
-                (cat && subcat)) {
+            if ((!req && !loc) ||
+                (cat && !subcat && !loc) ||
+                (cat && subcat && !loc)) {
+                console.log('tyt 1');
                 const category = await this.userModel
                     .find({
                     category: {
@@ -108,7 +108,8 @@ let UsersService = class UsersService {
                     };
                 }
             }
-            if ((req !== '' && loc === '') || !loc) {
+            if (req && !loc && !cat && !subcat) {
+                console.log('tyt 2');
                 const findTitle = await this.userModel
                     .find({
                     title: { $regex: regexReq },
@@ -145,28 +146,6 @@ let UsersService = class UsersService {
                     .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
-                const category = await this.userModel
-                    .find({
-                    category: {
-                        $elemMatch: {
-                            _id: cat,
-                        },
-                    },
-                })
-                    .sort({ createdAt: -1 })
-                    .select(parse_user_1.rows)
-                    .exec();
-                const subcategory = await this.userModel
-                    .find({
-                    'category.subcategories': {
-                        $elemMatch: {
-                            id: subcat,
-                        },
-                    },
-                })
-                    .sort({ createdAt: -1 })
-                    .select(parse_user_1.rows)
-                    .exec();
                 const findLocation = await this.userModel
                     .find({
                     location: { $regex: regexReq },
@@ -181,7 +160,7 @@ let UsersService = class UsersService {
                     .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
-                const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(findTitle, findDescr, category, subcategory, findCat, findSubcat, findLocation, findName);
+                const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(findTitle, findDescr, findCat, findSubcat, findLocation, findName);
                 if (Array.isArray(resultArray) && resultArray.length === 0) {
                     return {
                         totalPages: 0,
@@ -199,28 +178,8 @@ let UsersService = class UsersService {
                     };
                 }
             }
-            else if ((req === '' && loc !== '') || !req) {
-                const findLocation = await this.userModel
-                    .find({
-                    location: { $regex: regexLoc },
-                })
-                    .sort({ createdAt: -1 })
-                    .select(parse_user_1.rows)
-                    .skip(offset)
-                    .limit(limit)
-                    .exec();
-                const category = await this.userModel
-                    .find({
-                    category: {
-                        $elemMatch: {
-                            _id: cat,
-                        },
-                    },
-                    location: { $regex: regexLoc },
-                })
-                    .sort({ createdAt: -1 })
-                    .select(parse_user_1.rows)
-                    .exec();
+            else if (!req && loc && cat && subcat) {
+                console.log('tyt 3');
                 const subcategory = await this.userModel
                     .find({
                     'category.subcategories': {
@@ -233,17 +192,16 @@ let UsersService = class UsersService {
                     .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
-                const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(category, subcategory, findLocation);
-                if (Array.isArray(resultArray) && findLocation.length === 0) {
+                if (Array.isArray(subcategory) && subcategory.length === 0) {
                     return {
                         totalPages: 0,
                         currentPage: 0,
-                        data: resultArray,
+                        data: subcategory,
                     };
                 }
                 else {
-                    const result = (0, parse_user_1.paginateArray)(resultArray, curentPage);
-                    const totalPages = Math.ceil(resultArray.length / limit);
+                    const result = (0, parse_user_1.paginateArray)(subcategory, curentPage);
+                    const totalPages = Math.ceil(subcategory.length / limit);
                     return {
                         totalPages: totalPages,
                         currentPage: curentPage,
@@ -251,7 +209,40 @@ let UsersService = class UsersService {
                     };
                 }
             }
-            else if (req !== '' && loc !== '') {
+            else if (!req && loc && cat && !subcat) {
+                console.log('tyt 3/1');
+                const category = await this.userModel
+                    .find({
+                    category: {
+                        $elemMatch: {
+                            _id: cat,
+                        },
+                    },
+                    location: { $regex: regexLoc },
+                })
+                    .sort({ createdAt: -1 })
+                    .select(parse_user_1.rows)
+                    .exec();
+                if (Array.isArray(category) && category.length === 0) {
+                    return {
+                        totalPages: 0,
+                        currentPage: 0,
+                        data: category,
+                    };
+                }
+                else {
+                    const result = (0, parse_user_1.paginateArray)(category, curentPage);
+                    const totalPages = Math.ceil(category.length / limit);
+                    return {
+                        totalPages: totalPages,
+                        currentPage: curentPage,
+                        data: result,
+                    };
+                }
+            }
+            else if ((req && loc && cat && subcat) ||
+                (req && loc && cat && !subcat)) {
+                console.log('tyt 4');
                 const findTitle = await this.userModel
                     .find({
                     title: { $regex: regexReq },
@@ -279,12 +270,18 @@ let UsersService = class UsersService {
                     .exec();
                 const subcategory = await this.userModel
                     .find({
-                    'category.subcategories': {
-                        $elemMatch: {
-                            id: subcat,
+                    $and: [
+                        {
+                            'category.subcategories': {
+                                $elemMatch: {
+                                    id: subcat,
+                                },
+                            },
                         },
-                    },
-                    location: { $regex: regexLoc },
+                        {
+                            location: { $regex: regexLoc },
+                        },
+                    ],
                 })
                     .select(parse_user_1.rows)
                     .exec();

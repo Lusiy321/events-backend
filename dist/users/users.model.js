@@ -54,7 +54,7 @@ __decorate([
     (0, mongoose_1.Prop)({
         type: String,
         minlength: 2,
-        maxlength: 400,
+        maxlength: 1400,
     }),
     __metadata("design:type", String)
 ], User.prototype, "description", void 0);

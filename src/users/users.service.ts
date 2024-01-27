@@ -54,6 +54,7 @@ export class UsersService {
       const offset = (curentPage - 1) * limit;
       // Если ничего не задано в строке
       if (!req && !loc && !cat && !subcat) {
+        console.log('tyt 0');
         const result = await this.userModel
           .find() // добавить поиск по verify
           .select(rows)
@@ -70,14 +71,13 @@ export class UsersService {
 
       const regexReq = new RegExp(req, 'i');
       const regexLoc = new RegExp(loc, 'i');
-      // Если заданы пустые значения
+      // Если заданы пустые значения локации и запроса
       if (
-        (req === '' && loc === '') ||
         (!req && !loc) ||
-        (cat && !subcat) ||
-        (!cat && subcat) ||
-        (cat && subcat)
+        (cat && !subcat && !loc) ||
+        (cat && subcat && !loc)
       ) {
+        console.log('tyt 1');
         const category = await this.userModel
           .find({
             category: {
@@ -101,7 +101,6 @@ export class UsersService {
           .select(rows)
           .exec();
         const resultArray = mergeAndRemoveDuplicates(category, subcategory);
-        //написать обработку если есть и категория и подкатегория чтоб выдавало только подкатегорию
         if (Array.isArray(resultArray) && resultArray.length === 0) {
           return {
             totalPages: 0,
@@ -120,7 +119,8 @@ export class UsersService {
         }
       }
       // Если есть запрос без локации
-      if ((req !== '' && loc === '') || !loc) {
+      if (req && !loc && !cat && !subcat) {
+        console.log('tyt 2');
         const findTitle = await this.userModel
           .find({
             title: { $regex: regexReq },
@@ -157,28 +157,6 @@ export class UsersService {
           .sort({ createdAt: -1 })
           .select(rows)
           .exec();
-        const category = await this.userModel
-          .find({
-            category: {
-              $elemMatch: {
-                _id: cat,
-              },
-            },
-          })
-          .sort({ createdAt: -1 })
-          .select(rows)
-          .exec();
-        const subcategory = await this.userModel
-          .find({
-            'category.subcategories': {
-              $elemMatch: {
-                id: subcat,
-              },
-            },
-          })
-          .sort({ createdAt: -1 })
-          .select(rows)
-          .exec();
         const findLocation = await this.userModel
           .find({
             location: { $regex: regexReq },
@@ -197,8 +175,6 @@ export class UsersService {
         const resultArray = mergeAndRemoveDuplicates(
           findTitle,
           findDescr,
-          category,
-          subcategory,
           findCat,
           findSubcat,
           findLocation,
@@ -220,28 +196,8 @@ export class UsersService {
           };
         }
         //Если нет запроса, но есть локация
-      } else if ((req === '' && loc !== '') || !req) {
-        const findLocation = await this.userModel
-          .find({
-            location: { $regex: regexLoc },
-          })
-          .sort({ createdAt: -1 })
-          .select(rows)
-          .skip(offset)
-          .limit(limit)
-          .exec();
-        const category = await this.userModel
-          .find({
-            category: {
-              $elemMatch: {
-                _id: cat,
-              },
-            },
-            location: { $regex: regexLoc },
-          })
-          .sort({ createdAt: -1 })
-          .select(rows)
-          .exec();
+      } else if (!req && loc && cat && subcat) {
+        console.log('tyt 3');
         const subcategory = await this.userModel
           .find({
             'category.subcategories': {
@@ -255,21 +211,45 @@ export class UsersService {
           .select(rows)
           .exec();
 
-        const resultArray = mergeAndRemoveDuplicates(
-          category,
-          subcategory,
-          findLocation,
-        );
-
-        if (Array.isArray(resultArray) && findLocation.length === 0) {
+        if (Array.isArray(subcategory) && subcategory.length === 0) {
           return {
             totalPages: 0,
             currentPage: 0,
-            data: resultArray,
+            data: subcategory,
           };
         } else {
-          const result = paginateArray(resultArray, curentPage);
-          const totalPages = Math.ceil(resultArray.length / limit);
+          const result = paginateArray(subcategory, curentPage);
+          const totalPages = Math.ceil(subcategory.length / limit);
+          return {
+            totalPages: totalPages,
+            currentPage: curentPage,
+            data: result,
+          };
+        }
+      } else if (!req && loc && cat && !subcat) {
+        console.log('tyt 3/1');
+        const category = await this.userModel
+          .find({
+            category: {
+              $elemMatch: {
+                _id: cat,
+              },
+            },
+            location: { $regex: regexLoc },
+          })
+          .sort({ createdAt: -1 })
+          .select(rows)
+          .exec();
+
+        if (Array.isArray(category) && category.length === 0) {
+          return {
+            totalPages: 0,
+            currentPage: 0,
+            data: category,
+          };
+        } else {
+          const result = paginateArray(category, curentPage);
+          const totalPages = Math.ceil(category.length / limit);
           return {
             totalPages: totalPages,
             currentPage: curentPage,
@@ -277,7 +257,11 @@ export class UsersService {
           };
         }
         // Если есть локация и запрос
-      } else if (req !== '' && loc !== '') {
+      } else if (
+        (req && loc && cat && subcat) ||
+        (req && loc && cat && !subcat)
+      ) {
+        console.log('tyt 4');
         const findTitle = await this.userModel
           .find({
             title: { $regex: regexReq },
@@ -308,12 +292,18 @@ export class UsersService {
 
         const subcategory = await this.userModel
           .find({
-            'category.subcategories': {
-              $elemMatch: {
-                id: subcat,
+            $and: [
+              {
+                'category.subcategories': {
+                  $elemMatch: {
+                    id: subcat,
+                  },
+                },
               },
-            },
-            location: { $regex: regexLoc },
+              {
+                location: { $regex: regexLoc },
+              },
+            ],
           })
           .select(rows)
           .exec();

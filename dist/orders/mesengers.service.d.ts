@@ -46,5 +46,5 @@ export declare class MesengersService {
     sendMessagesToAllTgUsers(msg: string): Promise<void>;
     sendCode(chatId: string): Promise<void>;
     sendTgAgreement(phone: string, chatId: string): Promise<boolean>;
-    sendNewTgOrder(chatId: string, order: Orders): Promise<TelegramBot.Message>;
+    sendNewTgOrder(chatId: number, order: Orders): Promise<TelegramBot.Message>;
 }
