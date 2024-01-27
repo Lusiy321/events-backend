@@ -93,7 +93,8 @@ export class OrdersService {
       const order = await this.ordersModel.findOne({ sms: code });
       if (order === null) {
         throw new NotFound('Order not found');
-      } else if (order.verify === false) {
+      }
+      if (order.verify === false) {
         await this.ordersModel.findByIdAndUpdate(
           { _id: order._id },
           { verify: true, sms: null },

@@ -796,17 +796,35 @@ let UsersService = class UsersService {
             const SECRET_KEY = process.env.SECRET_KEY;
             const token = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY, { expiresIn: '1m' });
             const refreshToken = (0, jsonwebtoken_1.sign)(payload, SECRET_KEY);
-            await this.userModel.findByIdAndUpdate(authUser._id, {
-                token: token,
-                refresh_token: refreshToken,
-            });
             const authentificationUser = await this.userModel
                 .findById({
                 _id: authUser._id,
             })
                 .select('-password')
                 .exec();
-            return authentificationUser;
+            if (authentificationUser.refresh_token !== null) {
+                await this.userModel.findByIdAndUpdate(authUser._id, {
+                    token: token,
+                });
+                return await this.userModel
+                    .findById({
+                    _id: authUser._id,
+                })
+                    .select('-password')
+                    .exec();
+            }
+            else {
+                await this.userModel.findByIdAndUpdate(authUser._id, {
+                    token: token,
+                    refresh_token: refreshToken,
+                });
+                return await this.userModel
+                    .findById({
+                    _id: authUser._id,
+                })
+                    .select('-password')
+                    .exec();
+            }
         }
         catch (e) {
             throw e;

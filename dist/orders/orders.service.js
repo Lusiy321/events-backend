@@ -104,7 +104,7 @@ let OrdersService = class OrdersService {
             if (order === null) {
                 throw new http_errors_1.NotFound('Order not found');
             }
-            else if (order.verify === false) {
+            if (order.verify === false) {
                 await this.ordersModel.findByIdAndUpdate({ _id: order._id }, { verify: true, sms: null });
                 const usersArr = await this.findUserByCategory(order);
                 const sendMessagePromises = usersArr.map(async (user) => {
