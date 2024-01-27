@@ -107,7 +107,7 @@ __decorate([
         default: null,
     }),
     __metadata("design:type", String)
-], Orders.prototype, "viber", void 0);
+], Orders.prototype, "viber_chat", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         example: 'Kyiv',

@@ -75,18 +75,17 @@ export class OrdersService {
         const viber = allOrders[0].viber_chat;
         if (tgChat && viber === null) {
           return order;
-        }
-        if (tgChat !== null) {
+        } else if (tgChat !== null) {
           await this.mesengersService.sendCode(tgChat);
           return order;
-        }
-        if (viber !== null) {
+        } else if (viber !== null) {
           await this.mesengersService.sendCode(viber);
           return order;
         }
         return order;
+      } else {
+        return order;
       }
-      return order;
     } catch (e) {
       throw e;
     }

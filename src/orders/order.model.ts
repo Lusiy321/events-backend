@@ -88,7 +88,7 @@ export class Orders extends Model<Orders> {
     type: String,
     default: null,
   })
-  viber: string;
+  viber_chat: string;
 
   @ApiProperty({
     example: 'Kyiv',

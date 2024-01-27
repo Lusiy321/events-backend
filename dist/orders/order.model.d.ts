@@ -34,7 +34,7 @@ export declare class Orders extends Model<Orders> {
     tg_chat: number;
     botLink: string;
     exactLocation: string;
-    viber: string;
+    viber_chat: string;
     location: string;
     price: string;
     date: string;

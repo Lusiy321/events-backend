@@ -83,17 +83,19 @@ let OrdersService = class OrdersService {
                 if (tgChat && viber === null) {
                     return order;
                 }
-                if (tgChat !== null) {
+                else if (tgChat !== null) {
                     await this.mesengersService.sendCode(tgChat);
                     return order;
                 }
-                if (viber !== null) {
+                else if (viber !== null) {
                     await this.mesengersService.sendCode(viber);
                     return order;
                 }
                 return order;
             }
-            return order;
+            else {
+                return order;
+            }
         }
         catch (e) {
             throw e;
