@@ -49,7 +49,7 @@ let UsersService = class UsersService {
             const offset = (curentPage - 1) * limit;
             if (!req && !loc && !cat && !subcat) {
                 const result = await this.userModel
-                    .find()
+                    .find({ verify: true })
                     .select(parse_user_1.rows)
                     .skip(offset)
                     .sort({ createdAt: -1 })
@@ -73,6 +73,7 @@ let UsersService = class UsersService {
                             _id: cat,
                         },
                     },
+                    verify: true,
                 })
                     .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
@@ -84,6 +85,7 @@ let UsersService = class UsersService {
                             id: subcat,
                         },
                     },
+                    verify: true,
                 })
                     .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
@@ -110,6 +112,7 @@ let UsersService = class UsersService {
                 const findTitle = await this.userModel
                     .find({
                     title: { $regex: regexReq },
+                    verify: true,
                 })
                     .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
@@ -121,6 +124,7 @@ let UsersService = class UsersService {
                             name: { $regex: regexReq },
                         },
                     },
+                    verify: true,
                 })
                     .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
@@ -132,6 +136,7 @@ let UsersService = class UsersService {
                             name: { $regex: regexReq },
                         },
                     },
+                    verify: true,
                 })
                     .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
@@ -139,6 +144,7 @@ let UsersService = class UsersService {
                 const findDescr = await this.userModel
                     .find({
                     description: { $regex: regexReq },
+                    verify: true,
                 })
                     .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
@@ -146,6 +152,7 @@ let UsersService = class UsersService {
                 const findLocation = await this.userModel
                     .find({
                     location: { $regex: regexReq },
+                    verify: true,
                 })
                     .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
@@ -153,6 +160,7 @@ let UsersService = class UsersService {
                 const findName = await this.userModel
                     .find({
                     firstName: { $regex: regexReq },
+                    verify: true,
                 })
                     .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
@@ -184,6 +192,7 @@ let UsersService = class UsersService {
                         },
                     },
                     location: { $regex: regexLoc },
+                    verify: true,
                 })
                     .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
@@ -209,6 +218,7 @@ let UsersService = class UsersService {
                 const location = await this.userModel
                     .find({
                     location: { $regex: regexLoc },
+                    verify: true,
                 })
                     .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
@@ -239,6 +249,7 @@ let UsersService = class UsersService {
                         },
                     },
                     location: { $regex: regexLoc },
+                    verify: true,
                 })
                     .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
@@ -266,6 +277,7 @@ let UsersService = class UsersService {
                     .find({
                     title: { $regex: regexReq },
                     location: { $regex: regexLoc },
+                    verify: true,
                 })
                     .select(parse_user_1.rows)
                     .exec();
@@ -273,6 +285,7 @@ let UsersService = class UsersService {
                     .find({
                     description: { $regex: regexReq },
                     location: { $regex: regexLoc },
+                    verify: true,
                 })
                     .select(parse_user_1.rows)
                     .exec();
@@ -284,6 +297,7 @@ let UsersService = class UsersService {
                         },
                     },
                     location: { $regex: regexLoc },
+                    verify: true,
                 })
                     .select(parse_user_1.rows)
                     .exec();
@@ -300,6 +314,7 @@ let UsersService = class UsersService {
                         {
                             location: { $regex: regexLoc },
                         },
+                        { verify: true },
                     ],
                 })
                     .select(parse_user_1.rows)
@@ -312,6 +327,7 @@ let UsersService = class UsersService {
                         },
                     },
                     location: { $regex: regexLoc },
+                    verify: true,
                 })
                     .select(parse_user_1.rows)
                     .exec();
@@ -323,6 +339,7 @@ let UsersService = class UsersService {
                         },
                     },
                     location: { $regex: regexLoc },
+                    verify: true,
                 })
                     .select(parse_user_1.rows)
                     .exec();
@@ -330,6 +347,7 @@ let UsersService = class UsersService {
                     .find({
                     firstName: { $regex: regexReq },
                     location: { $regex: regexLoc },
+                    verify: true,
                 })
                     .select(parse_user_1.rows)
                     .exec();
@@ -368,6 +386,7 @@ let UsersService = class UsersService {
     async findById(id) {
         try {
             const find = await this.userModel.findById(id).select('-password').exec();
+            await this.checkTrialStatus(id);
             return find;
         }
         catch (e) {
