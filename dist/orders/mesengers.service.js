@@ -958,16 +958,16 @@ let MesengersService = class MesengersService {
             }
         });
     }
-    async sendCode(chatId) {
+    async sendCode(chatId, code) {
         try {
             const telegram = await this.ordersModel.findOne({ tg_chat: chatId });
             const viber = await this.ordersModel.findOne({ viber_chat: chatId });
             if (telegram) {
-                const msg = `Ваш код верифікації: ${telegram.sms}\nПерейти на сайт: ${process.env.CODE_LINK}`;
+                const msg = `Ваш код верифікації: ${code}\nПерейти на сайт: ${process.env.CODE_LINK}`;
                 await this.sendMessageTg(chatId, msg);
             }
             else if (viber) {
-                const msg = `Ваш код верифікації: ${viber.sms}\nПерейти на сайт: ${process.env.CODE_LINK}`;
+                const msg = `Ваш код верифікації: ${code}\nПерейти на сайт: ${process.env.CODE_LINK}`;
                 await this.viber_bot.sendMessage({ id: chatId }, new TextMessage(msg), new KeyboardMessage(main_keyboard_1.MAIN_KEYBOARD_VIBER));
             }
             else {

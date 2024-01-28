@@ -80,15 +80,17 @@ let OrdersService = class OrdersService {
             if (Array.isArray(allOrders) && allOrders.length !== 0) {
                 const tgChat = allOrders[0].tg_chat;
                 const viber = allOrders[0].viber_chat;
-                if (tgChat && viber === null) {
+                if (tgChat === null && viber === null) {
                     return order;
                 }
-                else if (tgChat !== null) {
-                    await this.mesengersService.sendCode(tgChat);
+                if (tgChat !== null) {
+                    await this.ordersModel.findByIdAndUpdate({ _id: createdOrder._id }, { tg_chat: tgChat });
+                    await this.mesengersService.sendCode(tgChat, verificationCode);
                     return order;
                 }
-                else if (viber !== null) {
-                    await this.mesengersService.sendCode(viber);
+                if (viber !== null) {
+                    await this.ordersModel.findByIdAndUpdate({ _id: createdOrder._id }, { viber_chat: viber });
+                    await this.mesengersService.sendCode(viber, verificationCode);
                     return order;
                 }
                 return order;
