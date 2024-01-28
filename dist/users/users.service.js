@@ -49,11 +49,10 @@ let UsersService = class UsersService {
             const offset = (curentPage - 1) * limit;
             if (!req && !loc && !cat && !subcat) {
                 const result = await this.userModel
-                    .find({ verify: true })
-                    .select(parse_user_1.rows)
-                    .skip(offset)
-                    .sort({ createdAt: -1 })
-                    .limit(limit)
+                    .aggregate([
+                    { $match: { verify: true } },
+                    { $sample: { size: limit } },
+                ])
                     .exec();
                 return {
                     totalPages: totalPages,
