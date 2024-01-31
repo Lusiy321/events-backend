@@ -9,4 +9,5 @@ export declare class BannersController {
     findBannerById(id: string): Promise<Banner>;
     updateBanners(id: string, data: CreateBannerDto): Promise<Banner>;
     findBannerAndDel(id: string): Promise<Banner>;
+    getRight(): Promise<Object[]>;
 }

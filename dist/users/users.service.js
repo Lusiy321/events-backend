@@ -53,6 +53,8 @@ let UsersService = class UsersService {
                     { $match: { verify: true } },
                     { $sample: { size: limit } },
                 ])
+                    .limit(limit)
+                    .skip(offset)
                     .exec();
                 return {
                     totalPages: totalPages,

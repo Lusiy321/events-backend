@@ -20,8 +20,11 @@ async function start() {
             maxAge: 60000,
         },
     }));
-    app
-        .enableCors();
+    app.enableCors({
+        origin: 'https://show-swart.vercel.app',
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+        credentials: true,
+    });
     const config = new swagger_1.DocumentBuilder()
         .setTitle('Wechirka.com SERVER')
         .setDescription('Wechirka REAST API Documentation')

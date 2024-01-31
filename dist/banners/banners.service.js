@@ -28,9 +28,11 @@ const common_1 = require("@nestjs/common");
 const banners_model_1 = require("./banners.model");
 const mongoose_1 = require("@nestjs/mongoose");
 const http_errors_1 = require("http-errors");
+const users_model_1 = require("../users/users.model");
 let BannersService = class BannersService {
-    constructor(bannerModel) {
+    constructor(bannerModel, userModel) {
         this.bannerModel = bannerModel;
+        this.userModel = userModel;
     }
     async createBanner(banner) {
         try {
@@ -81,11 +83,139 @@ let BannersService = class BannersService {
             throw new http_errors_1.NotFound('Banner not found');
         }
     }
+    async getRightBanner() {
+        try {
+            const music = await this.userModel
+                .aggregate([
+                { $unwind: '$category' },
+                {
+                    $match: {
+                        'category._id': '65258a576f9a7d99e555c7bd',
+                    },
+                },
+                { $match: { verify: true } },
+                { $sample: { size: 3 } },
+            ])
+                .exec();
+            const animators = await this.userModel
+                .aggregate([
+                { $unwind: '$category' },
+                {
+                    $match: {
+                        'category._id': '65258abb6f9a7d99e555c7ce',
+                    },
+                },
+                { $match: { verify: true } },
+                { $sample: { size: 3 } },
+            ])
+                .exec();
+            const photo = await this.userModel
+                .aggregate([
+                { $unwind: '$category' },
+                {
+                    $match: {
+                        'category._id': '65258b446f9a7d99e555c7e2',
+                    },
+                },
+                { $match: { verify: true } },
+                { $sample: { size: 3 } },
+            ])
+                .exec();
+            const decorations = await this.userModel
+                .aggregate([
+                { $unwind: '$category' },
+                {
+                    $match: {
+                        'category._id': '65258b9d6f9a7d99e555c7f3',
+                    },
+                },
+                { $match: { verify: true } },
+                { $sample: { size: 3 } },
+            ])
+                .exec();
+            const catering = await this.userModel
+                .aggregate([
+                { $unwind: '$category' },
+                {
+                    $match: {
+                        'category._id': '65258c516f9a7d99e555c804',
+                    },
+                },
+                { $match: { verify: true } },
+                { $sample: { size: 3 } },
+            ])
+                .exec();
+            const rent = await this.userModel
+                .aggregate([
+                { $unwind: '$category' },
+                {
+                    $match: {
+                        'category._id': '65258ca76f9a7d99e555c815',
+                    },
+                },
+                { $match: { verify: true } },
+                { $sample: { size: 3 } },
+            ])
+                .exec();
+            const organ = await this.userModel
+                .aggregate([
+                { $unwind: '$category' },
+                {
+                    $match: {
+                        'category._id': '65258cf26f9a7d99e555c826',
+                    },
+                },
+                { $match: { verify: true } },
+                { $sample: { size: 3 } },
+            ])
+                .exec();
+            const corporative = await this.userModel
+                .aggregate([
+                { $unwind: '$category' },
+                {
+                    $match: {
+                        'category._id': '6525924f78a57a652732329d',
+                    },
+                },
+                { $match: { verify: true } },
+                { $sample: { size: 3 } },
+            ])
+                .exec();
+            const weddings = await this.userModel
+                .aggregate([
+                { $unwind: '$category' },
+                {
+                    $match: {
+                        'category._id': '6525934f78a57a65273232b1',
+                    },
+                },
+                { $match: { verify: true } },
+                { $sample: { size: 3 } },
+            ])
+                .exec();
+            return [
+                { id: 1, name: 'Музичні послуги', data: music },
+                { id: 2, name: 'Анімаційні послуги', data: animators },
+                { id: 3, name: 'Фото та відео', data: photo },
+                { id: 4, name: 'Декорації та дизайн', data: decorations },
+                { id: 5, name: 'Кейтеринг та розваги', data: catering },
+                { id: 6, name: 'Оренда обладнання', data: rent },
+                { id: 7, name: 'Послуги організації', data: organ },
+                { id: 8, name: 'Корпоративні заходи', data: corporative },
+                { id: 9, name: 'Весілля та ювілеї', data: weddings },
+            ];
+        }
+        catch (e) {
+            throw new http_errors_1.NotFound(`Banner not found: ${e}`);
+        }
+    }
 };
 exports.BannersService = BannersService;
 exports.BannersService = BannersService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(banners_model_1.Banner.name)),
-    __metadata("design:paramtypes", [banners_model_1.Banner])
+    __param(1, (0, mongoose_1.InjectModel)(users_model_1.User.name)),
+    __metadata("design:paramtypes", [banners_model_1.Banner,
+        users_model_1.User])
 ], BannersService);
 //# sourceMappingURL=banners.service.js.map

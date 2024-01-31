@@ -12,6 +12,7 @@ const banners_service_1 = require("./banners.service");
 const banners_controller_1 = require("./banners.controller");
 const mongoose_1 = require("@nestjs/mongoose");
 const banners_model_1 = require("./banners.model");
+const users_model_1 = require("../users/users.model");
 let BannersModule = class BannersModule {
 };
 exports.BannersModule = BannersModule;
@@ -20,6 +21,7 @@ exports.BannersModule = BannersModule = __decorate([
         imports: [
             mongoose_1.MongooseModule.forFeature([
                 { name: banners_model_1.Banner.name, schema: banners_model_1.BannerSchema, collection: 'banners' },
+                { name: users_model_1.User.name, schema: users_model_1.UserSchema, collection: 'users' },
             ]),
         ],
         providers: [banners_service_1.BannersService],
