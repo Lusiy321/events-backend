@@ -4,6 +4,7 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
 import { MesengersService } from './orders/mesengers.service';
 import * as session from 'express-session';
+import { DocumentBuilder } from '@nestjs/swagger';
 
 async function start() {
   const PORT = process.env.PORT || 5000;
@@ -43,12 +44,11 @@ async function start() {
     .addServer(`http://localhost:${PORT}`)
     .build();
 
-  });
   await app.listen(PORT, () =>
     console.log(`Server started on port = http://localhost:${PORT}`),
   );
-  // const mesengersService = app.get(MesengersService);
+  const mesengersService = app.get(MesengersService);
 
-  // await mesengersService.startServer();
+  await mesengersService.startServer();
 }
 start();
