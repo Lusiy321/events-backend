@@ -9,10 +9,12 @@ import { Category } from './category.model';
 import { CloudinaryService } from './cloudinary.service';
 import { DelUserMediaDto } from './dto/delete.user.dto';
 import { Categories } from './dto/caterory.interface';
+import { SearchService } from './search.service';
 export declare class UsersController {
     private readonly usersService;
+    private readonly searchService;
     private readonly cloudinaryService;
-    constructor(usersService: UsersService, cloudinaryService: CloudinaryService);
+    constructor(usersService: UsersService, searchService: SearchService, cloudinaryService: CloudinaryService);
     [x: string]: any;
     create(user: CreateUserDto): Promise<User>;
     searchUser(query: any): Promise<any>;

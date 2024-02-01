@@ -12,6 +12,8 @@ import { ConfigService } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
 import { FacebookStrategy } from './utils/FacebookStrategy';
 import * as nodemailer from 'nodemailer';
+import { SearchService } from './search.service';
+import { OrderSchema, Orders } from 'src/orders/order.model';
 
 @Module({
   imports: [
@@ -21,6 +23,7 @@ import * as nodemailer from 'nodemailer';
     }),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema, collection: 'users' },
+      { name: Orders.name, schema: OrderSchema, collection: 'orders' },
       { name: Category.name, schema: CategorySchema, collection: 'categories' },
     ]),
     MulterModule.register({
@@ -34,6 +37,7 @@ import * as nodemailer from 'nodemailer';
     { provide: 'USER_SERVICE', useClass: UsersService },
     UsersService,
     CloudinaryService,
+    SearchService,
     ConfigService,
     {
       provide: TRANSPORTER_PROVIDER,
@@ -50,7 +54,12 @@ import * as nodemailer from 'nodemailer';
       },
     },
   ],
-  exports: [UsersService, CloudinaryService, TRANSPORTER_PROVIDER],
+  exports: [
+    UsersService,
+    CloudinaryService,
+    TRANSPORTER_PROVIDER,
+    SearchService,
+  ],
   controllers: [UsersController],
 })
 export class UsersModule {}

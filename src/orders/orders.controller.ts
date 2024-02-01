@@ -13,14 +13,14 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Orders } from './order.model';
 import { CreateOrderDto } from './dto/create.order.dto';
 import { InjectModel } from '@nestjs/mongoose';
+import { SearchService } from 'src/users/search.service';
 
 @ApiTags('Orders')
 @Controller('orders')
 export class OrdersController {
   constructor(
     private readonly ordersService: OrdersService,
-    @InjectModel(Orders.name)
-    private ordersModel: Orders,
+    private readonly searchService: SearchService,
   ) {}
 
   @ApiOperation({
@@ -29,7 +29,7 @@ export class OrdersController {
   @ApiResponse({ status: 200, type: [Orders] })
   @Get('/')
   async searchUser(@Query() query: any): Promise<any> {
-    return this.ordersService.searchOrders(query);
+    return this.searchService.searchOrders(query);
   }
 
   @ApiOperation({ summary: 'Get all orders' })

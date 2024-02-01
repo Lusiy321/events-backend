@@ -6,6 +6,7 @@ import { OrderSchema, Orders } from './order.model';
 import { User, UserSchema } from 'src/users/users.model';
 import { MesengersService } from './mesengers.service';
 import { OrdersArchive, OrdersArchiveSchema } from './order.archive.model';
+import { SearchService } from 'src/users/search.service';
 
 @Module({
   imports: [
@@ -20,6 +21,6 @@ import { OrdersArchive, OrdersArchiveSchema } from './order.archive.model';
     ]),
   ],
   controllers: [OrdersController],
-  providers: [OrdersService, MesengersService],
+  providers: [OrdersService, MesengersService, SearchService],
 })
 export class OrdersModule {}

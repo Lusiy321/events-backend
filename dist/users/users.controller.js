@@ -30,16 +30,18 @@ const multer_1 = require("multer");
 const path = require("path");
 const delete_user_dto_1 = require("./dto/delete.user.dto");
 const GuardFacebook_1 = require("./utils/GuardFacebook");
+const search_service_1 = require("./search.service");
 let UsersController = class UsersController {
-    constructor(usersService, cloudinaryService) {
+    constructor(usersService, searchService, cloudinaryService) {
         this.usersService = usersService;
+        this.searchService = searchService;
         this.cloudinaryService = cloudinaryService;
     }
     async create(user) {
         return this.usersService.create(user);
     }
     async searchUser(query) {
-        return this.usersService.searchUsers(query);
+        return this.searchService.searchUsers(query);
     }
     async findUsers() {
         return this.usersService.findAllUsers();
@@ -389,6 +391,7 @@ exports.UsersController = UsersController = __decorate([
     (0, swagger_1.ApiTags)('User'),
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [users_service_1.UsersService,
+        search_service_1.SearchService,
         cloudinary_service_1.CloudinaryService])
 ], UsersController);
 //# sourceMappingURL=users.controller.js.map

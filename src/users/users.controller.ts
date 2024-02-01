@@ -38,12 +38,14 @@ import * as path from 'path';
 import { DelUserMediaDto } from './dto/delete.user.dto';
 import { FacebookAuthGuard } from './utils/GuardFacebook';
 import { Categories } from './dto/caterory.interface';
+import { SearchService } from './search.service';
 
 @ApiTags('User')
 @Controller('users')
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
+    private readonly searchService: SearchService,
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
@@ -62,7 +64,7 @@ export class UsersController {
   @ApiResponse({ status: 200, type: [User] })
   @Get('/')
   async searchUser(@Query() query: any): Promise<any> {
-    return this.usersService.searchUsers(query);
+    return this.searchService.searchUsers(query);
   }
 
   @ApiOperation({ summary: 'Get all users' })

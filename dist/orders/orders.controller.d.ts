@@ -1,10 +1,11 @@
 import { OrdersService } from './orders.service';
 import { Orders } from './order.model';
 import { CreateOrderDto } from './dto/create.order.dto';
+import { SearchService } from 'src/users/search.service';
 export declare class OrdersController {
     private readonly ordersService;
-    private ordersModel;
-    constructor(ordersService: OrdersService, ordersModel: Orders);
+    private readonly searchService;
+    constructor(ordersService: OrdersService, searchService: SearchService);
     searchUser(query: any): Promise<any>;
     findOrders(): Promise<Orders[]>;
     findIdOrders(id: string): Promise<Orders>;
