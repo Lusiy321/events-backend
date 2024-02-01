@@ -12,8 +12,7 @@ export declare class OrdersService {
     findOrderByPhone(phone: string): Promise<Orders[]>;
     generateSixDigitNumber(): Promise<number>;
     create(orderObj: CreateOrderDto): Promise<Orders>;
-    verifyOrder(code: string): Promise<any>;
+    verifyOrder(code: number): Promise<any>;
     checkTrialStatus(id: string): Promise<boolean>;
     findUserByCategory(order: Orders): Promise<any>;
-    searchOrders(query: any): Promise<any>;
 }

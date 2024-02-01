@@ -18,14 +18,14 @@ const orders_service_1 = require("./orders.service");
 const swagger_1 = require("@nestjs/swagger");
 const order_model_1 = require("./order.model");
 const create_order_dto_1 = require("./dto/create.order.dto");
-const mongoose_1 = require("@nestjs/mongoose");
+const search_service_1 = require("../users/search.service");
 let OrdersController = class OrdersController {
-    constructor(ordersService, ordersModel) {
+    constructor(ordersService, searchService) {
         this.ordersService = ordersService;
-        this.ordersModel = ordersModel;
+        this.searchService = searchService;
     }
     async searchUser(query) {
-        return this.ordersService.searchOrders(query);
+        return this.searchService.searchOrders(query);
     }
     async findOrders() {
         return this.ordersService.findAllOrders();
@@ -40,8 +40,7 @@ let OrdersController = class OrdersController {
         return res.redirect('viber://pa?chatURI=wechirka', 200);
     }
     async verifyBySms(code) {
-        await this.ordersService.verifyOrder(code);
-        return await this.ordersModel.findOne({ sms: code });
+        return await this.ordersService.verifyOrder(code);
     }
     async findPhoneUser(phone) {
         return this.ordersService.findOrderByPhone(phone);
@@ -101,7 +100,7 @@ __decorate([
     (0, common_1.Post)('/verify/:code'),
     __param(0, (0, common_1.Param)('code')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "verifyBySms", null);
 __decorate([
@@ -116,8 +115,7 @@ __decorate([
 exports.OrdersController = OrdersController = __decorate([
     (0, swagger_1.ApiTags)('Orders'),
     (0, common_1.Controller)('orders'),
-    __param(1, (0, mongoose_1.InjectModel)(order_model_1.Orders.name)),
     __metadata("design:paramtypes", [orders_service_1.OrdersService,
-        order_model_1.Orders])
+        search_service_1.SearchService])
 ], OrdersController);
 //# sourceMappingURL=orders.controller.js.map

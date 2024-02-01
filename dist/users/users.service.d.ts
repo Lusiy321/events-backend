@@ -1,6 +1,6 @@
 import { User } from './users.model';
 import { CreateUserDto } from './dto/create.user.dto';
-import { UpdateUserDto, search_result } from './dto/update.user.dto';
+import { UpdateUserDto } from './dto/update.user.dto';
 import { PasswordUserDto } from './dto/password.user.dto';
 import { MailUserDto } from './dto/email.user.dto';
 import { GoogleUserDto } from './dto/google.user.dto';
@@ -14,7 +14,6 @@ export declare class UsersService {
     private categoryModel;
     private transporter;
     constructor(userModel: User, categoryModel: Category, transporter: nodemailer.Transporter);
-    searchUsers(query: any): Promise<search_result>;
     findAllUsers(): Promise<User[]>;
     findById(id: string): Promise<User>;
     create(user: CreateUserDto): Promise<User>;

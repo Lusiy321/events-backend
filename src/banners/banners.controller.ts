@@ -40,6 +40,7 @@ export class BannersController {
   async findBannerById(@Param('id') id: string): Promise<Banner> {
     return this.bannerService.findBannerById(id);
   }
+
   @ApiOperation({
     summary: 'Update banner by ID',
   })
@@ -59,5 +60,14 @@ export class BannersController {
   @Delete('/:id')
   async findBannerAndDel(@Param('id') id: string): Promise<Banner> {
     return this.bannerService.deleteBanner(id);
+  }
+
+  @ApiOperation({
+    summary: 'Get Right banner',
+  })
+  @ApiResponse({ status: 200, type: Object })
+  @Get('right/get')
+  async getRight(): Promise<Object[]> {
+    return this.bannerService.getRightBanner();
   }
 }

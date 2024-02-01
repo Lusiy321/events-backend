@@ -6,11 +6,6 @@ import { CreateOrderDto } from './dto/create.order.dto';
 import { User } from 'src/users/users.model';
 import { Categories } from 'src/users/dto/caterory.interface';
 import { MesengersService } from 'src/orders/mesengers.service';
-import {
-  mergeAndRemoveDuplicates,
-  paginateArray,
-  rows,
-} from 'src/users/utils/parse.user';
 
 @Injectable()
 export class OrdersService {
@@ -69,28 +64,45 @@ export class OrdersService {
 
       const order = await this.ordersModel.findById(createdOrder._id);
       const allOrders = await this.ordersModel.find({ phone: order.phone });
+
       if (Array.isArray(allOrders) && allOrders.length !== 0) {
         const tgChat = allOrders[0].tg_chat;
-        const viber = allOrders[0].viber;
-        if (tgChat !== null) {
-          await this.mesengersService.sendCode(tgChat);
-          return order;
-        } else if (viber !== null) {
-          await this.mesengersService.sendCode(viber);
-          return order;
-        } else {
+        const viber = allOrders[0].viber_chat;
+
+        if (tgChat === null && viber === null) {
           return order;
         }
+        if (tgChat !== null) {
+          await this.ordersModel.findByIdAndUpdate(
+            { _id: createdOrder._id },
+            { tg_chat: tgChat },
+          );
+          await this.mesengersService.sendCode(tgChat, verificationCode);
+          return order;
+        }
+        if (viber !== null) {
+          await this.ordersModel.findByIdAndUpdate(
+            { _id: createdOrder._id },
+            { viber_chat: viber },
+          );
+          await this.mesengersService.sendCode(viber, verificationCode);
+          return order;
+        }
+        return order;
+      } else {
+        return order;
       }
-      return order;
     } catch (e) {
-      throw new BadRequest(e.message);
+      throw e;
     }
   }
 
-  async verifyOrder(code: string) {
+  async verifyOrder(code: number) {
     try {
       const order = await this.ordersModel.findOne({ sms: code });
+      if (order === null) {
+        throw new NotFound('Order not found');
+      }
       if (order.verify === false) {
         await this.ordersModel.findByIdAndUpdate(
           { _id: order._id },
@@ -99,34 +111,38 @@ export class OrdersService {
 
         const usersArr = await this.findUserByCategory(order);
         const sendMessagePromises = usersArr.map(
-          async (user: { tg_chat: string; _id: string; viber: string }) => {
+          async (user: {
+            tg_chat: number;
+            _id: string;
+            viber_chat: string;
+          }) => {
             if (user.tg_chat !== null) {
               const check = await this.checkTrialStatus(user._id);
               if (check === true) {
                 await this.mesengersService.sendNewTgOrder(user.tg_chat, order);
               }
             }
-
-            if (user.viber !== null) {
+            if (user.viber_chat !== null) {
               const check = await this.checkTrialStatus(user._id);
               if (check === true) {
                 await this.mesengersService.sendNewViberOrder(
-                  user.viber,
+                  user.viber_chat,
                   order,
                 );
               }
             }
           },
         );
-
         await Promise.all(sendMessagePromises);
-
         if (usersArr.length !== 0) {
           const message = `Ваше замовлення було успішно опубліковано. По вашим параметрам знайшлося ${usersArr.length} виконавців.`;
           if (order.tg_chat !== null) {
             await this.mesengersService.sendMessageTg(order.tg_chat, message);
-          } else if (order.viber !== null) {
-            await this.mesengersService.sendMessageViber(order.viber, message);
+          } else if (order.viber_chat !== null) {
+            await this.mesengersService.sendMessageViber(
+              order.viber_chat,
+              message,
+            );
           }
           return usersArr;
         } else {
@@ -135,18 +151,23 @@ export class OrdersService {
 
           if (order.tg_chat !== null) {
             await this.mesengersService.sendMessageTg(order.tg_chat, message);
-          } else if (order.viber !== null) {
-            await this.mesengersService.sendMessageViber(order.viber, message);
+          } else if (order.viber_chat !== null) {
+            await this.mesengersService.sendMessageViber(
+              order.viber_chat,
+              message,
+            );
           }
 
           return usersArr;
         }
-      }
-      if (!order) {
-        throw new NotFound('Order not found');
+      } else {
+        throw new BadRequest('Order not found');
       }
     } catch (e) {
-      throw new BadRequest(e.message);
+      if (e.message === 'ETELEGRAM: 400 Bad Request: chat not found') {
+        return [];
+      }
+      throw e;
     }
   }
 
@@ -203,314 +224,30 @@ export class OrdersService {
         const regexLocation = new RegExp('Київська область', 'i');
         const category = await this.userModel
           .find({
-            category: {
+            'category.subcategories': {
               $elemMatch: {
                 id: findId,
               },
-              location: { $regex: regexLocation },
             },
+            location: { $regex: regexLocation },
+          })
+          .exec();
+        return category;
+      } else {
+        const regexLocation = new RegExp(region, 'i');
+        const category = await this.userModel
+          .find({
+            'category.subcategories': {
+              $elemMatch: {
+                id: findId,
+              },
+            },
+            location: { $regex: regexLocation },
           })
           .exec();
         return category;
       }
-      const regexLocation = new RegExp(region, 'i');
-      const category = await this.userModel
-        .find({
-          category: {
-            $elemMatch: {
-              id: findId,
-            },
-            location: { $regex: regexLocation },
-          },
-        })
-        .exec();
-      return category;
     }
-
     return subcategory;
-  }
-
-  async searchOrders(query: any): Promise<any> {
-    const { req, loc, page, cat, subcat } = query;
-    try {
-      const curentPage = page || 1;
-      const limit = 8;
-      const totalCount = await this.ordersModel.countDocuments();
-
-      const totalPages = Math.ceil(totalCount / limit);
-      const offset = (curentPage - 1) * limit;
-      // Если ничего не задано в строке
-      if (!req && !loc && !cat && !subcat) {
-        const result = await this.ordersModel
-          .find() // добавить поиск по
-          .select(rows)
-          .skip(offset)
-          .sort({ createdAt: -1 })
-          .limit(limit)
-          .exec();
-        return {
-          totalPages: totalPages,
-          currentPage: curentPage,
-          data: result,
-        };
-      }
-
-      const regexReq = new RegExp(req, 'i');
-      const regexLoc = new RegExp(loc, 'i');
-      // Если заданы пустые значения
-      if (
-        (req === '' && loc === '') ||
-        (!req && !loc) ||
-        (cat && !subcat) ||
-        (!cat && subcat)
-      ) {
-        const category = await this.ordersModel
-          .find({
-            category: {
-              $elemMatch: {
-                _id: cat,
-              },
-            },
-          })
-          .select(rows)
-          .exec();
-        const subcategory = await this.ordersModel
-          .find({
-            'category.subcategories': {
-              $elemMatch: {
-                id: subcat,
-              },
-            },
-          })
-          .select(rows)
-          .exec();
-        const resultArray = mergeAndRemoveDuplicates(category, subcategory);
-        if (Array.isArray(resultArray) && resultArray.length === 0) {
-          throw new NotFound('Orders not found');
-        } else {
-          const result = paginateArray(resultArray, curentPage);
-          const totalPages = Math.ceil(resultArray.length / limit);
-          return {
-            totalPages: totalPages,
-            currentPage: curentPage,
-            data: result,
-          };
-        }
-      }
-      // Если есть запрос без локации
-      if ((req !== '' && loc === '') || !loc) {
-        const findCat = await this.ordersModel
-          .find({
-            category: {
-              $elemMatch: {
-                name: { $regex: regexReq },
-              },
-            },
-          })
-          .select(rows)
-          .exec();
-        const findSubcat = await this.ordersModel
-          .find({
-            'category.subcategories': {
-              $elemMatch: {
-                name: { $regex: regexReq },
-              },
-            },
-          })
-          .select(rows)
-          .exec();
-        const findDescr = await this.ordersModel
-          .find({
-            description: { $regex: regexReq },
-          })
-          .select(rows)
-          .exec();
-        const category = await this.ordersModel
-          .find({
-            category: {
-              $elemMatch: {
-                _id: cat,
-              },
-            },
-          })
-          .select(rows)
-          .exec();
-        const subcategory = await this.ordersModel
-          .find({
-            'category.subcategories': {
-              $elemMatch: {
-                id: subcat,
-              },
-            },
-          })
-          .select(rows)
-          .exec();
-        const findLocation = await this.ordersModel
-          .find({
-            location: { $regex: regexReq },
-          })
-          .select(rows)
-          .exec();
-        const findName = await this.ordersModel
-          .find({
-            name: { $regex: regexReq },
-          })
-          .select(rows)
-          .exec();
-
-        const resultArray = mergeAndRemoveDuplicates(
-          findDescr,
-          category,
-          subcategory,
-          findCat,
-          findSubcat,
-          findLocation,
-          findName,
-        );
-        if (Array.isArray(resultArray) && resultArray.length === 0) {
-          throw new NotFound('Orders not found');
-        } else {
-          const result = paginateArray(resultArray, curentPage);
-          const totalPages = Math.ceil(resultArray.length / limit);
-          return {
-            totalPages: totalPages,
-            currentPage: curentPage,
-            data: result,
-          };
-        }
-        //Если нет запроса, но есть локация
-      } else if ((req === '' && loc !== '') || !req) {
-        const findLocation = await this.ordersModel
-          .find({
-            location: { $regex: regexLoc },
-          })
-          .select(rows)
-          .skip(offset)
-          .limit(limit)
-          .exec();
-        const category = await this.ordersModel
-          .find({
-            category: {
-              $elemMatch: {
-                _id: cat,
-              },
-            },
-          })
-          .select(rows)
-          .exec();
-        const subcategory = await this.ordersModel
-          .find({
-            'category.subcategories': {
-              $elemMatch: {
-                id: subcat,
-              },
-            },
-          })
-          .select(rows)
-          .exec();
-
-        const resultArray = mergeAndRemoveDuplicates(
-          category,
-          subcategory,
-          findLocation,
-        );
-
-        if (Array.isArray(resultArray) && findLocation.length === 0) {
-          throw new NotFound('Orders not found');
-        } else {
-          const result = paginateArray(resultArray, curentPage);
-          const totalPages = Math.ceil(resultArray.length / limit);
-          return {
-            totalPages: totalPages,
-            currentPage: curentPage,
-            data: result,
-          };
-        }
-      } else if (req !== '' && loc !== '') {
-        const findDescr = await this.ordersModel
-          .find({
-            description: { $regex: regexReq },
-            location: { $regex: regexLoc },
-          })
-          .select(rows)
-          .exec();
-
-        const category = await this.ordersModel
-          .find({
-            category: {
-              $elemMatch: {
-                _id: cat,
-              },
-            },
-            location: { $regex: regexLoc },
-          })
-          .select(rows)
-          .exec();
-
-        const subcategory = await this.ordersModel
-          .find({
-            'category.subcategories': {
-              $elemMatch: {
-                id: subcat,
-              },
-            },
-            location: { $regex: regexLoc },
-          })
-          .select(rows)
-          .exec();
-        const findCat = await this.ordersModel
-          .find({
-            category: {
-              $elemMatch: {
-                name: { $regex: regexReq },
-              },
-            },
-            location: { $regex: regexLoc },
-          })
-          .select(rows)
-          .exec();
-        const findSubcat = await this.ordersModel
-          .find({
-            'category.subcategories': {
-              $elemMatch: {
-                name: { $regex: regexReq },
-              },
-            },
-            location: { $regex: regexLoc },
-          })
-          .select(rows)
-          .exec();
-        const findName = await this.ordersModel
-          .find({
-            name: { $regex: regexReq },
-            location: { $regex: regexLoc },
-          })
-          .select(rows)
-          .exec();
-
-        const resultArray = mergeAndRemoveDuplicates(
-          findDescr,
-          category,
-          subcategory,
-          findCat,
-          findSubcat,
-          findName,
-        );
-
-        if (Array.isArray(resultArray) && resultArray.length === 0) {
-          throw new NotFound('Orders not found');
-        } else {
-          const result = paginateArray(resultArray, curentPage);
-          const totalPages = Math.ceil(resultArray.length / limit);
-          return {
-            totalPages: totalPages,
-            currentPage: curentPage,
-            data: result,
-          };
-        }
-      }
-    } catch (e) {
-      throw new NotFound('Orders not found');
-    }
   }
 }

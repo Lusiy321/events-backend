@@ -37,6 +37,9 @@ let BannersController = class BannersController {
     async findBannerAndDel(id) {
         return this.bannerService.deleteBanner(id);
     }
+    async getRight() {
+        return this.bannerService.getRightBanner();
+    }
 };
 exports.BannersController = BannersController;
 __decorate([
@@ -92,6 +95,16 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], BannersController.prototype, "findBannerAndDel", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({
+        summary: 'Get Right banner',
+    }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: Object }),
+    (0, common_1.Get)('right/get'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], BannersController.prototype, "getRight", null);
 exports.BannersController = BannersController = __decorate([
     (0, swagger_1.ApiTags)('Banner'),
     (0, common_1.Controller)('banners'),

@@ -30,7 +30,6 @@ const mongoose_1 = require("@nestjs/mongoose");
 const http_errors_1 = require("http-errors");
 const users_model_1 = require("../users/users.model");
 const mesengers_service_1 = require("./mesengers.service");
-const parse_user_1 = require("../users/utils/parse.user");
 let OrdersService = class OrdersService {
     constructor(mesengersService, ordersModel, userModel) {
         this.mesengersService = mesengersService;
@@ -79,28 +78,36 @@ let OrdersService = class OrdersService {
             const allOrders = await this.ordersModel.find({ phone: order.phone });
             if (Array.isArray(allOrders) && allOrders.length !== 0) {
                 const tgChat = allOrders[0].tg_chat;
-                const viber = allOrders[0].viber;
+                const viber = allOrders[0].viber_chat;
+                if (tgChat === null && viber === null) {
+                    return order;
+                }
                 if (tgChat !== null) {
-                    await this.mesengersService.sendCode(tgChat);
+                    await this.ordersModel.findByIdAndUpdate({ _id: createdOrder._id }, { tg_chat: tgChat });
+                    await this.mesengersService.sendCode(tgChat, verificationCode);
                     return order;
                 }
-                else if (viber !== null) {
-                    await this.mesengersService.sendCode(viber);
+                if (viber !== null) {
+                    await this.ordersModel.findByIdAndUpdate({ _id: createdOrder._id }, { viber_chat: viber });
+                    await this.mesengersService.sendCode(viber, verificationCode);
                     return order;
                 }
-                else {
-                    return order;
-                }
+                return order;
             }
-            return order;
+            else {
+                return order;
+            }
         }
         catch (e) {
-            throw new http_errors_1.BadRequest(e.message);
+            throw e;
         }
     }
     async verifyOrder(code) {
         try {
             const order = await this.ordersModel.findOne({ sms: code });
+            if (order === null) {
+                throw new http_errors_1.NotFound('Order not found');
+            }
             if (order.verify === false) {
                 await this.ordersModel.findByIdAndUpdate({ _id: order._id }, { verify: true, sms: null });
                 const usersArr = await this.findUserByCategory(order);
@@ -111,10 +118,10 @@ let OrdersService = class OrdersService {
                             await this.mesengersService.sendNewTgOrder(user.tg_chat, order);
                         }
                     }
-                    if (user.viber !== null) {
+                    if (user.viber_chat !== null) {
                         const check = await this.checkTrialStatus(user._id);
                         if (check === true) {
-                            await this.mesengersService.sendNewViberOrder(user.viber, order);
+                            await this.mesengersService.sendNewViberOrder(user.viber_chat, order);
                         }
                     }
                 });
@@ -124,8 +131,8 @@ let OrdersService = class OrdersService {
                     if (order.tg_chat !== null) {
                         await this.mesengersService.sendMessageTg(order.tg_chat, message);
                     }
-                    else if (order.viber !== null) {
-                        await this.mesengersService.sendMessageViber(order.viber, message);
+                    else if (order.viber_chat !== null) {
+                        await this.mesengersService.sendMessageViber(order.viber_chat, message);
                     }
                     return usersArr;
                 }
@@ -134,18 +141,21 @@ let OrdersService = class OrdersService {
                     if (order.tg_chat !== null) {
                         await this.mesengersService.sendMessageTg(order.tg_chat, message);
                     }
-                    else if (order.viber !== null) {
-                        await this.mesengersService.sendMessageViber(order.viber, message);
+                    else if (order.viber_chat !== null) {
+                        await this.mesengersService.sendMessageViber(order.viber_chat, message);
                     }
                     return usersArr;
                 }
             }
-            if (!order) {
-                throw new http_errors_1.NotFound('Order not found');
+            else {
+                throw new http_errors_1.BadRequest('Order not found');
             }
         }
         catch (e) {
-            throw new http_errors_1.BadRequest(e.message);
+            if (e.message === 'ETELEGRAM: 400 Bad Request: chat not found') {
+                return [];
+            }
+            throw e;
         }
     }
     async checkTrialStatus(id) {
@@ -198,286 +208,32 @@ let OrdersService = class OrdersService {
                 const regexLocation = new RegExp('Київська область', 'i');
                 const category = await this.userModel
                     .find({
-                    category: {
+                    'category.subcategories': {
                         $elemMatch: {
                             id: findId,
                         },
-                        location: { $regex: regexLocation },
                     },
+                    location: { $regex: regexLocation },
                 })
                     .exec();
                 return category;
             }
-            const regexLocation = new RegExp(region, 'i');
-            const category = await this.userModel
-                .find({
-                category: {
-                    $elemMatch: {
-                        id: findId,
+            else {
+                const regexLocation = new RegExp(region, 'i');
+                const category = await this.userModel
+                    .find({
+                    'category.subcategories': {
+                        $elemMatch: {
+                            id: findId,
+                        },
                     },
                     location: { $regex: regexLocation },
-                },
-            })
-                .exec();
-            return category;
+                })
+                    .exec();
+                return category;
+            }
         }
         return subcategory;
-    }
-    async searchOrders(query) {
-        const { req, loc, page, cat, subcat } = query;
-        try {
-            const curentPage = page || 1;
-            const limit = 8;
-            const totalCount = await this.ordersModel.countDocuments();
-            const totalPages = Math.ceil(totalCount / limit);
-            const offset = (curentPage - 1) * limit;
-            if (!req && !loc && !cat && !subcat) {
-                const result = await this.ordersModel
-                    .find()
-                    .select(parse_user_1.rows)
-                    .skip(offset)
-                    .sort({ createdAt: -1 })
-                    .limit(limit)
-                    .exec();
-                return {
-                    totalPages: totalPages,
-                    currentPage: curentPage,
-                    data: result,
-                };
-            }
-            const regexReq = new RegExp(req, 'i');
-            const regexLoc = new RegExp(loc, 'i');
-            if ((req === '' && loc === '') ||
-                (!req && !loc) ||
-                (cat && !subcat) ||
-                (!cat && subcat)) {
-                const category = await this.ordersModel
-                    .find({
-                    category: {
-                        $elemMatch: {
-                            _id: cat,
-                        },
-                    },
-                })
-                    .select(parse_user_1.rows)
-                    .exec();
-                const subcategory = await this.ordersModel
-                    .find({
-                    'category.subcategories': {
-                        $elemMatch: {
-                            id: subcat,
-                        },
-                    },
-                })
-                    .select(parse_user_1.rows)
-                    .exec();
-                const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(category, subcategory);
-                if (Array.isArray(resultArray) && resultArray.length === 0) {
-                    throw new http_errors_1.NotFound('Orders not found');
-                }
-                else {
-                    const result = (0, parse_user_1.paginateArray)(resultArray, curentPage);
-                    const totalPages = Math.ceil(resultArray.length / limit);
-                    return {
-                        totalPages: totalPages,
-                        currentPage: curentPage,
-                        data: result,
-                    };
-                }
-            }
-            if ((req !== '' && loc === '') || !loc) {
-                const findCat = await this.ordersModel
-                    .find({
-                    category: {
-                        $elemMatch: {
-                            name: { $regex: regexReq },
-                        },
-                    },
-                })
-                    .select(parse_user_1.rows)
-                    .exec();
-                const findSubcat = await this.ordersModel
-                    .find({
-                    'category.subcategories': {
-                        $elemMatch: {
-                            name: { $regex: regexReq },
-                        },
-                    },
-                })
-                    .select(parse_user_1.rows)
-                    .exec();
-                const findDescr = await this.ordersModel
-                    .find({
-                    description: { $regex: regexReq },
-                })
-                    .select(parse_user_1.rows)
-                    .exec();
-                const category = await this.ordersModel
-                    .find({
-                    category: {
-                        $elemMatch: {
-                            _id: cat,
-                        },
-                    },
-                })
-                    .select(parse_user_1.rows)
-                    .exec();
-                const subcategory = await this.ordersModel
-                    .find({
-                    'category.subcategories': {
-                        $elemMatch: {
-                            id: subcat,
-                        },
-                    },
-                })
-                    .select(parse_user_1.rows)
-                    .exec();
-                const findLocation = await this.ordersModel
-                    .find({
-                    location: { $regex: regexReq },
-                })
-                    .select(parse_user_1.rows)
-                    .exec();
-                const findName = await this.ordersModel
-                    .find({
-                    name: { $regex: regexReq },
-                })
-                    .select(parse_user_1.rows)
-                    .exec();
-                const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(findDescr, category, subcategory, findCat, findSubcat, findLocation, findName);
-                if (Array.isArray(resultArray) && resultArray.length === 0) {
-                    throw new http_errors_1.NotFound('Orders not found');
-                }
-                else {
-                    const result = (0, parse_user_1.paginateArray)(resultArray, curentPage);
-                    const totalPages = Math.ceil(resultArray.length / limit);
-                    return {
-                        totalPages: totalPages,
-                        currentPage: curentPage,
-                        data: result,
-                    };
-                }
-            }
-            else if ((req === '' && loc !== '') || !req) {
-                const findLocation = await this.ordersModel
-                    .find({
-                    location: { $regex: regexLoc },
-                })
-                    .select(parse_user_1.rows)
-                    .skip(offset)
-                    .limit(limit)
-                    .exec();
-                const category = await this.ordersModel
-                    .find({
-                    category: {
-                        $elemMatch: {
-                            _id: cat,
-                        },
-                    },
-                })
-                    .select(parse_user_1.rows)
-                    .exec();
-                const subcategory = await this.ordersModel
-                    .find({
-                    'category.subcategories': {
-                        $elemMatch: {
-                            id: subcat,
-                        },
-                    },
-                })
-                    .select(parse_user_1.rows)
-                    .exec();
-                const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(category, subcategory, findLocation);
-                if (Array.isArray(resultArray) && findLocation.length === 0) {
-                    throw new http_errors_1.NotFound('Orders not found');
-                }
-                else {
-                    const result = (0, parse_user_1.paginateArray)(resultArray, curentPage);
-                    const totalPages = Math.ceil(resultArray.length / limit);
-                    return {
-                        totalPages: totalPages,
-                        currentPage: curentPage,
-                        data: result,
-                    };
-                }
-            }
-            else if (req !== '' && loc !== '') {
-                const findDescr = await this.ordersModel
-                    .find({
-                    description: { $regex: regexReq },
-                    location: { $regex: regexLoc },
-                })
-                    .select(parse_user_1.rows)
-                    .exec();
-                const category = await this.ordersModel
-                    .find({
-                    category: {
-                        $elemMatch: {
-                            _id: cat,
-                        },
-                    },
-                    location: { $regex: regexLoc },
-                })
-                    .select(parse_user_1.rows)
-                    .exec();
-                const subcategory = await this.ordersModel
-                    .find({
-                    'category.subcategories': {
-                        $elemMatch: {
-                            id: subcat,
-                        },
-                    },
-                    location: { $regex: regexLoc },
-                })
-                    .select(parse_user_1.rows)
-                    .exec();
-                const findCat = await this.ordersModel
-                    .find({
-                    category: {
-                        $elemMatch: {
-                            name: { $regex: regexReq },
-                        },
-                    },
-                    location: { $regex: regexLoc },
-                })
-                    .select(parse_user_1.rows)
-                    .exec();
-                const findSubcat = await this.ordersModel
-                    .find({
-                    'category.subcategories': {
-                        $elemMatch: {
-                            name: { $regex: regexReq },
-                        },
-                    },
-                    location: { $regex: regexLoc },
-                })
-                    .select(parse_user_1.rows)
-                    .exec();
-                const findName = await this.ordersModel
-                    .find({
-                    name: { $regex: regexReq },
-                    location: { $regex: regexLoc },
-                })
-                    .select(parse_user_1.rows)
-                    .exec();
-                const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(findDescr, category, subcategory, findCat, findSubcat, findName);
-                if (Array.isArray(resultArray) && resultArray.length === 0) {
-                    throw new http_errors_1.NotFound('Orders not found');
-                }
-                else {
-                    const result = (0, parse_user_1.paginateArray)(resultArray, curentPage);
-                    const totalPages = Math.ceil(resultArray.length / limit);
-                    return {
-                        totalPages: totalPages,
-                        currentPage: curentPage,
-                        data: result,
-                    };
-                }
-            }
-        }
-        catch (e) {
-            throw new http_errors_1.NotFound('Orders not found');
-        }
     }
 };
 exports.OrdersService = OrdersService;

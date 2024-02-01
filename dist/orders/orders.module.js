@@ -15,6 +15,7 @@ const order_model_1 = require("./order.model");
 const users_model_1 = require("../users/users.model");
 const mesengers_service_1 = require("./mesengers.service");
 const order_archive_model_1 = require("./order.archive.model");
+const search_service_1 = require("../users/search.service");
 let OrdersModule = class OrdersModule {
 };
 exports.OrdersModule = OrdersModule;
@@ -32,7 +33,7 @@ exports.OrdersModule = OrdersModule = __decorate([
             ]),
         ],
         controllers: [orders_controller_1.OrdersController],
-        providers: [orders_service_1.OrdersService, mesengers_service_1.MesengersService],
+        providers: [orders_service_1.OrdersService, mesengers_service_1.MesengersService, search_service_1.SearchService],
     })
 ], OrdersModule);
 //# sourceMappingURL=orders.module.js.map

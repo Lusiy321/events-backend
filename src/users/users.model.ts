@@ -41,7 +41,7 @@ export class User extends Model<User> {
   @Prop({
     type: String,
     minlength: 2,
-    maxlength: 400,
+    maxlength: 1400,
   })
   description: string;
 
