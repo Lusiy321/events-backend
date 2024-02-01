@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { MesengersService } from './orders/mesengers.service';
 import * as session from 'express-session';
 
@@ -44,14 +43,12 @@ async function start() {
     .addServer(`http://localhost:${PORT}`)
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document);
-
+  });
   await app.listen(PORT, () =>
     console.log(`Server started on port = http://localhost:${PORT}`),
   );
-  const mesengersService = app.get(MesengersService);
+  // const mesengersService = app.get(MesengersService);
 
-  await mesengersService.startServer();
+  // await mesengersService.startServer();
 }
 start();
