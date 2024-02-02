@@ -20,11 +20,7 @@ async function start() {
             maxAge: 60000,
         },
     }));
-    app.enableCors({
-        origin: 'https://show-swart.vercel.app',
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-        credentials: true,
-    });
+    app.enableCors({});
     const config = new swagger_1.DocumentBuilder()
         .setTitle('Wechirka.com SERVER')
         .setDescription('Wechirka REAST API Documentation')
@@ -39,6 +35,8 @@ async function start() {
         .addServer(`https://events-4qv2.onrender.com`)
         .addServer(`http://localhost:${PORT}`)
         .build();
+    const document = swagger_1.SwaggerModule.createDocument(app, config);
+    swagger_1.SwaggerModule.setup('docs', app, document);
     await app.listen(PORT, () => console.log(`Server started on port = http://localhost:${PORT}`));
     const mesengersService = app.get(mesengers_service_1.MesengersService);
     await mesengersService.startServer();
