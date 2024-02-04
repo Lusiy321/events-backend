@@ -96,7 +96,7 @@ let UsersController = class UsersController {
     async googleAuthRedirect(res, req) {
         const userId = req.user.id;
         const user = await this.usersService.findById(userId);
-        return res.redirect(`${process.env.FRONT_LINK}?token=${user.token}`);
+        return res.redirect(`${process.env.FRONT_LINK}?token=${user.refresh_token}`);
     }
     facebookLogin() {
         return;
@@ -104,7 +104,7 @@ let UsersController = class UsersController {
     async facebookAuthRedirect(res, req) {
         const userId = req.user.id;
         const user = await this.usersService.findById(userId);
-        return res.redirect(`${process.env.FRONT_LINK}?token=${user.token}`);
+        return res.redirect(`${process.env.FRONT_LINK}?token=${user.refresh_token}`);
     }
     async refresh(req) {
         return await this.usersService.refreshAccessToken(req);

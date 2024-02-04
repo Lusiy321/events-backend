@@ -237,7 +237,9 @@ export class UsersController {
   async googleAuthRedirect(@Res() res: any, @Req() req: any) {
     const userId = req.user.id;
     const user = await this.usersService.findById(userId);
-    return res.redirect(`${process.env.FRONT_LINK}?token=${user.token}`);
+    return res.redirect(
+      `${process.env.FRONT_LINK}?token=${user.refresh_token}`,
+    );
   }
 
   @Get('facebook/login')
@@ -251,7 +253,9 @@ export class UsersController {
   async facebookAuthRedirect(@Res() res: any, @Req() req: any) {
     const userId = req.user.id;
     const user = await this.usersService.findById(userId);
-    return res.redirect(`${process.env.FRONT_LINK}?token=${user.token}`);
+    return res.redirect(
+      `${process.env.FRONT_LINK}?token=${user.refresh_token}`,
+    );
   }
 
   @ApiOperation({ summary: 'Refresh Access Token' })
