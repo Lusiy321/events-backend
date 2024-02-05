@@ -245,7 +245,10 @@ export class User extends Model<User> {
     example: '{Instagram: https://www.instagram.com/herlastsightband/}',
     description: 'User social links',
   })
-  @Prop({ type: Object })
+  @Prop({
+    type: Object,
+    default: { Instagram: 'https://' },
+  })
   social: Social;
 
   @ApiProperty({
