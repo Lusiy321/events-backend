@@ -302,6 +302,30 @@ let UsersService = class UsersService {
             throw e;
         }
     }
+    async deleteUserProfile(req, userPassword) {
+        const user = await this.findToken(req);
+        if (!user) {
+            throw new http_errors_1.Unauthorized('jwt expired');
+        }
+        try {
+            const { password } = userPassword;
+            if (user.comparePassword(password) === true) {
+                await this.userModel.findByIdAndRemove({ _id: user._id });
+                const msg = {
+                    to: user.email,
+                    from: process.env.NOREPLY_MAIL,
+                    subject: 'Видалення профілю',
+                    html: `<div class="container">
+          <h1>Ваш профіль було видалено з ресурсу Wechirka.com</h1></div>`,
+                };
+                return await this.transporter.sendMail(msg);
+            }
+            throw new http_errors_1.BadRequest('Password is not avaible');
+        }
+        catch (e) {
+            throw e;
+        }
+    }
     async updateUser(user, req) {
         try {
             const { firstName, social, title, description, phone, telegram, whatsapp, location, master_photo, video, price, viber, } = user;

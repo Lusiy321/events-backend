@@ -28,7 +28,7 @@ import {
 import { UpdateUserDto } from './dto/update.user.dto';
 import { GoogleUserDto } from './dto/google.user.dto';
 import { GoogleAuthGuard } from './utils/Guards';
-import { PasswordUserDto } from './dto/password.user.dto';
+import { PasswordChangeDto } from './dto/change-password.user.dto';
 import { MailUserDto } from './dto/email.user.dto';
 import { Category } from './category.model';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -39,6 +39,7 @@ import { DelUserMediaDto } from './dto/delete.user.dto';
 import { FacebookAuthGuard } from './utils/GuardFacebook';
 import { Categories } from './dto/caterory.interface';
 import { SearchService } from './search.service';
+import { PasswordUserDto } from './dto/password.user.dto';
 
 @ApiTags('User')
 @Controller('users')
@@ -138,6 +139,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Upload images' })
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')
+  @HttpCode(200)
   @Post('upload')
   @UseInterceptors(
     FilesInterceptor('file', 5, {
@@ -268,7 +270,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Change password' })
   @ApiBearerAuth('BearerAuthMethod')
   @Patch('change-password')
-  async cangePwd(@Req() request: any, @Body() password: PasswordUserDto) {
+  async cangePwd(@Req() request: any, @Body() password: PasswordChangeDto) {
     return await this.usersService.changePassword(request, password);
   }
 
@@ -278,6 +280,18 @@ export class UsersController {
   async forgotPwd(@Body() email: MailUserDto) {
     await this.usersService.restorePassword(email);
     return { message: 'Email send' };
+  }
+
+  @ApiOperation({ summary: 'Delete user profile' })
+  @ApiBearerAuth('BearerAuthMethod')
+  @Delete('delete-profile')
+  async deleteProfile(
+    @Res() res: any,
+    @Req() request: any,
+    @Body() password: PasswordUserDto,
+  ) {
+    await this.usersService.deleteUserProfile(request, password);
+    return res.redirect(`${process.env.FRONT_LINK}`);
   }
 
   @ApiOperation({
@@ -291,6 +305,7 @@ export class UsersController {
   }
 
   @ApiOperation({ summary: 'Verify user email' })
+  @ApiResponse({ status: 200, type: Object })
   @Get('verify-email/:Id')
   async verifyEmail(@Param('Id') id: string, @Res() res: any) {
     await this.usersService.verifyUserEmail(id);

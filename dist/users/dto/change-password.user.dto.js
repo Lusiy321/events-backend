@@ -9,13 +9,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PasswordUserDto = void 0;
+exports.PasswordChangeDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
-class PasswordUserDto {
+class PasswordChangeDto {
 }
-exports.PasswordUserDto = PasswordUserDto;
+exports.PasswordChangeDto = PasswordChangeDto;
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'Vovan-123545', description: 'User password' }),
     __metadata("design:type", String)
-], PasswordUserDto.prototype, "password", void 0);
-//# sourceMappingURL=password.user.dto.js.map
+], PasswordChangeDto.prototype, "oldPassword", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Vovan-123545', description: 'User password' }),
+    __metadata("design:type", String)
+], PasswordChangeDto.prototype, "password", void 0);
+//# sourceMappingURL=change-password.user.dto.js.map

@@ -143,7 +143,6 @@ __decorate([
     }),
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
-    (0, common_1.HttpCode)(200),
     (0, common_1.Put)('/find-by-id/:id'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),

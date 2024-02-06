@@ -1,13 +1,14 @@
 import { User } from './users.model';
 import { CreateUserDto } from './dto/create.user.dto';
 import { UpdateUserDto } from './dto/update.user.dto';
-import { PasswordUserDto } from './dto/password.user.dto';
+import { PasswordChangeDto } from './dto/change-password.user.dto';
 import { MailUserDto } from './dto/email.user.dto';
 import { GoogleUserDto } from './dto/google.user.dto';
 import { Category } from './category.model';
 import { Categories } from './dto/caterory.interface';
 import * as nodemailer from 'nodemailer';
 import { LoginUserDto } from './dto/login.user.dto';
+import { PasswordUserDto } from './dto/password.user.dto';
 export declare const TRANSPORTER_PROVIDER = "TRANSPORTER_PROVIDER";
 export declare class UsersService {
     private userModel;
@@ -20,12 +21,13 @@ export declare class UsersService {
     checkTrialStatus(id: string): Promise<boolean>;
     sendVerificationEmail(email: string): Promise<void>;
     verifyUserEmail(id: any): Promise<void>;
-    changePassword(req: any, newPass: PasswordUserDto): Promise<User>;
+    changePassword(req: any, newPass: PasswordChangeDto): Promise<User>;
     validateUser(details: GoogleUserDto): Promise<any>;
     validateFacebook(details: any): Promise<any>;
     restorePassword(email: MailUserDto): Promise<any>;
     login(user: LoginUserDto): Promise<User>;
     logout(req: any): Promise<User>;
+    deleteUserProfile(req: any, userPassword: PasswordUserDto): Promise<User>;
     updateUser(user: UpdateUserDto, req: any): Promise<User>;
     private addSubcategory;
     updateCategory(data: Categories, req: any): Promise<User>;

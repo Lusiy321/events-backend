@@ -90,7 +90,6 @@ export class AdminController {
   })
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')
-  @HttpCode(200)
   @Put('/find-by-id/:id')
   async find(
     @Param('id') id: string,

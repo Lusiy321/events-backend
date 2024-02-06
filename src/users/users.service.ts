@@ -7,7 +7,7 @@ import { compareSync, hashSync } from 'bcryptjs';
 import { Conflict, NotFound, BadRequest, Unauthorized } from 'http-errors';
 import { UpdateUserDto, search_result } from './dto/update.user.dto';
 import { sign, verify, JwtPayload } from 'jsonwebtoken';
-import { PasswordUserDto } from './dto/password.user.dto';
+import { PasswordChangeDto } from './dto/change-password.user.dto';
 import { MailUserDto } from './dto/email.user.dto';
 import { GoogleUserDto } from './dto/google.user.dto';
 import { Category } from './category.model';
@@ -16,6 +16,7 @@ import { verifyEmailMsg } from './utils/email.schemas';
 import { rows } from './utils/parse.user';
 import * as nodemailer from 'nodemailer';
 import { LoginUserDto } from './dto/login.user.dto';
+import { PasswordUserDto } from './dto/password.user.dto';
 export const TRANSPORTER_PROVIDER = 'TRANSPORTER_PROVIDER';
 
 @Injectable()
@@ -141,7 +142,7 @@ export class UsersService {
     }
   }
 
-  async changePassword(req: any, newPass: PasswordUserDto): Promise<User> {
+  async changePassword(req: any, newPass: PasswordChangeDto): Promise<User> {
     const user = await this.findToken(req);
     if (!user) {
       throw new Unauthorized('jwt expired');
@@ -329,6 +330,33 @@ export class UsersService {
         .findById({ _id: user.id })
         .select('-password')
         .exec();
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  async deleteUserProfile(
+    req: any,
+    userPassword: PasswordUserDto,
+  ): Promise<User> {
+    const user = await this.findToken(req);
+    if (!user) {
+      throw new Unauthorized('jwt expired');
+    }
+    try {
+      const { password } = userPassword;
+      if (user.comparePassword(password) === true) {
+        await this.userModel.findByIdAndRemove({ _id: user._id });
+        const msg = {
+          to: user.email,
+          from: process.env.NOREPLY_MAIL,
+          subject: 'Видалення профілю',
+          html: `<div class="container">
+          <h1>Ваш профіль було видалено з ресурсу Wechirka.com</h1></div>`,
+        };
+        return await this.transporter.sendMail(msg);
+      }
+      throw new BadRequest('Password is not avaible');
     } catch (e) {
       throw e;
     }

@@ -3,13 +3,14 @@ import { User } from './users.model';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create.user.dto';
 import { UpdateUserDto } from './dto/update.user.dto';
-import { PasswordUserDto } from './dto/password.user.dto';
+import { PasswordChangeDto } from './dto/change-password.user.dto';
 import { MailUserDto } from './dto/email.user.dto';
 import { Category } from './category.model';
 import { CloudinaryService } from './cloudinary.service';
 import { DelUserMediaDto } from './dto/delete.user.dto';
 import { Categories } from './dto/caterory.interface';
 import { SearchService } from './search.service';
+import { PasswordUserDto } from './dto/password.user.dto';
 export declare class UsersController {
     private readonly usersService;
     private readonly searchService;
@@ -36,10 +37,11 @@ export declare class UsersController {
     facebookLogin(): void;
     facebookAuthRedirect(res: any, req: any): Promise<any>;
     refresh(req: any): Promise<User>;
-    cangePwd(request: any, password: PasswordUserDto): Promise<User>;
+    cangePwd(request: any, password: PasswordChangeDto): Promise<User>;
     forgotPwd(email: MailUserDto): Promise<{
         message: string;
     }>;
+    deleteProfile(res: any, request: any, password: PasswordUserDto): Promise<any>;
     setEmailPsw(email: string): Promise<any>;
     verifyEmail(id: string, res: any): Promise<any>;
 }

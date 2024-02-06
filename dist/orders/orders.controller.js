@@ -77,7 +77,7 @@ __decorate([
 ], OrdersController.prototype, "findIdOrders", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Create Order' }),
-    (0, swagger_1.ApiResponse)({ status: 200, type: order_model_1.Orders }),
+    (0, swagger_1.ApiResponse)({ status: 201, type: order_model_1.Orders }),
     (0, common_1.Post)('/'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),

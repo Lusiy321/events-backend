@@ -275,7 +275,10 @@ __decorate([
         example: '{Instagram: https://www.instagram.com/herlastsightband/}',
         description: 'User social links',
     }),
-    (0, mongoose_1.Prop)({ type: Object }),
+    (0, mongoose_1.Prop)({
+        type: Object,
+        default: { Instagram: 'https://' },
+    }),
     __metadata("design:type", Object)
 ], User.prototype, "social", void 0);
 __decorate([

@@ -21,7 +21,7 @@ const swagger_1 = require("@nestjs/swagger");
 const update_user_dto_1 = require("./dto/update.user.dto");
 const google_user_dto_1 = require("./dto/google.user.dto");
 const Guards_1 = require("./utils/Guards");
-const password_user_dto_1 = require("./dto/password.user.dto");
+const change_password_user_dto_1 = require("./dto/change-password.user.dto");
 const email_user_dto_1 = require("./dto/email.user.dto");
 const category_model_1 = require("./category.model");
 const platform_express_1 = require("@nestjs/platform-express");
@@ -31,6 +31,7 @@ const path = require("path");
 const delete_user_dto_1 = require("./dto/delete.user.dto");
 const GuardFacebook_1 = require("./utils/GuardFacebook");
 const search_service_1 = require("./search.service");
+const password_user_dto_1 = require("./dto/password.user.dto");
 let UsersController = class UsersController {
     constructor(usersService, searchService, cloudinaryService) {
         this.usersService = usersService;
@@ -115,6 +116,10 @@ let UsersController = class UsersController {
     async forgotPwd(email) {
         await this.usersService.restorePassword(email);
         return { message: 'Email send' };
+    }
+    async deleteProfile(res, request, password) {
+        await this.usersService.deleteUserProfile(request, password);
+        return res.redirect(`${process.env.FRONT_LINK}`);
     }
     async setEmailPsw(email) {
         return this.usersService.sendVerificationEmail(email);
@@ -228,6 +233,7 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Upload images' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
+    (0, common_1.HttpCode)(200),
     (0, common_1.Post)('upload'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)('file', 5, {
         storage: (0, multer_1.diskStorage)({
@@ -354,7 +360,7 @@ __decorate([
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, password_user_dto_1.PasswordUserDto]),
+    __metadata("design:paramtypes", [Object, change_password_user_dto_1.PasswordChangeDto]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "cangePwd", null);
 __decorate([
@@ -366,6 +372,17 @@ __decorate([
     __metadata("design:paramtypes", [email_user_dto_1.MailUserDto]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "forgotPwd", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Delete user profile' }),
+    (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
+    (0, common_1.Delete)('delete-profile'),
+    __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Req)()),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object, password_user_dto_1.PasswordUserDto]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "deleteProfile", null);
 __decorate([
     (0, swagger_1.ApiOperation)({
         summary: 'Send link to verify email',
@@ -380,6 +397,7 @@ __decorate([
 ], UsersController.prototype, "setEmailPsw", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Verify user email' }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: Object }),
     (0, common_1.Get)('verify-email/:Id'),
     __param(0, (0, common_1.Param)('Id')),
     __param(1, (0, common_1.Res)()),
