@@ -20,9 +20,11 @@ const bcryptjs_1 = require("bcryptjs");
 const http_errors_1 = require("http-errors");
 const jsonwebtoken_1 = require("jsonwebtoken");
 const category_model_1 = require("./category.model");
-const email_schemas_1 = require("./utils/email.schemas");
+const email_schemas_1 = require("./utils/emails/email.schemas");
 const parse_user_1 = require("./utils/parse.user");
 const nodemailer = require("nodemailer");
+const email_changePassword_1 = require("./utils/emails/email.changePassword");
+const email_restorePassword_1 = require("./utils/emails/email.restorePassword");
 exports.TRANSPORTER_PROVIDER = 'TRANSPORTER_PROVIDER';
 let UsersService = class UsersService {
     constructor(userModel, categoryModel, transporter) {
@@ -145,17 +147,14 @@ let UsersService = class UsersService {
             if (user.comparePassword(oldPassword) === true) {
                 user.setPassword(password);
                 await this.userModel.findByIdAndUpdate({ _id: user._id }, { password: user.password });
+                const body = await (0, email_changePassword_1.changePasswordEmailMsg)();
                 const msg = {
                     to: user.email,
                     from: process.env.NOREPLY_MAIL,
                     subject: 'Зміна пароля',
-                    html: `<div class="container">
-          <h1>Ваш пароль було змінено на Wechirka.com</h1>
-          <p>Натисніть на посіляння для переходу на сайт:</p>
-          <p><a href="${process.env.FRONT_LINK}profile">Перейти у профіль</a></p>
-      </div>`,
+                    html: body,
                 };
-                await this.transporter.sendMail(msg);
+                this.transporter.sendMail(msg);
                 return await this.userModel.findById(user._id).select(parse_user_1.rows).exec();
             }
             throw new http_errors_1.BadRequest('Password is not avaible');
@@ -249,16 +248,12 @@ let UsersService = class UsersService {
                 const newPassword = generatePassword();
                 restoreMail.setPassword(newPassword);
                 await this.userModel.findByIdAndUpdate({ _id: restoreMail._id }, { password: restoreMail.password });
+                const body = await (0, email_restorePassword_1.restorePasswordEmailMsg)(newPassword);
                 const msg = {
                     to: restoreMail.email,
                     from: process.env.NOREPLY_MAIL,
                     subject: 'Відновлення пароля на Wechirka.com',
-                    html: `<div class="container">
-          <h1>Ваш пароль було змінено</h1>
-          <p>Новий пароль для входу: ${newPassword}</p>
-          <p>Натисніть на посіляння для переходу на сайт:</p>
-          <p><a href="${process.env.FRONT_LINK}auth/login">Перейти за посиланням для в ходу</a></p>
-      </div>`,
+                    html: body,
                 };
                 return await this.transporter.sendMail(msg);
             }
@@ -311,12 +306,12 @@ let UsersService = class UsersService {
             const { password } = userPassword;
             if (user.comparePassword(password) === true) {
                 await this.userModel.findByIdAndRemove({ _id: user._id });
+                const body = delUserMsg;
                 const msg = {
                     to: user.email,
                     from: process.env.NOREPLY_MAIL,
                     subject: 'Видалення профілю',
-                    html: `<div class="container">
-          <h1>Ваш профіль було видалено з ресурсу Wechirka.com</h1></div>`,
+                    html: body,
                 };
                 return await this.transporter.sendMail(msg);
             }
