@@ -4,5 +4,5 @@ export declare enum verify {
     rejected = "rejected"
 }
 export declare class VerifyUserDto {
-    readonly verify: verify;
+    readonly verified: string;
 }

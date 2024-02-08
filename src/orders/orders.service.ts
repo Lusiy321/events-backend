@@ -65,7 +65,6 @@ export class OrdersService {
         Array.isArray(allUsers) &&
         allUsers.length === 0
       ) {
-        console.log('tyt 3');
         const createdOrder = await this.ordersModel.create(params);
         await this.ordersModel.findByIdAndUpdate(
           { _id: createdOrder._id },
@@ -77,7 +76,6 @@ export class OrdersService {
         (Array.isArray(allUsers) && allUsers.length !== 0)
       ) {
         if (allOrders.length !== 0) {
-          console.log('tyt 2');
           const tgChat = allOrders[allOrders.length - 1].tg_chat;
           const viber = allOrders[allOrders.length - 1].viber_chat;
           const sms = allOrders[allOrders.length - 1].sms;
@@ -114,7 +112,6 @@ export class OrdersService {
           const u_tgChat = allUsers[0].tg_chat;
           const u_viber = allUsers[0].viber_chat;
           if (u_tgChat !== null) {
-            console.log('tyt 1');
             const createdOrder = await this.ordersModel.create(params);
             createdOrder.tg_chat = u_tgChat;
             createdOrder.sms = verificationCode;
@@ -178,7 +175,7 @@ export class OrdersService {
         );
         await Promise.all(sendMessagePromises);
         if (usersArr.length !== 0) {
-          const message = `Ваше замовлення було успішно опубліковано. По вашим параметрам знайшлося ${usersArr.length} виконавців.`;
+          const message = `Ваше замовлення було успішно опубліковано. По вашим параметрам знайшлося ${usersArr.length} виконавців. Очікуйте відгуків на Вашу пропозицію.`;
           if (order.tg_chat !== null) {
             await this.mesengersService.sendMessageTg(order.tg_chat, message);
           } else if (order.viber_chat !== null) {

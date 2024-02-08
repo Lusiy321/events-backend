@@ -51,7 +51,7 @@ export class MesengersService {
         const userId = res.userProfile.id;
 
         const MAIN_KEYBOARD = mainKeyboardViber(userProfile, userId);
-        this.viber_bot.sendMessage(
+        await this.viber_bot.sendMessage(
           { id: res.userProfile.id },
           new KeyboardMessage(MAIN_KEYBOARD),
         );
@@ -72,7 +72,7 @@ export class MesengersService {
             await this.userModel.findByIdAndUpdate(user.id, {
               disagree_order: user.disagree_order,
             });
-            this.viber_bot.sendMessage({ id: chatId }, [
+            await this.viber_bot.sendMessage({ id: chatId }, [
               new TextMessage('Ви не погодились на пропозицію.'),
               new KeyboardMessage(MAIN_KEYBOARD),
             ]);
@@ -85,7 +85,7 @@ export class MesengersService {
             break;
           case 'delete':
             const order = await this.ordersModel.findById(phone);
-            this.viber_bot.sendMessage({ id: chatId }, [
+            await this.viber_bot.sendMessage({ id: chatId }, [
               new TextMessage(`Ви видалили замевлення: ${order.description}.`),
               new KeyboardMessage(MAIN_KEYBOARD),
             ]);
@@ -102,7 +102,7 @@ export class MesengersService {
             await this.ordersModel.findByIdAndUpdate(actiOrder.id, {
               active: true,
             });
-            this.viber_bot.sendMessage({ id: chatId }, [
+            await this.viber_bot.sendMessage({ id: chatId }, [
               new TextMessage(
                 `Ви активували замевлення: ${actiOrder.description}.`,
               ),
@@ -114,7 +114,7 @@ export class MesengersService {
             await this.ordersModel.findByIdAndUpdate(deactiOrder.id, {
               active: false,
             });
-            this.viber_bot.sendMessage({ id: chatId }, [
+            await this.viber_bot.sendMessage({ id: chatId }, [
               new TextMessage(
                 `Ви деактивували замевлення: ${deactiOrder.description}.`,
               ),
@@ -127,7 +127,7 @@ export class MesengersService {
             findOrder.accepted_users.map(async (user: any) => {
               const findedUser = await this.userModel.findOne({ _id: user });
               const msgOrder = `*Замовлення:*\n${findOrder.description}\n*Користувач:* ${findedUser.firstName}\n*Категорія:* ${findedUser.category[0].subcategories[0].name}\n*Оплата:* ${findedUser.price}\n*Телефон:* +${findedUser.phone}.\n*Посилання на профіль:*\n${process.env.FRONT_LINK}artists/${findedUser._id}.`;
-              this.viber_bot.sendMessage({ id: chatId }, [
+              await this.viber_bot.sendMessage({ id: chatId }, [
                 new TextMessage(msgOrder),
                 new KeyboardMessage(MAIN_KEYBOARD),
               ]);
@@ -151,14 +151,14 @@ export class MesengersService {
               },
             );
             await updatedUser.save();
-            this.viber_bot.sendMessage({ id: res.userProfile.id }, [
+            await this.viber_bot.sendMessage({ id: res.userProfile.id }, [
               new TextMessage(
                 `Дякую, ${res.userProfile.name} теперь Вам будуть надходити сповіщення про нові пропозиції у обраній категорії категорії.`,
               ),
               new KeyboardMessage(MAIN_KEYBOARD),
             ]);
             if (order.verify === false) {
-              this.viber_bot.sendMessage({ id: res.userProfile.id }, [
+              await this.viber_bot.sendMessage({ id: res.userProfile.id }, [
                 new TextMessage(
                   `Ваш код верифікаціЇ: ${order.sms}\nПерейти на сайт: ${process.env.CODE_LINK}`,
                 ),
@@ -175,14 +175,14 @@ export class MesengersService {
               },
             );
             await updatedOrder.save();
-            this.viber_bot.sendMessage({ id: res.userProfile.id }, [
+            await this.viber_bot.sendMessage({ id: res.userProfile.id }, [
               new TextMessage(
                 `Дякую, *${res.userProfile.name}* теперь Вам будуть надходити сповіщення про нові пропозиції у обраній категорії категорії.`,
               ),
               new KeyboardMessage(MAIN_KEYBOARD),
             ]);
             if (order.verify === false) {
-              this.viber_bot.sendMessage({ id: res.userProfile.id }, [
+              await this.viber_bot.sendMessage({ id: res.userProfile.id }, [
                 new TextMessage(
                   `*Ваш код верифікаціЇ*: ${order.sms}\n*Перейти на сайт*: ${process.env.CODE_LINK}`,
                 ),
@@ -204,7 +204,7 @@ export class MesengersService {
                 },
               );
               await updatedUser.save();
-              this.viber_bot.sendMessage({ id: res.userProfile.id }, [
+              await this.viber_bot.sendMessage({ id: res.userProfile.id }, [
                 new TextMessage(
                   `${res.userProfile.name} Ви відписалися від сповіщення про нові пропозиції.`,
                 ),
@@ -220,7 +220,7 @@ export class MesengersService {
               );
 
               await updatedOrder.save();
-              this.viber_bot.sendMessage({ id: res.userProfile.id }, [
+              await this.viber_bot.sendMessage({ id: res.userProfile.id }, [
                 new TextMessage(
                   `${res.userProfile.name} Ви відписалися від сповіщення про нові пропозиції.`,
                 ),
@@ -230,7 +230,7 @@ export class MesengersService {
             }
           }
           if (!user && !order) {
-            this.viber_bot.sendMessage({ id: res.userProfile.id }, [
+            await this.viber_bot.sendMessage({ id: res.userProfile.id }, [
               new TextMessage(
                 `Користувач з номером *+${phoneNumber}* не зареєстрований у нашій системі.`,
               ),
@@ -244,7 +244,7 @@ export class MesengersService {
     });
     this.viber_bot
       .getBotProfile()
-      .then((response: any) => console.log(`Bot Named: ${response.name}`))
+      .then(async (response: any) => console.log(`Bot Named: ${response.name}`))
       .catch((error: any) => {
         console.error('Error while getting bot profile:', error);
       });
@@ -280,6 +280,10 @@ export class MesengersService {
         keyboard: [
           [
             {
+              text: 'Перейти на сайт',
+              url: 'https://www.wechirka.com/',
+            },
+            {
               text: 'Відправити номер телефону',
               request_contact: true,
             },
@@ -293,7 +297,7 @@ export class MesengersService {
     this.tg_bot.onText(/\/start/, async (msg) => {
       try {
         const chatId = msg.chat.id;
-        this.tg_bot.sendMessage(
+        await this.tg_bot.sendMessage(
           chatId,
           `Привіт ${msg.from.first_name}. Я бот ресурсу WECHIRKA! Щоб отримувати сповіщеня, натисніть кнопку "Відправити номер телефону" для реєстрації у боті.\n\nСюди, Вам будуть надходити сповіщеня про замовлення або пропозиції від виконавців.`,
           optCont,
@@ -309,21 +313,21 @@ export class MesengersService {
         const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
         const find = await this.ordersModel.find({ tg_chat: chatId }).exec();
         if (!user && Array.isArray(find) && find.length === 0) {
-          this.tg_bot.sendMessage(
+          await this.tg_bot.sendMessage(
             chatId,
             'Ми не знайшли Ваших заявок, напевно ви не зареєструвались, натисніть кнопку *"Відправити номер телефону"* для реєстрації у боті',
             optCont,
           );
         }
         if (user && Array.isArray(find) && find.length === 0) {
-          this.tg_bot.sendMessage(
+          await this.tg_bot.sendMessage(
             chatId,
             'Ви не зареєстровані як замовник',
             optCont,
           );
         }
         if (find || user.tg_chat === find[0].tg_chat) {
-          find.map((finded: Orders) => {
+          find.map(async (finded: Orders) => {
             const msg = `Замовник: ${finded.name}.
       Дата події: ${finded.date}.
       Категорія: ${finded.category[0].subcategories[0].name}.
@@ -353,7 +357,7 @@ export class MesengersService {
                   ],
                 ],
               };
-              this.tg_bot.sendMessage(chatId, msg, {
+              await this.tg_bot.sendMessage(chatId, msg, {
                 reply_markup: keyboard,
               });
             } else {
@@ -377,7 +381,7 @@ export class MesengersService {
                   ],
                 ],
               };
-              this.tg_bot.sendMessage(chatId, msg, {
+              await this.tg_bot.sendMessage(chatId, msg, {
                 reply_markup: keyboard,
               });
             }
@@ -394,7 +398,7 @@ export class MesengersService {
         const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
 
         if (!user) {
-          this.tg_bot.sendMessage(
+          await this.tg_bot.sendMessage(
             chatId,
             'Ви не зареєстровані як виконавець',
             optCont,
@@ -494,7 +498,7 @@ export class MesengersService {
             const order = await this.sendTgAgreement(phone, chatId);
             if (order === true) {
               const msg = `${query.message.text}: Ви погодились на це замовлення \n`;
-              this.tg_bot.editMessageText(msg, {
+              await this.tg_bot.editMessageText(msg, {
                 chat_id: chatId,
                 message_id: query.message.message_id,
               });
@@ -507,7 +511,7 @@ export class MesengersService {
             await this.userModel.findByIdAndUpdate(user.id, {
               disagree_order: user.disagree_order,
             });
-            this.tg_bot.sendMessage(
+            await this.tg_bot.sendMessage(
               chatId,
               `Ви відмовились від виконання замовлення: ${orders.description}.`,
               optURL,
@@ -515,7 +519,7 @@ export class MesengersService {
             break;
           case 'delete':
             const delOrder = await this.ordersModel.findById(phone);
-            this.tg_bot.sendMessage(
+            await this.tg_bot.sendMessage(
               chatId,
               `Ви видалили замевлення: ${delOrder.description}.`,
               optURL,
@@ -535,7 +539,7 @@ export class MesengersService {
             await this.ordersModel.findByIdAndUpdate(actiOrder.id, {
               active: true,
             });
-            this.tg_bot.sendMessage(
+            await this.tg_bot.sendMessage(
               chatId,
               `Ви активували замевлення: ${actiOrder.description}.`,
               optURL,
@@ -547,7 +551,7 @@ export class MesengersService {
             await this.ordersModel.findByIdAndUpdate(deactiOrder.id, {
               active: false,
             });
-            this.tg_bot.sendMessage(
+            await this.tg_bot.sendMessage(
               chatId,
               `Ви деактивували замевлення: ${deactiOrder.description}.`,
               optURL,
@@ -556,7 +560,7 @@ export class MesengersService {
           case 'users':
             const findOrder = await this.ordersModel.findOne({ _id: phone });
             if (findOrder.accepted_users.length === 0) {
-              this.tg_bot.sendMessage(
+              await this.tg_bot.sendMessage(
                 chatId,
                 `Немає відгуків на пропозицію.`,
                 optURL,
@@ -565,7 +569,7 @@ export class MesengersService {
               findOrder.accepted_users.map(async (user: any) => {
                 const findedUser = await this.userModel.findOne({ _id: user });
                 const msgOrder = `Замовлення:\n${findOrder.description}\nКористувач: ${findedUser.firstName}.\nКатегорія: ${findedUser.category[0].subcategories[0].name}\nОплата: ${findedUser.price}\nТелефон: +${findedUser.phone}.\nПосилання на профіль:\n${process.env.FRONT_LINK}artists/${findedUser._id}.`;
-                this.tg_bot.sendMessage(chatId, msgOrder);
+                await this.tg_bot.sendMessage(chatId, msgOrder);
               });
             }
             break;
@@ -592,14 +596,14 @@ export class MesengersService {
           });
         }
       }
-      this.tg_bot.sendMessage(
+      await this.tg_bot.sendMessage(
         chatId,
         `Ви вимкнули оповіщення. Щоб знову отримувати оповіщення, натисніть кнопку "Відправити номер телефону".`,
         optCont,
       );
     });
   }
-  // VIMER METHODS ON CLASS ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // VIBER METHODS ON CLASS ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   async sendNewViberOrder(userId: string, order: Orders) {
     try {
       const msg = `Доброго дня, з'явилось нове повідомлення по Вашому профілю. \n
@@ -637,7 +641,7 @@ export class MesengersService {
         ],
       };
 
-      this.viber_bot.sendMessage({ id: userId }, [
+      await this.viber_bot.sendMessage({ id: userId }, [
         new TextMessage(msg),
         new RichMediaMessage(KEYBOARD),
       ]);
@@ -659,7 +663,7 @@ export class MesengersService {
       const accept = user.accepted_orders;
       if (accept.includes(order._id)) {
         const msg = `Ви вже погодились на це замовлення`;
-        this.viber_bot.sendMessage({ id: userChatId }, [
+        await this.viber_bot.sendMessage({ id: userChatId }, [
           new TextMessage(msg),
           new KeyboardMessage(MAIN_KEYBOARD_VIBER),
         ]);
@@ -678,7 +682,7 @@ export class MesengersService {
           accepted_users: order.accepted_users,
           approve_count: order.approve_count,
         });
-        this.viber_bot.sendMessage({ id: userChatId }, [
+        await this.viber_bot.sendMessage({ id: userChatId }, [
           new TextMessage(msgTrue),
           new KeyboardMessage(MAIN_KEYBOARD_VIBER),
         ]);
@@ -713,17 +717,17 @@ export class MesengersService {
         }
 
         const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"*${order.description}*".\n \nВ категорії:\n"*${order.category[0].name} - ${order.category[0].subcategories[0].name}*". \n \nЯкщо Ваш профіль сподобаеться замовнику, він з Вами зв'яжеться. Очікуйте на дзвінок або повідомлення`;
-        this.viber_bot.sendMessage({ id: userChatId }, [
+        await this.viber_bot.sendMessage({ id: userChatId }, [
           new TextMessage(msgTrue),
           new KeyboardMessage(MAIN_KEYBOARD_VIBER),
         ]);
       } else if (viber_chat === null && tg_chat === null) {
         const msg = `Замовник ще не активував чат-бот, спробуйте пізніше`;
-        this.viber_bot.sendMessage(userChatId, msg);
+        await this.viber_bot.sendMessage(userChatId, msg);
         return false;
       } else {
         const msg = `Замовник призупинив пошук`;
-        this.viber_bot.sendMessage(userChatId, msg);
+        await this.viber_bot.sendMessage(userChatId, msg);
         return true;
       }
     } catch (e) {
@@ -742,7 +746,7 @@ export class MesengersService {
         Array.isArray(find) &&
         find.length === 0
       ) {
-        this.viber_bot.sendMessage(
+        await this.viber_bot.sendMessage(
           { id: chatId },
           new TextMessage(
             'Ви не являетесь замовником. Якщо Ви замовник будь ласка, відправте свій номер телефону у форматі 380981231122',
@@ -750,7 +754,7 @@ export class MesengersService {
         );
       }
       if (!user && Array.isArray(find) && find.length === 0) {
-        this.viber_bot.sendMessage(
+        await this.viber_bot.sendMessage(
           { id: chatId },
           new TextMessage(
             'Ми не знайшли Ваших заявок, напевно ви не зарееструвались у чат боті. Будь ласка, відправте свій номер телефону у форматі 380981231122',
@@ -758,7 +762,7 @@ export class MesengersService {
         );
       }
       if (find || user.viber_chat === find[0].viber_chat) {
-        find.map((finded: Orders) => {
+        find.map(async (finded: Orders) => {
           const FIND_KEYBOARD = {
             Type: 'keyboard',
             Revision: 1,
@@ -846,7 +850,7 @@ export class MesengersService {
                 },
               ],
             };
-            this.viber_bot.sendMessage({ id: chatId }, [
+            await this.viber_bot.sendMessage({ id: chatId }, [
               new TextMessage(msg),
               new RichMediaMessage(KEYBOARD, USERS),
               new RichMediaMessage(USERS),
@@ -896,7 +900,7 @@ export class MesengersService {
                 },
               ],
             };
-            this.viber_bot.sendMessage({ id: chatId }, [
+            await this.viber_bot.sendMessage({ id: chatId }, [
               new TextMessage(msg),
               new RichMediaMessage(KEYBOARD),
               new RichMediaMessage(USERS),
@@ -954,13 +958,13 @@ export class MesengersService {
         Array.isArray(user.accepted_orders) &&
         user.accepted_orders.length === 0
       ) {
-        this.viber_bot.sendMessage({ id: chatId }, [
+        await this.viber_bot.sendMessage({ id: chatId }, [
           new TextMessage('Ми не знайшли Ваших відгуків на замовлення'),
           new KeyboardMessage(KEYBOARD),
         ]);
       }
       if (!user) {
-        this.viber_bot.sendMessage({ id: chatId }, [
+        await this.viber_bot.sendMessage({ id: chatId }, [
           new TextMessage(
             'Ми не знайшли Ваших відгуків, напевно ви не зарееструвались як виконавець.',
           ),
@@ -1018,7 +1022,7 @@ export class MesengersService {
       *Гонорар*: ${myOrders.price}.      
       *Статус*: ${myOrders.active ? 'Активний' : 'Неактивний'}.\n`;
 
-          this.viber_bot.sendMessage({ id: chatId }, [
+          await this.viber_bot.sendMessage({ id: chatId }, [
             new TextMessage(msg),
             new KeyboardMessage(FIND_KEYBOARD),
           ]);
@@ -1041,9 +1045,9 @@ export class MesengersService {
         .exec();
 
       const allViberUsers = allOrders.concat(allUsers);
-      allViberUsers.map((user: any) => {
+      allViberUsers.map(async (user: any) => {
         if (user.viber_chat !== null) {
-          this.viber_bot.sendMessage({ id: user.viber_chat }, [
+          await this.viber_bot.sendMessage({ id: user.viber_chat }, [
             new TextMessage(msg),
             new KeyboardMessage(MAIN_KEYBOARD_VIBER),
           ]);
@@ -1078,8 +1082,11 @@ export class MesengersService {
         .then(async (listener) => {
           console.log('publicUrl => ', listener.url());
           await http
-            .createServer(this.viber_bot.middleware())
-            .listen(port, () => this.viber_bot.setWebhook(listener.url()));
+            .createServer(await this.viber_bot.middleware())
+            .listen(
+              port,
+              async () => await this.viber_bot.setWebhook(listener.url()),
+            );
         });
     } catch (error) {
       console.log('Can not connect to ngrok server.');
@@ -1102,9 +1109,9 @@ export class MesengersService {
     const allOrders = await this.ordersModel.find({}).select('tg_chat').exec();
     const allUsers = await this.userModel.find({}).select('tg_chat').exec();
     const allTgUsers = allOrders.concat(allUsers);
-    allTgUsers.map((user: any) => {
+    allTgUsers.map(async (user: any) => {
       if (user.tg_chat !== null) {
-        this.sendMessageTg(user.tg_chat.toString(), msg);
+        await this.sendMessageTg(user.tg_chat.toString(), msg);
       }
     });
   }

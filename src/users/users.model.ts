@@ -269,10 +269,10 @@ export class User extends Model<User> {
 
   @ApiProperty({ example: 'new', description: 'User moderate status' })
   @Prop({
-    enum: ['new', 'approve', 'rejected'],
+    type: String,
     default: 'new',
   })
-  verified: verify;
+  verified: string;
   @ApiProperty({ example: false, description: 'User email verify' })
   @Prop({
     type: Boolean,

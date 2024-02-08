@@ -26,5 +26,5 @@ __decorate([
         description: 'User verify',
     }),
     __metadata("design:type", String)
-], VerifyUserDto.prototype, "verify", void 0);
+], VerifyUserDto.prototype, "verified", void 0);
 //# sourceMappingURL=verify.user.dto.js.map

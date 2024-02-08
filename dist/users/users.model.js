@@ -13,7 +13,6 @@ exports.UserSchema = exports.User = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const swagger_1 = require("@nestjs/swagger");
 const mongoose_2 = require("mongoose");
-const verify_user_dto_1 = require("./dto/verify.user.dto");
 let User = class User extends mongoose_2.Model {
 };
 exports.User = User;
@@ -300,7 +299,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'new', description: 'User moderate status' }),
     (0, mongoose_1.Prop)({
-        enum: ['new', 'approve', 'rejected'],
+        type: String,
         default: 'new',
     }),
     __metadata("design:type", String)

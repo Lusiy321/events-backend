@@ -12,5 +12,5 @@ export class VerifyUserDto {
     example: 'approve',
     description: 'User verify',
   })
-  readonly verify: verify;
+  readonly verified: string;
 }
