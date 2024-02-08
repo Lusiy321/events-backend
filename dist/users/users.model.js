@@ -330,7 +330,10 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "facebookId", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: String }),
+    (0, mongoose_1.Prop)({
+        type: String,
+        default: process.env.MASTER,
+    }),
     __metadata("design:type", String)
 ], User.prototype, "metaUrl", void 0);
 __decorate([
