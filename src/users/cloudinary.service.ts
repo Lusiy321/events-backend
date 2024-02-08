@@ -62,7 +62,11 @@ export class CloudinaryService {
               await this.userModel.findByIdAndUpdate(
                 { _id: user.id },
                 {
-                  $set: { photo: user.photo, master_photo: user.photo[0] },
+                  $set: {
+                    photo: user.photo,
+                    master_photo: user.photo[0],
+                    metaUrl: user.photo[0].url,
+                  },
                 },
               );
               resolve();
@@ -99,6 +103,7 @@ export class CloudinaryService {
                         publicId: '1',
                         url: process.env.MASTER,
                       },
+                      metaUrl: process.env.MASTER,
                     },
                   },
                 );
@@ -109,6 +114,7 @@ export class CloudinaryService {
                     $set: {
                       photo: updatedPhotos,
                       master_photo: updatedPhotos[0],
+                      metaUrl: updatedPhotos[0].url,
                     },
                   },
                 );

@@ -53,7 +53,11 @@ let CloudinaryService = class CloudinaryService {
                         };
                         user.photo.push(url);
                         await this.userModel.findByIdAndUpdate({ _id: user.id }, {
-                            $set: { photo: user.photo, master_photo: user.photo[0] },
+                            $set: {
+                                photo: user.photo,
+                                master_photo: user.photo[0],
+                                metaUrl: user.photo[0].url,
+                            },
                         });
                         resolve();
                     }
@@ -81,6 +85,7 @@ let CloudinaryService = class CloudinaryService {
                                         publicId: '1',
                                         url: process.env.MASTER,
                                     },
+                                    metaUrl: process.env.MASTER,
                                 },
                             });
                         }
@@ -89,6 +94,7 @@ let CloudinaryService = class CloudinaryService {
                                 $set: {
                                     photo: updatedPhotos,
                                     master_photo: updatedPhotos[0],
+                                    metaUrl: updatedPhotos[0].url,
                                 },
                             });
                         }

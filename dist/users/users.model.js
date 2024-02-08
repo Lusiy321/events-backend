@@ -330,6 +330,10 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "facebookId", void 0);
 __decorate([
+    (0, mongoose_1.Prop)({ type: String }),
+    __metadata("design:type", String)
+], User.prototype, "metaUrl", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({ example: 'false', description: 'User ban status' }),
     (0, mongoose_1.Prop)({
         type: Boolean,

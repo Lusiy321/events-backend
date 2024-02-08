@@ -293,6 +293,9 @@ export class User extends Model<User> {
   @Prop({ type: String })
   facebookId: string;
 
+  @Prop({ type: String })
+  metaUrl: string;
+
   @ApiProperty({ example: 'false', description: 'User ban status' })
   @Prop({
     type: Boolean,

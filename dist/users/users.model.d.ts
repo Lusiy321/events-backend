@@ -55,6 +55,7 @@ export declare class User extends Model<User> {
     verify: boolean;
     googleId: string;
     facebookId: string;
+    metaUrl: string;
     ban: boolean;
     totalRating: number;
     numberOfRatings: number;

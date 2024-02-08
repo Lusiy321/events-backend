@@ -188,6 +188,7 @@ let UsersService = class UsersService {
                 const userUpdateToken = await this.userModel.findOne({
                     email: details.email,
                 });
+                await this.sendVerificationEmail(details.email);
                 const newUser = await this.createToken(userUpdateToken);
                 return newUser;
             }
@@ -224,6 +225,7 @@ let UsersService = class UsersService {
                     email: details.email,
                 });
                 await this.checkTrialStatus(user._id);
+                await this.sendVerificationEmail(details.email);
                 const newUser = await this.createToken(userUpdateToken);
                 return newUser;
             }
