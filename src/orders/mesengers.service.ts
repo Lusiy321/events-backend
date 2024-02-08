@@ -14,7 +14,7 @@ import { newOrderKeyboard, newOrderMsg } from './Telegram/new.order.msg';
 import { MAIN_KEYBOARD_VIBER, mainKeyboardViber } from './Viber/main.keyboard';
 import { OrdersArchive } from './order.archive.model';
 import { Model } from 'mongoose';
-import { NotFound, BadRequest } from 'http-errors';
+import { BadRequest } from 'http-errors';
 
 @Injectable()
 export class MesengersService {
@@ -252,7 +252,7 @@ export class MesengersService {
 
     //TELEGRAM BOT CODE START
     const token = process.env.BOT_TELEGRAM;
-    this.tg_bot = new TelegramBot(token, { polling: false });
+    this.tg_bot = new TelegramBot(token, { polling: true });
     this.tg_bot.setMyCommands([
       { command: '/stop', description: 'Зупинити оповіщення' },
       { command: '/orders', description: 'Управління замовленнями' },
@@ -405,7 +405,7 @@ export class MesengersService {
           Array.isArray(user.accepted_orders) &&
           user.accepted_orders.length === 0
         ) {
-          this.tg_bot.sendMessage(
+          await this.tg_bot.sendMessage(
             chatId,
             'Ми не знайшли Ваших відгуків.',
             optCont,
@@ -416,11 +416,13 @@ export class MesengersService {
           Array.isArray(user.accepted_orders) &&
           user.accepted_orders.length !== 0
         ) {
-          user.accepted_orders.map(async (finded: Orders) => {
-            const findetOrder = await this.ordersModel.findOne({
-              _id: finded,
-            });
-            const msg = `Замовник: ${findetOrder.name}.
+          try {
+            user.accepted_orders.map(async (finded: Orders) => {
+              const findetOrder = await this.ordersModel.findOne({
+                _id: finded,
+              });
+
+              const msg = `Замовник: ${findetOrder.name}.
       Дата події: ${findetOrder.date}.
       Категорія: ${findetOrder.category[0].subcategories[0].name}.
       Вимоги: ${findetOrder.description}.
@@ -428,8 +430,11 @@ export class MesengersService {
       Гонорар: ${findetOrder.price}.      
       Статус: ${findetOrder.active ? 'Активний' : 'Неактивний'}.\n`;
 
-            this.tg_bot.sendMessage(chatId, msg, optCont);
-          });
+              await this.tg_bot.sendMessage(chatId, msg, optCont);
+            });
+          } catch (e) {
+            return await this.tg_bot.sendMessage(chatId, e, optCont);
+          }
         }
       } catch (e) {
         throw new Error(`Помилка надсилання повідомлення: ${e}`);
@@ -1108,6 +1113,7 @@ export class MesengersService {
     try {
       const telegram = await this.ordersModel.findOne({ tg_chat: chatId });
       const viber = await this.ordersModel.findOne({ viber_chat: chatId });
+
       if (telegram) {
         const msg = `Ваш код верифікації: ${code}\nПерейти на сайт: ${process.env.CODE_LINK}`;
         await this.sendMessageTg(chatId, msg);
@@ -1121,8 +1127,8 @@ export class MesengersService {
       } else {
         throw new Error(`Помилка надсилання повідомлення`);
       }
-    } catch (error) {
-      throw new Error(`Помилка надсилання повідомлення: ${error}`);
+    } catch (e) {
+      throw e;
     }
   }
 

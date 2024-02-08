@@ -72,30 +72,72 @@ let OrdersService = class OrdersService {
         try {
             const params = __rest(orderObj, []);
             const verificationCode = await this.generateSixDigitNumber();
-            const createdOrder = await this.ordersModel.create(params);
-            await this.ordersModel.findByIdAndUpdate({ _id: createdOrder._id }, { sms: verificationCode });
-            const order = await this.ordersModel.findById(createdOrder._id);
-            const allOrders = await this.ordersModel.find({ phone: order.phone });
-            if (Array.isArray(allOrders) && allOrders.length !== 0) {
-                const tgChat = allOrders[0].tg_chat;
-                const viber = allOrders[0].viber_chat;
-                if (tgChat === null && viber === null) {
-                    return order;
+            const allOrders = await this.ordersModel.find({ phone: orderObj.phone });
+            const allUsers = await this.userModel.find({ phone: orderObj.phone });
+            if (Array.isArray(allOrders) &&
+                allOrders.length === 0 &&
+                Array.isArray(allUsers) &&
+                allUsers.length === 0) {
+                console.log('tyt 3');
+                const createdOrder = await this.ordersModel.create(params);
+                await this.ordersModel.findByIdAndUpdate({ _id: createdOrder._id }, { sms: verificationCode });
+                return await this.ordersModel.findById({ _id: createdOrder._id });
+            }
+            else if ((Array.isArray(allOrders) && allOrders.length !== 0) ||
+                (Array.isArray(allUsers) && allUsers.length !== 0)) {
+                if (allOrders.length !== 0) {
+                    console.log('tyt 2');
+                    const tgChat = allOrders[allOrders.length - 1].tg_chat;
+                    const viber = allOrders[allOrders.length - 1].viber_chat;
+                    const sms = allOrders[allOrders.length - 1].sms;
+                    if (tgChat === null && viber === null && sms !== null) {
+                        throw (0, http_errors_1.Conflict)('Ви не активували бот');
+                    }
+                    if ((tgChat !== null && sms !== null) ||
+                        (viber !== null && sms !== null)) {
+                        throw (0, http_errors_1.Conflict)('Ви не підтвердили попередній запит');
+                    }
+                    if (tgChat !== null) {
+                        const createdOrder = await this.ordersModel.create(params);
+                        createdOrder.tg_chat = tgChat;
+                        createdOrder.sms = verificationCode;
+                        createdOrder.save();
+                        await this.mesengersService.sendCode(tgChat, verificationCode);
+                        return await this.ordersModel.findById({ _id: createdOrder._id });
+                    }
+                    if (viber !== null) {
+                        const createdOrder = await this.ordersModel.create(params);
+                        createdOrder.viber_chat = viber;
+                        createdOrder.sms = verificationCode;
+                        createdOrder.save();
+                        await this.mesengersService.sendCode(viber, verificationCode);
+                        return await this.ordersModel.findById({ _id: createdOrder._id });
+                    }
                 }
-                if (tgChat !== null) {
-                    await this.ordersModel.findByIdAndUpdate({ _id: createdOrder._id }, { tg_chat: tgChat });
-                    await this.mesengersService.sendCode(tgChat, verificationCode);
-                    return order;
+                if (allUsers.length !== 0) {
+                    const u_tgChat = allUsers[0].tg_chat;
+                    const u_viber = allUsers[0].viber_chat;
+                    if (u_tgChat !== null) {
+                        console.log('tyt 1');
+                        const createdOrder = await this.ordersModel.create(params);
+                        createdOrder.tg_chat = u_tgChat;
+                        createdOrder.sms = verificationCode;
+                        createdOrder.save();
+                        await this.mesengersService.sendCode(u_tgChat, verificationCode);
+                        return await this.ordersModel.findById({ _id: createdOrder._id });
+                    }
+                    if (u_viber !== null) {
+                        const createdOrder = await this.ordersModel.create(params);
+                        createdOrder.viber_chat = u_viber;
+                        createdOrder.sms = verificationCode;
+                        createdOrder.save();
+                        await this.mesengersService.sendCode(u_viber, verificationCode);
+                        return await this.ordersModel.findById({ _id: createdOrder._id });
+                    }
                 }
-                if (viber !== null) {
-                    await this.ordersModel.findByIdAndUpdate({ _id: createdOrder._id }, { viber_chat: viber });
-                    await this.mesengersService.sendCode(viber, verificationCode);
-                    return order;
-                }
-                return order;
             }
             else {
-                return order;
+                throw new http_errors_1.BadRequest('Order not found');
             }
         }
         catch (e) {

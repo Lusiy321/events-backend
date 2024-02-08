@@ -205,7 +205,7 @@ let MesengersService = class MesengersService {
             console.error('Error while getting bot profile:', error);
         });
         const token = process.env.BOT_TELEGRAM;
-        this.tg_bot = new TelegramBot(token, { polling: false });
+        this.tg_bot = new TelegramBot(token, { polling: true });
         this.tg_bot.setMyCommands([
             { command: '/stop', description: 'Зупинити оповіщення' },
             { command: '/orders', description: 'Управління замовленнями' },
@@ -334,24 +334,29 @@ let MesengersService = class MesengersService {
                 if (user &&
                     Array.isArray(user.accepted_orders) &&
                     user.accepted_orders.length === 0) {
-                    this.tg_bot.sendMessage(chatId, 'Ми не знайшли Ваших відгуків.', optCont);
+                    await this.tg_bot.sendMessage(chatId, 'Ми не знайшли Ваших відгуків.', optCont);
                 }
                 if (user &&
                     Array.isArray(user.accepted_orders) &&
                     user.accepted_orders.length !== 0) {
-                    user.accepted_orders.map(async (finded) => {
-                        const findetOrder = await this.ordersModel.findOne({
-                            _id: finded,
-                        });
-                        const msg = `Замовник: ${findetOrder.name}.
+                    try {
+                        user.accepted_orders.map(async (finded) => {
+                            const findetOrder = await this.ordersModel.findOne({
+                                _id: finded,
+                            });
+                            const msg = `Замовник: ${findetOrder.name}.
       Дата події: ${findetOrder.date}.
       Категорія: ${findetOrder.category[0].subcategories[0].name}.
       Вимоги: ${findetOrder.description}.
       Локація: ${findetOrder.location}.
       Гонорар: ${findetOrder.price}.      
       Статус: ${findetOrder.active ? 'Активний' : 'Неактивний'}.\n`;
-                        this.tg_bot.sendMessage(chatId, msg, optCont);
-                    });
+                            await this.tg_bot.sendMessage(chatId, msg, optCont);
+                        });
+                    }
+                    catch (e) {
+                        return await this.tg_bot.sendMessage(chatId, e, optCont);
+                    }
                 }
             }
             catch (e) {
@@ -974,8 +979,8 @@ let MesengersService = class MesengersService {
                 throw new Error(`Помилка надсилання повідомлення`);
             }
         }
-        catch (error) {
-            throw new Error(`Помилка надсилання повідомлення: ${error}`);
+        catch (e) {
+            throw e;
         }
     }
     async sendTgAgreement(phone, chatId) {
