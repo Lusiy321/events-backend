@@ -2,7 +2,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Model } from 'mongoose';
-import { place } from './dto/position.banner';
 
 export type BannerDocument = Banner & Document;
 
@@ -20,13 +19,11 @@ export class Banner extends Model<Banner> {
   })
   text: string;
 
-  @ApiProperty({ example: 'top', description: 'Banner position' })
+  @ApiProperty({ example: 'Link to user or site', description: 'Banner URL' })
   @Prop({
     type: String,
-    enum: ['left', 'right', 'top'],
-    default: 'new',
   })
-  position: place;
+  url: string;
 }
 
 export const BannerSchema = SchemaFactory.createForClass(Banner);

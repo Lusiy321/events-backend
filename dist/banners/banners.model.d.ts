@@ -23,12 +23,11 @@
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
 import { Model } from 'mongoose';
-import { place } from './dto/position.banner';
 export type BannerDocument = Banner & Document;
 export declare class Banner extends Model<Banner> {
     img: string;
     text: string;
-    position: place;
+    url: string;
 }
 export declare const BannerSchema: import("mongoose").Schema<Banner, Model<Banner, any, any, any, import("mongoose").Document<unknown, any, Banner> & Banner & {
     _id: import("mongoose").Types.ObjectId;

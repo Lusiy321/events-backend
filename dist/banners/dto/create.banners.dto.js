@@ -11,7 +11,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateBannerDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
-const position_banner_1 = require("./position.banner");
 class CreateBannerDto {
 }
 exports.CreateBannerDto = CreateBannerDto;

@@ -1,6 +1,5 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
-import { place } from './position.banner';
 
 export class CreateBannerDto {
   @ApiProperty({ example: 'https://', description: 'Banner img' })
@@ -13,5 +12,5 @@ export class CreateBannerDto {
     example: 'top',
     description: 'Banner position: enum [top, left, right]',
   })
-  readonly role: place;
+  readonly role: string;
 }

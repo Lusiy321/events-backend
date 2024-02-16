@@ -7,6 +7,7 @@ const TextMessage = require('viber-bot').Message.Text;
 const RichMediaMessage = require('viber-bot').Message.RichMedia;
 const KeyboardMessage = require('viber-bot').Message.Keyboard;
 const PictureMessage = require('viber-bot').Message.Picture;
+const ContactMessage = require('viber-bot').Message.Contact;
 import { User } from 'src/users/users.model';
 import { Orders } from 'src/orders/order.model';
 const ngrok = require('@ngrok/ngrok');
@@ -1184,13 +1185,29 @@ export class MesengersService {
       } else if (order.viber_chat !== null && order.active === true) {
         const msgOrder =
           `Користувач ${user.firstName} готовий виконати ваше замовлення "${order.description}". \n Посилання на профіль виконавця: ${process.env.FRONT_LINK}artists/${user._id}.\n Ви можете написати йому, або зателефонувати по номеру. \n` +
-          `\n Телефон: +${phone}`;
+          `\n Телефон: +${user.phone}`;
 
         await this.viber_bot.sendMessage({ id: order.viber_chat }, [
-          new PictureMessage(user.master_photo.url),
           new TextMessage(msgOrder),
+          new PictureMessage(user.master_photo.url),
+          new ContactMessage(user.firstName, user.phone),
           new KeyboardMessage(MAIN_KEYBOARD_VIBER),
         ]);
+        if (user.photo.length > 0 || user.video.length > 0) {
+          user.photo.map(async (photos: any) => {
+            await this.viber_bot.sendMessage(
+              { id: order.viber_chat },
+              new PictureMessage(photos.url),
+            );
+          });
+          user.video.map(async (videos: any) => {
+            await this.viber_bot.sendMessage(
+              { id: order.viber_chat },
+              new TextMessage(videos.url),
+            );
+          });
+        }
+
         const msgTrue = `Доброго дня, замовник отримав Вашу відповідь на замовлення:\n"${order.description}".\n \nВ категорії:\n"${order.category[0].name} - ${order.category[0].subcategories[0].name}". \n \nЯкщо Ваш профіль сподобаеться замовнику, він з Вами зв'яжеться. Очікуйте на дзвінок або повідомлення`;
         await this.sendMessageTg(chatId, msgTrue);
         order.approve_count = +1;

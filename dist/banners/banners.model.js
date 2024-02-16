@@ -13,7 +13,6 @@ exports.BannerSchema = exports.Banner = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const swagger_1 = require("@nestjs/swagger");
 const mongoose_2 = require("mongoose");
-const position_banner_1 = require("./dto/position.banner");
 let Banner = class Banner extends mongoose_2.Model {
 };
 exports.Banner = Banner;
@@ -32,14 +31,12 @@ __decorate([
     __metadata("design:type", String)
 ], Banner.prototype, "text", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'top', description: 'Banner position' }),
+    (0, swagger_1.ApiProperty)({ example: 'Link to user or site', description: 'Banner URL' }),
     (0, mongoose_1.Prop)({
         type: String,
-        enum: ['left', 'right', 'top'],
-        default: 'new',
     }),
     __metadata("design:type", String)
-], Banner.prototype, "position", void 0);
+], Banner.prototype, "url", void 0);
 exports.Banner = Banner = __decorate([
     (0, mongoose_1.Schema)({ versionKey: false, timestamps: true })
 ], Banner);
