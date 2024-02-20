@@ -242,8 +242,8 @@ let OrdersService = class OrdersService {
         })
             .exec();
         if (Array.isArray(subcategory) && subcategory.length === 0) {
-            const [city, region, country] = order.location.split(', ');
-            if (country === undefined) {
+            const [city, municipality, district, region, index, country] = order.location.split(', ');
+            if (city === 'Київ') {
                 const regexLocation = new RegExp('Київська область', 'i');
                 const category = await this.userModel
                     .find({
