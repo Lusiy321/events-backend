@@ -183,16 +183,17 @@ let SearchService = class SearchService {
                     .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
-                if (Array.isArray(subcategory) && subcategory.length === 0) {
+                const randomArray = (0, parse_user_1.shuffleArray)(subcategory);
+                if (Array.isArray(randomArray) && randomArray.length === 0) {
                     return {
                         totalPages: 0,
                         currentPage: 0,
-                        data: subcategory,
+                        data: randomArray,
                     };
                 }
                 else {
-                    const result = (0, parse_user_1.paginateArray)(subcategory, curentPage);
-                    const totalPages = Math.ceil(subcategory.length / limit);
+                    const result = (0, parse_user_1.paginateArray)(randomArray, curentPage);
+                    const totalPages = Math.ceil(randomArray.length / limit);
                     return {
                         totalPages: totalPages,
                         currentPage: curentPage,
@@ -209,16 +210,17 @@ let SearchService = class SearchService {
                     .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
-                if (Array.isArray(location) && location.length === 0) {
+                const randomArray = (0, parse_user_1.shuffleArray)(location);
+                if (Array.isArray(randomArray) && randomArray.length === 0) {
                     return {
                         totalPages: 0,
                         currentPage: 0,
-                        data: location,
+                        data: randomArray,
                     };
                 }
                 else {
-                    const result = (0, parse_user_1.paginateArray)(location, curentPage);
-                    const totalPages = Math.ceil(location.length / limit);
+                    const result = (0, parse_user_1.paginateArray)(randomArray, curentPage);
+                    const totalPages = Math.ceil(randomArray.length / limit);
                     return {
                         totalPages: totalPages,
                         currentPage: curentPage,
@@ -240,16 +242,17 @@ let SearchService = class SearchService {
                     .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
-                if (Array.isArray(category) && category.length === 0) {
+                const randomArray = (0, parse_user_1.shuffleArray)(category);
+                if (Array.isArray(randomArray) && randomArray.length === 0) {
                     return {
                         totalPages: 0,
                         currentPage: 0,
-                        data: category,
+                        data: randomArray,
                     };
                 }
                 else {
-                    const result = (0, parse_user_1.paginateArray)(category, curentPage);
-                    const totalPages = Math.ceil(category.length / limit);
+                    const result = (0, parse_user_1.paginateArray)(randomArray, curentPage);
+                    const totalPages = Math.ceil(randomArray.length / limit);
                     return {
                         totalPages: totalPages,
                         currentPage: curentPage,

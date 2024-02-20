@@ -5,6 +5,7 @@ import {
   mergeAndRemoveDuplicates,
   paginateArray,
   rows,
+  shuffleArray,
 } from './utils/parse.user';
 import { NotFound } from 'http-errors';
 import { search_result } from './dto/update.user.dto';
@@ -192,16 +193,16 @@ export class SearchService {
           .sort({ createdAt: -1 })
           .select(rows)
           .exec();
-
-        if (Array.isArray(subcategory) && subcategory.length === 0) {
+        const randomArray = shuffleArray(subcategory);
+        if (Array.isArray(randomArray) && randomArray.length === 0) {
           return {
             totalPages: 0,
             currentPage: 0,
-            data: subcategory,
+            data: randomArray,
           };
         } else {
-          const result = paginateArray(subcategory, curentPage);
-          const totalPages = Math.ceil(subcategory.length / limit);
+          const result = paginateArray(randomArray, curentPage);
+          const totalPages = Math.ceil(randomArray.length / limit);
           return {
             totalPages: totalPages,
             currentPage: curentPage,
@@ -217,16 +218,16 @@ export class SearchService {
           .sort({ createdAt: -1 })
           .select(rows)
           .exec();
-
-        if (Array.isArray(location) && location.length === 0) {
+        const randomArray = shuffleArray(location);
+        if (Array.isArray(randomArray) && randomArray.length === 0) {
           return {
             totalPages: 0,
             currentPage: 0,
-            data: location,
+            data: randomArray,
           };
         } else {
-          const result = paginateArray(location, curentPage);
-          const totalPages = Math.ceil(location.length / limit);
+          const result = paginateArray(randomArray, curentPage);
+          const totalPages = Math.ceil(randomArray.length / limit);
           return {
             totalPages: totalPages,
             currentPage: curentPage,
@@ -247,16 +248,16 @@ export class SearchService {
           .sort({ createdAt: -1 })
           .select(rows)
           .exec();
-
-        if (Array.isArray(category) && category.length === 0) {
+        const randomArray = shuffleArray(category);
+        if (Array.isArray(randomArray) && randomArray.length === 0) {
           return {
             totalPages: 0,
             currentPage: 0,
-            data: category,
+            data: randomArray,
           };
         } else {
-          const result = paginateArray(category, curentPage);
-          const totalPages = Math.ceil(category.length / limit);
+          const result = paginateArray(randomArray, curentPage);
+          const totalPages = Math.ceil(randomArray.length / limit);
           return {
             totalPages: totalPages,
             currentPage: curentPage,
