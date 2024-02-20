@@ -22,6 +22,7 @@ __decorate([
         type: String,
         minlength: 2,
         maxlength: 20,
+        required: [true, 'User name is required'],
     }),
     __metadata("design:type", String)
 ], User.prototype, "firstName", void 0);
@@ -52,8 +53,6 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: 'I sing song', description: 'User post description' }),
     (0, mongoose_1.Prop)({
         type: String,
-        minlength: 2,
-        maxlength: 1400,
     }),
     __metadata("design:type", String)
 ], User.prototype, "description", void 0);
@@ -66,7 +65,7 @@ __decorate([
         type: String,
         minlength: 10,
         maxlength: 13,
-        default: '380000000000',
+        required: [true, 'Phone is required'],
     }),
     __metadata("design:type", String)
 ], User.prototype, "phone", void 0);

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { User, UserSchema } from './users/users.model';
 import { ConfigModule } from '@nestjs/config';
@@ -20,6 +20,8 @@ import {
 } from './orders/order.archive.model';
 import { Banner, BannerSchema } from './banners/banners.model';
 import { PostSchema, Posts } from './posts/posts.model';
+import { ValidationOrders } from './middleware/validation.orders';
+import { ValidationUsers } from './middleware/validation.users';
 
 @Module({
   controllers: [UsersController, AdminController],
@@ -50,4 +52,9 @@ import { PostSchema, Posts } from './posts/posts.model';
     BannersModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(ValidationOrders).forRoutes('./orders/orders.controller');
+    consumer.apply(ValidationUsers).forRoutes('./users/users.controller');
+  }
+}

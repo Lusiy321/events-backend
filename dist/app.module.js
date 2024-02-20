@@ -26,7 +26,13 @@ const banners_module_1 = require("./banners/banners.module");
 const order_archive_model_1 = require("./orders/order.archive.model");
 const banners_model_1 = require("./banners/banners.model");
 const posts_model_1 = require("./posts/posts.model");
+const validation_orders_1 = require("./middleware/validation.orders");
+const validation_users_1 = require("./middleware/validation.users");
 let AppModule = class AppModule {
+    configure(consumer) {
+        consumer.apply(validation_orders_1.ValidationOrders).forRoutes('./orders/orders.controller');
+        consumer.apply(validation_users_1.ValidationUsers).forRoutes('./users/users.controller');
+    }
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([

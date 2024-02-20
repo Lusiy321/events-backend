@@ -33,6 +33,8 @@ __decorate([
     }),
     (0, mongoose_1.Prop)({
         type: String,
+        minlength: 2,
+        required: [true, 'User name'],
     }),
     __metadata("design:type", String)
 ], Orders.prototype, "name", void 0);
@@ -43,6 +45,7 @@ __decorate([
     }),
     (0, mongoose_1.Prop)({
         type: String,
+        required: [true, 'User description'],
     }),
     __metadata("design:type", String)
 ], Orders.prototype, "description", void 0);
@@ -60,26 +63,14 @@ __decorate([
                 ],
             },
         ],
-        description: 'Order description',
+        description: 'Order category',
     }),
     (0, mongoose_1.Prop)({
         type: (Array),
-        default: [],
+        required: [true, 'User category'],
     }),
     __metadata("design:type", Array)
 ], Orders.prototype, "category", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({
-        example: 'YourLogin',
-        description: 'Order telegram login',
-    }),
-    (0, mongoose_1.Prop)({
-        type: String,
-        minlength: 3,
-        maxlength: 15,
-    }),
-    __metadata("design:type", String)
-], Orders.prototype, "telegram", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
         type: Number,
@@ -90,14 +81,6 @@ __decorate([
 __decorate([
     (0, mongoose_1.Prop)({
         type: String,
-        default: 'none',
-    }),
-    __metadata("design:type", String)
-], Orders.prototype, "botLink", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({
-        type: String,
-        default: 'none',
     }),
     __metadata("design:type", String)
 ], Orders.prototype, "exactLocation", void 0);
@@ -115,6 +98,7 @@ __decorate([
     }),
     (0, mongoose_1.Prop)({
         type: String,
+        required: [true, 'User location'],
     }),
     __metadata("design:type", String)
 ], Orders.prototype, "location", void 0);
@@ -135,7 +119,7 @@ __decorate([
         description: 'Order data',
         default: 'Не визначено',
     }),
-    (0, mongoose_1.Prop)({ type: String }),
+    (0, mongoose_1.Prop)({ type: String, required: [true, 'Date'] }),
     __metadata("design:type", String)
 ], Orders.prototype, "date", void 0);
 __decorate([

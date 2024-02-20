@@ -28,7 +28,7 @@ __decorate([
 ], CreateUserDto.prototype, "firstName", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        example: '+380987894556',
+        example: '380987894556',
         description: 'User phone number',
     }),
     __metadata("design:type", String)

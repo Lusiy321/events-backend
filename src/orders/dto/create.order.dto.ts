@@ -48,12 +48,6 @@ export class CreateOrderDto {
   readonly price: string;
 
   @ApiProperty({
-    example: 't.me/1387912',
-    description: 'Bot link',
-  })
-  readonly botLink: string;
-
-  @ApiProperty({
     example: '10.11.2024',
     description: 'Order data',
   })

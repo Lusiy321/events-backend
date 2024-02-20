@@ -9,7 +9,7 @@ export class CreateUserDto {
   @ApiProperty({ example: 'Volodymyr', description: 'User first name' })
   readonly firstName: string;
   @ApiProperty({
-    example: '+380987894556',
+    example: '380987894556',
     description: 'User phone number',
   })
   readonly phone: string;

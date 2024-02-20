@@ -14,6 +14,7 @@ export class User extends Model<User> {
     type: String,
     minlength: 2,
     maxlength: 20,
+    required: [true, 'User name is required'],
   })
   firstName: string;
 
@@ -40,8 +41,6 @@ export class User extends Model<User> {
   @ApiProperty({ example: 'I sing song', description: 'User post description' })
   @Prop({
     type: String,
-    minlength: 2,
-    maxlength: 1400,
   })
   description: string;
 
@@ -53,7 +52,7 @@ export class User extends Model<User> {
     type: String,
     minlength: 10,
     maxlength: 13,
-    default: '380000000000',
+    required: [true, 'Phone is required'],
   })
   phone: string;
 

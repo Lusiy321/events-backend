@@ -22,6 +22,8 @@ export class Orders extends Model<Orders> {
   })
   @Prop({
     type: String,
+    minlength: 2,
+    required: [true, 'User name'],
   })
   name: string;
 
@@ -31,6 +33,7 @@ export class Orders extends Model<Orders> {
   })
   @Prop({
     type: String,
+    required: [true, 'User description'],
   })
   description: string;
 
@@ -47,24 +50,13 @@ export class Orders extends Model<Orders> {
         ],
       },
     ],
-    description: 'Order description',
+    description: 'Order category',
   })
   @Prop({
     type: Array<Object>,
-    default: [],
+    required: [true, 'User category'],
   })
   category: Array<Categories>;
-
-  @ApiProperty({
-    example: 'YourLogin',
-    description: 'Order telegram login',
-  })
-  @Prop({
-    type: String,
-    minlength: 3,
-    maxlength: 15,
-  })
-  telegram: string;
 
   @Prop({
     type: Number,
@@ -74,13 +66,6 @@ export class Orders extends Model<Orders> {
 
   @Prop({
     type: String,
-    default: 'none',
-  })
-  botLink: string;
-
-  @Prop({
-    type: String,
-    default: 'none',
   })
   exactLocation: string;
 
@@ -96,6 +81,7 @@ export class Orders extends Model<Orders> {
   })
   @Prop({
     type: String,
+    required: [true, 'User location'],
   })
   location: string;
 
@@ -114,7 +100,7 @@ export class Orders extends Model<Orders> {
     description: 'Order data',
     default: 'Не визначено',
   })
-  @Prop({ type: String })
+  @Prop({ type: String, required: [true, 'Date'] })
   date: string;
 
   @ApiProperty({ example: 'true', description: 'Order status' })

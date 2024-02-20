@@ -1080,7 +1080,7 @@ export class MesengersService {
           addr: port,
           authtoken_from_env: true,
         })
-        .then(async (listener) => {
+        .then(async (listener: any) => {
           console.log('publicUrl => ', listener.url());
           await http
             .createServer(await this.viber_bot.middleware())
