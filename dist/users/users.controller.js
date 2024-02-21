@@ -125,8 +125,7 @@ let UsersController = class UsersController {
         return this.usersService.sendVerificationEmail(email);
     }
     async verifyEmail(id, res) {
-        await this.usersService.verifyUserEmail(id);
-        return res.redirect(`${process.env.FRONT_LINK}auth/login`);
+        return await this.usersService.verifyUserEmail(id);
     }
 };
 exports.UsersController = UsersController;

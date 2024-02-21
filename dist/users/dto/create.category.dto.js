@@ -15,7 +15,7 @@ class CreateCategoryDto {
 }
 exports.CreateCategoryDto = CreateCategoryDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Music', description: 'Category name' }),
+    (0, swagger_1.ApiProperty)({ example: 'Музичні послуги', description: 'Category name' }),
     __metadata("design:type", String)
 ], CreateCategoryDto.prototype, "name", void 0);
 //# sourceMappingURL=create.category.dto.js.map

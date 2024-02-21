@@ -78,7 +78,10 @@ export class SearchService {
           .sort({ createdAt: -1 })
           .select(rows)
           .exec();
-        const resultArray = mergeAndRemoveDuplicates(category, subcategory);
+        const resultArray = await mergeAndRemoveDuplicates(
+          category,
+          subcategory,
+        );
         if (Array.isArray(resultArray) && resultArray.length === 0) {
           return {
             totalPages: 0,
@@ -86,7 +89,7 @@ export class SearchService {
             data: resultArray,
           };
         } else {
-          const result = paginateArray(resultArray, curentPage);
+          const result = await paginateArray(resultArray, curentPage);
 
           const totalPages = Math.ceil(resultArray.length / limit);
           return {
@@ -155,7 +158,7 @@ export class SearchService {
           .select(rows)
           .exec();
 
-        const resultArray = mergeAndRemoveDuplicates(
+        const resultArray = await mergeAndRemoveDuplicates(
           findTitle,
           findDescr,
           findCat,
@@ -170,7 +173,7 @@ export class SearchService {
             data: resultArray,
           };
         } else {
-          const result = paginateArray(resultArray, curentPage);
+          const result = await paginateArray(resultArray, curentPage);
           const totalPages = Math.ceil(resultArray.length / limit);
           return {
             totalPages: totalPages,
@@ -193,7 +196,7 @@ export class SearchService {
           .sort({ createdAt: -1 })
           .select(rows)
           .exec();
-        const randomArray = shuffleArray(subcategory);
+        const randomArray = await shuffleArray(subcategory);
         if (Array.isArray(randomArray) && randomArray.length === 0) {
           return {
             totalPages: 0,
@@ -201,7 +204,7 @@ export class SearchService {
             data: randomArray,
           };
         } else {
-          const result = paginateArray(randomArray, curentPage);
+          const result = await paginateArray(randomArray, curentPage);
           const totalPages = Math.ceil(randomArray.length / limit);
           return {
             totalPages: totalPages,
@@ -218,7 +221,7 @@ export class SearchService {
           .sort({ createdAt: -1 })
           .select(rows)
           .exec();
-        const randomArray = shuffleArray(location);
+        const randomArray = await shuffleArray(location);
         if (Array.isArray(randomArray) && randomArray.length === 0) {
           return {
             totalPages: 0,
@@ -226,7 +229,7 @@ export class SearchService {
             data: randomArray,
           };
         } else {
-          const result = paginateArray(randomArray, curentPage);
+          const result = await paginateArray(randomArray, curentPage);
           const totalPages = Math.ceil(randomArray.length / limit);
           return {
             totalPages: totalPages,
@@ -248,7 +251,7 @@ export class SearchService {
           .sort({ createdAt: -1 })
           .select(rows)
           .exec();
-        const randomArray = shuffleArray(category);
+        const randomArray = await shuffleArray(category);
         if (Array.isArray(randomArray) && randomArray.length === 0) {
           return {
             totalPages: 0,
@@ -256,7 +259,7 @@ export class SearchService {
             data: randomArray,
           };
         } else {
-          const result = paginateArray(randomArray, curentPage);
+          const result = await paginateArray(randomArray, curentPage);
           const totalPages = Math.ceil(randomArray.length / limit);
           return {
             totalPages: totalPages,
@@ -351,7 +354,7 @@ export class SearchService {
           .select(rows)
           .exec();
 
-        const resultArray = mergeAndRemoveDuplicates(
+        const resultArray = await mergeAndRemoveDuplicates(
           findTitle,
           findDescr,
           category,
@@ -368,7 +371,7 @@ export class SearchService {
             data: resultArray,
           };
         } else {
-          const result = paginateArray(resultArray, curentPage);
+          const result = await paginateArray(resultArray, curentPage);
           const totalPages = Math.ceil(resultArray.length / limit);
           return {
             totalPages: totalPages,
@@ -436,11 +439,14 @@ export class SearchService {
           })
           .select(rows)
           .exec();
-        const resultArray = mergeAndRemoveDuplicates(category, subcategory);
+        const resultArray = await mergeAndRemoveDuplicates(
+          category,
+          subcategory,
+        );
         if (Array.isArray(resultArray) && resultArray.length === 0) {
           throw new NotFound('Orders not found');
         } else {
-          const result = paginateArray(resultArray, curentPage);
+          const result = await paginateArray(resultArray, curentPage);
           const totalPages = Math.ceil(resultArray.length / limit);
           return {
             totalPages: totalPages,
@@ -510,7 +516,7 @@ export class SearchService {
           .select(rows)
           .exec();
 
-        const resultArray = mergeAndRemoveDuplicates(
+        const resultArray = await mergeAndRemoveDuplicates(
           findDescr,
           category,
           subcategory,
@@ -561,7 +567,7 @@ export class SearchService {
           .select(rows)
           .exec();
 
-        const resultArray = mergeAndRemoveDuplicates(
+        const resultArray = await mergeAndRemoveDuplicates(
           category,
           subcategory,
           findLocation,
@@ -570,7 +576,7 @@ export class SearchService {
         if (Array.isArray(resultArray) && findLocation.length === 0) {
           throw new NotFound('Orders not found');
         } else {
-          const result = paginateArray(resultArray, curentPage);
+          const result = await paginateArray(resultArray, curentPage);
           const totalPages = Math.ceil(resultArray.length / limit);
           return {
             totalPages: totalPages,
@@ -640,7 +646,7 @@ export class SearchService {
           .select(rows)
           .exec();
 
-        const resultArray = mergeAndRemoveDuplicates(
+        const resultArray = await mergeAndRemoveDuplicates(
           findDescr,
           category,
           subcategory,
@@ -652,7 +658,7 @@ export class SearchService {
         if (Array.isArray(resultArray) && resultArray.length === 0) {
           throw new NotFound('Orders not found');
         } else {
-          const result = paginateArray(resultArray, curentPage);
+          const result = await paginateArray(resultArray, curentPage);
           const totalPages = Math.ceil(resultArray.length / limit);
           return {
             totalPages: totalPages,

@@ -111,7 +111,7 @@ let UsersService = class UsersService {
     }
     async sendVerificationEmail(email) {
         try {
-            const user = this.userModel.findOne({ email: email });
+            const user = await this.userModel.findOne({ email: email });
             const body = await (0, email_schemas_1.verifyEmailMsg)(user.id);
             const msg = {
                 from: process.env.NOREPLY_MAIL,
@@ -120,6 +120,7 @@ let UsersService = class UsersService {
                 html: body,
             };
             await this.transporter.sendMail(msg);
+            return user;
         }
         catch (error) {
             throw new Error('Failed to send verification email');
@@ -154,7 +155,7 @@ let UsersService = class UsersService {
                     subject: 'Зміна пароля',
                     html: body,
                 };
-                this.transporter.sendMail(msg);
+                await this.transporter.sendMail(msg);
                 return await this.userModel.findById(user._id).select(parse_user_1.rows).exec();
             }
             throw new http_errors_1.BadRequest('Password is not avaible');

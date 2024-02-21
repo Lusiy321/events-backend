@@ -190,7 +190,6 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Создание категории в БД с категориями' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: category_model_1.Category }),
-    (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
     (0, common_1.HttpCode)(200),
     (0, common_1.Post)('/category/add'),
     __param(0, (0, common_1.Body)()),
@@ -202,7 +201,6 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Добавление подкатегории в БД с категориями' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: category_model_1.Category }),
-    (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
     (0, common_1.HttpCode)(200),
     (0, common_1.Post)('/subcategories/:id'),
     __param(0, (0, common_1.Param)('id')),

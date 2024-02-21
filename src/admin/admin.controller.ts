@@ -131,7 +131,7 @@ export class AdminController {
 
   @ApiOperation({ summary: 'Создание категории в БД с категориями' })
   @ApiResponse({ status: 200, type: Category })
-  @ApiBearerAuth('BearerAuthMethod')
+  // @ApiBearerAuth('BearerAuthMethod')
   @HttpCode(200)
   @Post('/category/add')
   async createCat(
@@ -143,7 +143,7 @@ export class AdminController {
 
   @ApiOperation({ summary: 'Добавление подкатегории в БД с категориями' })
   @ApiResponse({ status: 200, type: Category })
-  @ApiBearerAuth('BearerAuthMethod')
+  // @ApiBearerAuth('BearerAuthMethod')
   @HttpCode(200)
   @Post('/subcategories/:id')
   async addSubcategory(

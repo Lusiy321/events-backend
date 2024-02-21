@@ -1,14 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.rows = exports.shuffleArray = exports.paginateArray = exports.mergeAndRemoveDuplicates = void 0;
-function mergeAndRemoveDuplicates(...arrays) {
+async function mergeAndRemoveDuplicates(...arrays) {
     const mergedArray = [].concat(...arrays);
     const uniqueArray = mergedArray.filter((v, i, a) => a.findIndex((t) => t.id === v.id) === i);
     const randomArray = shuffleArray(uniqueArray);
     return randomArray;
 }
 exports.mergeAndRemoveDuplicates = mergeAndRemoveDuplicates;
-function paginateArray(array, page) {
+async function paginateArray(array, page) {
     const pageSize = 8;
     const startIndex = (page - 1) * pageSize;
     const endIndex = startIndex + pageSize;
@@ -16,7 +16,7 @@ function paginateArray(array, page) {
     return paginatedArray;
 }
 exports.paginateArray = paginateArray;
-function shuffleArray(array) {
+async function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];

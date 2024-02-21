@@ -315,29 +315,17 @@ let AdminService = class AdminService {
     }
     async createCategory(req, category) {
         try {
-            const admin = await this.findToken(req);
-            if (!admin) {
-                throw new http_errors_1.Unauthorized('jwt expired');
+            const { name } = category;
+            const lowerCaseEmail = name.toLowerCase();
+            const registrationCategory = await this.categoryModel.findOne({
+                name: lowerCaseEmail,
+            });
+            if (registrationCategory) {
+                throw new http_errors_1.Conflict(`Category ${name} exist`);
             }
-            else if (admin.role === 'admin' || admin.role === 'superadmin') {
-                const { name } = category;
-                const lowerCaseEmail = name.toLowerCase();
-                const registrationCategory = await this.categoryModel.findOne({
-                    name: lowerCaseEmail,
-                });
-                if (registrationCategory) {
-                    throw new http_errors_1.Conflict(`Category ${name} exist`);
-                }
-                const createdCategory = await this.categoryModel.create(category);
-                createdCategory.save();
-                return await this.categoryModel
-                    .findById(createdCategory._id)
-                    .select(parse_user_1.rows)
-                    .exec();
-            }
-            else {
-                throw new http_errors_1.BadRequest('You are not admin');
-            }
+            const createdCategory = await this.categoryModel.create(category);
+            createdCategory.save();
+            return await this.categoryModel.findById(createdCategory._id).exec();
         }
         catch (e) {
             throw new http_errors_1.BadRequest(e.message);
@@ -345,21 +333,12 @@ let AdminService = class AdminService {
     }
     async addSubcategory(req, catId, subCategory) {
         try {
-            const admin = await this.findToken(req);
-            if (!admin) {
-                throw new http_errors_1.Unauthorized('jwt expired');
-            }
-            else if (admin.role === 'admin' || admin.role === 'superadmin') {
-                const find = await this.categoryModel.findById(catId).exec();
-                const arr = find.subcategories;
-                subCategory.id = (0, uuid_1.v4)();
-                arr.push(subCategory);
-                await this.categoryModel.updateOne({ _id: catId }, { $set: { subcategories: arr } });
-                return await this.categoryModel.findById(catId);
-            }
-            else {
-                throw new http_errors_1.BadRequest('You are not admin');
-            }
+            const find = await this.categoryModel.findById(catId).exec();
+            const arr = find.subcategories;
+            subCategory.id = (0, uuid_1.v4)();
+            arr.push(subCategory);
+            await this.categoryModel.updateOne({ _id: catId }, { $set: { subcategories: arr } });
+            return await this.categoryModel.findById(catId);
         }
         catch (e) {
             throw new http_errors_1.NotFound('Category not found');

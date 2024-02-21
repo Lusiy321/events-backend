@@ -17,11 +17,11 @@ let Category = class Category extends mongoose_2.Model {
 };
 exports.Category = Category;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'music', description: 'Category name' }),
+    (0, swagger_1.ApiProperty)({ example: 'Музичні послуги', description: 'Category name' }),
     (0, mongoose_1.Prop)({
         type: String,
         minlength: 2,
-        maxlength: 20,
+        maxlength: 30,
         required: [true, 'Category name is required'],
     }),
     __metadata("design:type", String)
@@ -33,6 +33,7 @@ __decorate([
             { id: 102, name: 'Jazz' },
         ],
         description: 'Subcategories',
+        default: [],
     }),
     (0, mongoose_1.Prop)({
         type: (Array),

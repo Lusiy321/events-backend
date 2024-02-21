@@ -308,7 +308,6 @@ export class UsersController {
   @ApiResponse({ status: 200, type: Object })
   @Get('verify-email/:Id')
   async verifyEmail(@Param('Id') id: string, @Res() res: any) {
-    await this.usersService.verifyUserEmail(id);
-    return res.redirect(`${process.env.FRONT_LINK}auth/login`);
+    return await this.usersService.verifyUserEmail(id);
   }
 }

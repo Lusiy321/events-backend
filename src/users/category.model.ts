@@ -7,11 +7,11 @@ export type CategoryDocument = Category & Document;
 
 @Schema({ versionKey: false, timestamps: true })
 export class Category extends Model<Category> {
-  @ApiProperty({ example: 'music', description: 'Category name' })
+  @ApiProperty({ example: 'Музичні послуги', description: 'Category name' })
   @Prop({
     type: String,
     minlength: 2,
-    maxlength: 20,
+    maxlength: 30,
     required: [true, 'Category name is required'],
   })
   name: string;
@@ -22,6 +22,7 @@ export class Category extends Model<Category> {
       { id: 102, name: 'Jazz' },
     ],
     description: 'Subcategories',
+    default: [],
   })
   @Prop({
     type: Array<Object>,

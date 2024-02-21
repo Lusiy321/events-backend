@@ -76,7 +76,7 @@ let SearchService = class SearchService {
                     .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
-                const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(category, subcategory);
+                const resultArray = await (0, parse_user_1.mergeAndRemoveDuplicates)(category, subcategory);
                 if (Array.isArray(resultArray) && resultArray.length === 0) {
                     return {
                         totalPages: 0,
@@ -85,7 +85,7 @@ let SearchService = class SearchService {
                     };
                 }
                 else {
-                    const result = (0, parse_user_1.paginateArray)(resultArray, curentPage);
+                    const result = await (0, parse_user_1.paginateArray)(resultArray, curentPage);
                     const totalPages = Math.ceil(resultArray.length / limit);
                     return {
                         totalPages: totalPages,
@@ -151,7 +151,7 @@ let SearchService = class SearchService {
                     .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
-                const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(findTitle, findDescr, findCat, findSubcat, findLocation, findName);
+                const resultArray = await (0, parse_user_1.mergeAndRemoveDuplicates)(findTitle, findDescr, findCat, findSubcat, findLocation, findName);
                 if (Array.isArray(resultArray) && resultArray.length === 0) {
                     return {
                         totalPages: 0,
@@ -160,7 +160,7 @@ let SearchService = class SearchService {
                     };
                 }
                 else {
-                    const result = (0, parse_user_1.paginateArray)(resultArray, curentPage);
+                    const result = await (0, parse_user_1.paginateArray)(resultArray, curentPage);
                     const totalPages = Math.ceil(resultArray.length / limit);
                     return {
                         totalPages: totalPages,
@@ -183,7 +183,7 @@ let SearchService = class SearchService {
                     .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
-                const randomArray = (0, parse_user_1.shuffleArray)(subcategory);
+                const randomArray = await (0, parse_user_1.shuffleArray)(subcategory);
                 if (Array.isArray(randomArray) && randomArray.length === 0) {
                     return {
                         totalPages: 0,
@@ -192,7 +192,7 @@ let SearchService = class SearchService {
                     };
                 }
                 else {
-                    const result = (0, parse_user_1.paginateArray)(randomArray, curentPage);
+                    const result = await (0, parse_user_1.paginateArray)(randomArray, curentPage);
                     const totalPages = Math.ceil(randomArray.length / limit);
                     return {
                         totalPages: totalPages,
@@ -210,7 +210,7 @@ let SearchService = class SearchService {
                     .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
-                const randomArray = (0, parse_user_1.shuffleArray)(location);
+                const randomArray = await (0, parse_user_1.shuffleArray)(location);
                 if (Array.isArray(randomArray) && randomArray.length === 0) {
                     return {
                         totalPages: 0,
@@ -219,7 +219,7 @@ let SearchService = class SearchService {
                     };
                 }
                 else {
-                    const result = (0, parse_user_1.paginateArray)(randomArray, curentPage);
+                    const result = await (0, parse_user_1.paginateArray)(randomArray, curentPage);
                     const totalPages = Math.ceil(randomArray.length / limit);
                     return {
                         totalPages: totalPages,
@@ -242,7 +242,7 @@ let SearchService = class SearchService {
                     .sort({ createdAt: -1 })
                     .select(parse_user_1.rows)
                     .exec();
-                const randomArray = (0, parse_user_1.shuffleArray)(category);
+                const randomArray = await (0, parse_user_1.shuffleArray)(category);
                 if (Array.isArray(randomArray) && randomArray.length === 0) {
                     return {
                         totalPages: 0,
@@ -251,7 +251,7 @@ let SearchService = class SearchService {
                     };
                 }
                 else {
-                    const result = (0, parse_user_1.paginateArray)(randomArray, curentPage);
+                    const result = await (0, parse_user_1.paginateArray)(randomArray, curentPage);
                     const totalPages = Math.ceil(randomArray.length / limit);
                     return {
                         totalPages: totalPages,
@@ -340,7 +340,7 @@ let SearchService = class SearchService {
                 })
                     .select(parse_user_1.rows)
                     .exec();
-                const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(findTitle, findDescr, category, subcategory, findCat, findSubcat, findName);
+                const resultArray = await (0, parse_user_1.mergeAndRemoveDuplicates)(findTitle, findDescr, category, subcategory, findCat, findSubcat, findName);
                 if (Array.isArray(resultArray) && resultArray.length === 0) {
                     return {
                         totalPages: 0,
@@ -349,7 +349,7 @@ let SearchService = class SearchService {
                     };
                 }
                 else {
-                    const result = (0, parse_user_1.paginateArray)(resultArray, curentPage);
+                    const result = await (0, parse_user_1.paginateArray)(resultArray, curentPage);
                     const totalPages = Math.ceil(resultArray.length / limit);
                     return {
                         totalPages: totalPages,
@@ -411,12 +411,12 @@ let SearchService = class SearchService {
                 })
                     .select(parse_user_1.rows)
                     .exec();
-                const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(category, subcategory);
+                const resultArray = await (0, parse_user_1.mergeAndRemoveDuplicates)(category, subcategory);
                 if (Array.isArray(resultArray) && resultArray.length === 0) {
                     throw new http_errors_1.NotFound('Orders not found');
                 }
                 else {
-                    const result = (0, parse_user_1.paginateArray)(resultArray, curentPage);
+                    const result = await (0, parse_user_1.paginateArray)(resultArray, curentPage);
                     const totalPages = Math.ceil(resultArray.length / limit);
                     return {
                         totalPages: totalPages,
@@ -484,7 +484,7 @@ let SearchService = class SearchService {
                 })
                     .select(parse_user_1.rows)
                     .exec();
-                const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(findDescr, category, subcategory, findCat, findSubcat, findLocation, findName);
+                const resultArray = await (0, parse_user_1.mergeAndRemoveDuplicates)(findDescr, category, subcategory, findCat, findSubcat, findLocation, findName);
                 if (Array.isArray(resultArray) && resultArray.length === 0) {
                     throw new http_errors_1.NotFound('Orders not found');
                 }
@@ -527,12 +527,12 @@ let SearchService = class SearchService {
                 })
                     .select(parse_user_1.rows)
                     .exec();
-                const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(category, subcategory, findLocation);
+                const resultArray = await (0, parse_user_1.mergeAndRemoveDuplicates)(category, subcategory, findLocation);
                 if (Array.isArray(resultArray) && findLocation.length === 0) {
                     throw new http_errors_1.NotFound('Orders not found');
                 }
                 else {
-                    const result = (0, parse_user_1.paginateArray)(resultArray, curentPage);
+                    const result = await (0, parse_user_1.paginateArray)(resultArray, curentPage);
                     const totalPages = Math.ceil(resultArray.length / limit);
                     return {
                         totalPages: totalPages,
@@ -600,12 +600,12 @@ let SearchService = class SearchService {
                 })
                     .select(parse_user_1.rows)
                     .exec();
-                const resultArray = (0, parse_user_1.mergeAndRemoveDuplicates)(findDescr, category, subcategory, findCat, findSubcat, findName);
+                const resultArray = await (0, parse_user_1.mergeAndRemoveDuplicates)(findDescr, category, subcategory, findCat, findSubcat, findName);
                 if (Array.isArray(resultArray) && resultArray.length === 0) {
                     throw new http_errors_1.NotFound('Orders not found');
                 }
                 else {
-                    const result = (0, parse_user_1.paginateArray)(resultArray, curentPage);
+                    const result = await (0, parse_user_1.paginateArray)(resultArray, curentPage);
                     const totalPages = Math.ceil(resultArray.length / limit);
                     return {
                         totalPages: totalPages,

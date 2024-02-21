@@ -43,5 +43,5 @@ export declare class UsersController {
     }>;
     deleteProfile(res: any, request: any, password: PasswordUserDto): Promise<any>;
     setEmailPsw(email: string): Promise<any>;
-    verifyEmail(id: string, res: any): Promise<any>;
+    verifyEmail(id: string, res: any): Promise<void>;
 }

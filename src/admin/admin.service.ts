@@ -352,30 +352,27 @@ export class AdminService {
     category: CreateCategoryDto,
   ): Promise<Category> {
     try {
-      const admin = await this.findToken(req);
-      if (!admin) {
-        throw new Unauthorized('jwt expired');
-      } else if (admin.role === 'admin' || admin.role === 'superadmin') {
-        const { name } = category;
-        const lowerCaseEmail = name.toLowerCase();
+      // const admin = await this.findToken(req);
+      // if (!admin) {
+      //   throw new Unauthorized('jwt expired');
+      // } else if (admin.role === 'admin' || admin.role === 'superadmin') {
+      const { name } = category;
+      const lowerCaseEmail = name.toLowerCase();
 
-        const registrationCategory = await this.categoryModel.findOne({
-          name: lowerCaseEmail,
-        });
-        if (registrationCategory) {
-          throw new Conflict(`Category ${name} exist`);
-        }
-
-        const createdCategory = await this.categoryModel.create(category);
-        createdCategory.save();
-
-        return await this.categoryModel
-          .findById(createdCategory._id)
-          .select(rows)
-          .exec();
-      } else {
-        throw new BadRequest('You are not admin');
+      const registrationCategory = await this.categoryModel.findOne({
+        name: lowerCaseEmail,
+      });
+      if (registrationCategory) {
+        throw new Conflict(`Category ${name} exist`);
       }
+
+      const createdCategory = await this.categoryModel.create(category);
+      createdCategory.save();
+
+      return await this.categoryModel.findById(createdCategory._id).exec();
+      // } else {
+      //   throw new BadRequest('You are not admin');
+      // }
     } catch (e) {
       throw new BadRequest(e.message);
     }
@@ -387,22 +384,23 @@ export class AdminService {
     subCategory: Subcategory,
   ): Promise<Category> {
     try {
-      const admin = await this.findToken(req);
-      if (!admin) {
-        throw new Unauthorized('jwt expired');
-      } else if (admin.role === 'admin' || admin.role === 'superadmin') {
-        const find = await this.categoryModel.findById(catId).exec();
-        const arr = find.subcategories;
-        subCategory.id = uuidv4();
-        arr.push(subCategory);
-        await this.categoryModel.updateOne(
-          { _id: catId },
-          { $set: { subcategories: arr } },
-        );
-        return await this.categoryModel.findById(catId);
-      } else {
-        throw new BadRequest('You are not admin');
-      }
+      // const admin = await this.findToken(req);
+      // if (!admin) {
+      //   throw new Unauthorized('jwt expired');
+      // } else if (admin.role === 'admin' || admin.role === 'superadmin') {
+
+      const find = await this.categoryModel.findById(catId).exec();
+      const arr = find.subcategories;
+      subCategory.id = uuidv4();
+      arr.push(subCategory);
+      await this.categoryModel.updateOne(
+        { _id: catId },
+        { $set: { subcategories: arr } },
+      );
+      return await this.categoryModel.findById(catId);
+      // } else {
+      //   throw new BadRequest('You are not admin');
+      // }
     } catch (e) {
       throw new NotFound('Category not found');
     }

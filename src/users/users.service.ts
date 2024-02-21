@@ -117,7 +117,8 @@ export class UsersService {
 
   async sendVerificationEmail(email: string): Promise<void> {
     try {
-      const user = this.userModel.findOne({ email: email });
+      const user = await this.userModel.findOne({ email: email });
+
       const body = await verifyEmailMsg(user.id);
       const msg = {
         from: process.env.NOREPLY_MAIL,
@@ -127,6 +128,7 @@ export class UsersService {
       };
 
       await this.transporter.sendMail(msg);
+      return user;
     } catch (error) {
       throw new Error('Failed to send verification email');
     }
@@ -164,7 +166,7 @@ export class UsersService {
           subject: 'Зміна пароля',
           html: body,
         };
-        this.transporter.sendMail(msg);
+        await this.transporter.sendMail(msg);
         return await this.userModel.findById(user._id).select(rows).exec();
       }
       throw new BadRequest('Password is not avaible');
