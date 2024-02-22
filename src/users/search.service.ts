@@ -384,7 +384,7 @@ export class SearchService {
       throw e;
     }
   }
-
+  ////////////////  ORDERS SEARCH
   async searchOrders(query: any): Promise<any> {
     const { req, loc, page, cat, subcat } = query;
     try {

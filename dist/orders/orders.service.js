@@ -166,7 +166,7 @@ let OrdersService = class OrdersService {
                 });
                 await Promise.all(sendMessagePromises);
                 if (usersArr.length !== 0) {
-                    const message = `Ваше замовлення було успішно опубліковано. По вашим параметрам знайшлося ${usersArr.length} виконавців. Очікуйте відгуків на Вашу пропозицію.`;
+                    const message = `Ваше замовлення було успішно опубліковано. Очікуйте відгуків на Вашу пропозицію.`;
                     if (order.tg_chat !== null) {
                         await this.mesengersService.sendMessageTg(order.tg_chat, message);
                     }
