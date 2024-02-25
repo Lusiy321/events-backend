@@ -499,7 +499,7 @@ async function verifyEmailMsg(id) {
                                                                                         <td class="esd-block-button">
                                                                                             <span
                                                                                                 class="es-button-border"><a
-                                                                                                    href="${process.env.FRONT_LINK}verify-email/${id}"
+                                                                                                    href="${process.env.FRONT_LINK}verify-email?token=${id}"
                                                                                                     class="es-button msohide"
                                                                                                     target="_blank">Підтвердити
                                                                                                     E-mail</a></span>
