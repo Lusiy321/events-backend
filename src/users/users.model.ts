@@ -333,6 +333,11 @@ export class User extends Model<User> {
     default: new Date(),
   })
   paidEnds: Date;
+  @Prop({
+    type: Boolean,
+    default: false,
+  })
+  register: boolean;
 
   @Prop({ type: Array, default: [] })
   accepted_orders: Array<string>;

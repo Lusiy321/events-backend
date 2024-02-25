@@ -384,6 +384,13 @@ __decorate([
     __metadata("design:type", Date)
 ], User.prototype, "paidEnds", void 0);
 __decorate([
+    (0, mongoose_1.Prop)({
+        type: Boolean,
+        default: false,
+    }),
+    __metadata("design:type", Boolean)
+], User.prototype, "register", void 0);
+__decorate([
     (0, mongoose_1.Prop)({ type: Array, default: [] }),
     __metadata("design:type", Array)
 ], User.prototype, "accepted_orders", void 0);

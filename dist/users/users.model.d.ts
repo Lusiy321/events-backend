@@ -62,6 +62,7 @@ export declare class User extends Model<User> {
     disagree_order: number;
     trialEnds: Date;
     paidEnds: Date;
+    register: boolean;
     accepted_orders: Array<string>;
 }
 export declare const UserSchema: import("mongoose").Schema<User, Model<User, any, any, any, import("mongoose").Document<unknown, any, User> & User & {
