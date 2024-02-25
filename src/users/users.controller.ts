@@ -307,7 +307,8 @@ export class UsersController {
   @ApiOperation({ summary: 'Verify user email' })
   @ApiResponse({ status: 200, type: Object })
   @Get('verify-email/:Id')
-  async verifyEmail(@Param('Id') id: string, @Res() res: any) {
-    return await this.usersService.verifyUserEmail(id);
+  async verifyEmail(@Param('Id') id: string): Promise<any> {
+    const user = await this.usersService.verifyUserEmail(id);
+    return user;
   }
 }

@@ -124,8 +124,9 @@ let UsersController = class UsersController {
     async setEmailPsw(email) {
         return this.usersService.sendVerificationEmail(email);
     }
-    async verifyEmail(id, res) {
-        return await this.usersService.verifyUserEmail(id);
+    async verifyEmail(id) {
+        const user = await this.usersService.verifyUserEmail(id);
+        return user;
     }
 };
 exports.UsersController = UsersController;
@@ -399,9 +400,8 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 200, type: Object }),
     (0, common_1.Get)('verify-email/:Id'),
     __param(0, (0, common_1.Param)('Id')),
-    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "verifyEmail", null);
 exports.UsersController = UsersController = __decorate([
