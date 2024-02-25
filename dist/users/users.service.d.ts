@@ -20,7 +20,7 @@ export declare class UsersService {
     create(user: CreateUserDto): Promise<User>;
     checkTrialStatus(id: string): Promise<boolean>;
     sendVerificationEmail(email: string): Promise<void>;
-    verifyUserEmail(id: any): Promise<void>;
+    verifyUserEmail(id: any): Promise<any>;
     changePassword(req: any, newPass: PasswordChangeDto): Promise<User>;
     validateUser(details: GoogleUserDto): Promise<any>;
     validateFacebook(details: any): Promise<any>;

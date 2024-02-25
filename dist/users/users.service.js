@@ -133,6 +133,7 @@ let UsersService = class UsersService {
                 throw new http_errors_1.NotFound('User not found');
             }
             await this.userModel.findByIdAndUpdate({ _id: id }, { verify: true });
+            return await this.userModel.findById(id);
         }
         catch (e) {
             throw e;
