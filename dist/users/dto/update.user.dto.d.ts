@@ -20,6 +20,7 @@ export declare class UpdateUserDto {
     readonly trial: boolean;
     readonly verify: verify;
     readonly ban: boolean;
+    readonly register: boolean;
 }
 export interface search_result {
     totalPages: number;

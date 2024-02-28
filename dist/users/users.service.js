@@ -327,7 +327,7 @@ let UsersService = class UsersService {
     }
     async updateUser(user, req) {
         try {
-            const { firstName, social, title, description, phone, telegram, whatsapp, location, master_photo, video, price, viber, } = user;
+            const { firstName, social, title, description, phone, telegram, whatsapp, location, master_photo, video, price, viber, register, } = user;
             const findId = await this.findToken(req);
             if (!findId) {
                 throw new http_errors_1.Unauthorized('jwt expired');
@@ -343,7 +343,8 @@ let UsersService = class UsersService {
                 video ||
                 price ||
                 social ||
-                viber) {
+                viber ||
+                register) {
                 if (video) {
                     await this.userModel.findByIdAndUpdate({ _id: findId.id }, {
                         $push: { video: { $each: video, $slice: 5 } },
@@ -375,6 +376,7 @@ let UsersService = class UsersService {
                     master_photo,
                     price,
                     viber,
+                    register,
                 });
                 return await this.userModel
                     .findById({ _id: findId.id })

@@ -79,6 +79,8 @@ export class UpdateUserDto {
   readonly verify: verify;
   @ApiProperty({ example: 'false', description: 'User ban status' })
   readonly ban: boolean;
+  @ApiProperty({ example: 'false', description: 'User register status' })
+  readonly register: boolean;
 }
 
 export interface search_result {

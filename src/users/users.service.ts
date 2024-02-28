@@ -375,6 +375,7 @@ export class UsersService {
         video,
         price,
         viber,
+        register,
       } = user;
       const findId = await this.findToken(req);
 
@@ -394,7 +395,8 @@ export class UsersService {
         video ||
         price ||
         social ||
-        viber
+        viber ||
+        register
       ) {
         if (video) {
           await this.userModel.findByIdAndUpdate(
@@ -438,6 +440,7 @@ export class UsersService {
             master_photo,
             price,
             viber,
+            register,
           },
         );
 

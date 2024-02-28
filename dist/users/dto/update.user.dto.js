@@ -127,4 +127,8 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: 'false', description: 'User ban status' }),
     __metadata("design:type", Boolean)
 ], UpdateUserDto.prototype, "ban", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'false', description: 'User register status' }),
+    __metadata("design:type", Boolean)
+], UpdateUserDto.prototype, "register", void 0);
 //# sourceMappingURL=update.user.dto.js.map
