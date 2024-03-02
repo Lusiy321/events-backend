@@ -274,7 +274,7 @@ __decorate([
     }),
     (0, mongoose_1.Prop)({
         type: Object,
-        default: { Instagram: 'https://' },
+        default: null,
     }),
     __metadata("design:type", Object)
 ], User.prototype, "social", void 0);

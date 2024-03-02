@@ -245,7 +245,7 @@ export class User extends Model<User> {
   })
   @Prop({
     type: Object,
-    default: { Instagram: 'https://' },
+    default: null,
   })
   social: Social;
 
