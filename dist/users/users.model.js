@@ -65,7 +65,6 @@ __decorate([
         type: String,
         minlength: 10,
         maxlength: 13,
-        required: [true, 'Phone is required'],
     }),
     __metadata("design:type", String)
 ], User.prototype, "phone", void 0);

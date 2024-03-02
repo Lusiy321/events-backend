@@ -52,7 +52,6 @@ export class User extends Model<User> {
     type: String,
     minlength: 10,
     maxlength: 13,
-    required: [true, 'Phone is required'],
   })
   phone: string;
 
