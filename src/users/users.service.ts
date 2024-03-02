@@ -1,10 +1,16 @@
 /* eslint-disable prettier/prettier */
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotAcceptableException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserSchema } from './users.model';
 import { CreateUserDto } from './dto/create.user.dto';
 import { compareSync, hashSync } from 'bcryptjs';
-import { Conflict, NotFound, BadRequest, Unauthorized } from 'http-errors';
+import {
+  Conflict,
+  NotFound,
+  BadRequest,
+  Unauthorized,
+  NotAcceptable,
+} from 'http-errors';
 import { UpdateUserDto } from './dto/update.user.dto';
 import { sign, verify, JwtPayload } from 'jsonwebtoken';
 import { PasswordChangeDto } from './dto/change-password.user.dto';
@@ -306,6 +312,9 @@ export class UsersService {
       const authUser = await this.userModel.findOne({ email: lowerCaseEmail });
       if (!authUser || !authUser.comparePassword(password)) {
         throw new Unauthorized(`Email or password is wrong`);
+      }
+      if (authUser.verify === false) {
+        throw new NotAcceptable(`Email not verify`);
       }
       await this.checkTrialStatus(authUser._id);
       await this.createToken(authUser);

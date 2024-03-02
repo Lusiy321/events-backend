@@ -273,6 +273,9 @@ let UsersService = class UsersService {
             if (!authUser || !authUser.comparePassword(password)) {
                 throw new http_errors_1.Unauthorized(`Email or password is wrong`);
             }
+            if (authUser.verify === false) {
+                throw new http_errors_1.NotAcceptable(`Email not verify`);
+            }
             await this.checkTrialStatus(authUser._id);
             await this.createToken(authUser);
             return await this.userModel
