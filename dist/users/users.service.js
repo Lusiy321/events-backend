@@ -184,7 +184,7 @@ let UsersService = class UsersService {
             if (!user) {
                 const trialEnds = new Date();
                 trialEnds.setMonth(trialEnds.getMonth() + 2);
-                const createdUser = await this.userModel.create(Object.assign(Object.assign({}, details), { trial: true, trialEnds, paidEnds: trialEnds }));
+                const createdUser = await this.userModel.create(Object.assign(Object.assign({}, details), { trial: true, verify: true, trialEnds, paidEnds: trialEnds }));
                 createdUser.setPassword(details.password);
                 createdUser.save();
                 const userUpdateToken = await this.userModel.findOne({
@@ -220,7 +220,7 @@ let UsersService = class UsersService {
             if (!user) {
                 const trialEnds = new Date();
                 trialEnds.setMonth(trialEnds.getMonth() + 2);
-                const createdUser = await this.userModel.create(Object.assign(Object.assign({}, details), { trial: true, trialEnds, paidEnds: trialEnds }));
+                const createdUser = await this.userModel.create(Object.assign(Object.assign({}, details), { trial: true, trialEnds, verify: true, paidEnds: trialEnds }));
                 createdUser.setPassword(details.password);
                 createdUser.save();
                 const userUpdateToken = await this.userModel.findOne({

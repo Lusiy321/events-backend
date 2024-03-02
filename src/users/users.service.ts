@@ -202,6 +202,7 @@ export class UsersService {
         const createdUser = await this.userModel.create({
           ...details,
           trial: true,
+          verify: true,
           trialEnds,
           paidEnds: trialEnds,
         });
@@ -247,6 +248,7 @@ export class UsersService {
           ...details,
           trial: true,
           trialEnds,
+          verify: true,
           paidEnds: trialEnds,
         });
         createdUser.setPassword(details.password);
