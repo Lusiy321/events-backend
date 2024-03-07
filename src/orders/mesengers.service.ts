@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as TelegramBot from 'node-telegram-bot-api';
-import { InlineKeyboardMarkup } from 'node-telegram-bot-api';
+// import { InlineKeyboardMarkup } from 'node-telegram-bot-api';
 export const ViberBot = require('viber-bot').Bot;
 const TextMessage = require('viber-bot').Message.Text;
 const RichMediaMessage = require('viber-bot').Message.RichMedia;
@@ -282,6 +282,47 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
 
     // KEYBOARDS
 
+    const mainKeyboard = {
+      reply_markup: {
+        keyboard: [
+          [{ text: 'Замовлення' }],
+          [{ text: 'Відгуки' }],
+          [{ text: 'Налаштування' }],
+        ],
+        resize_keyboard: true,
+      },
+    };
+
+    const settingsKeyboard = {
+      reply_markup: {
+        keyboard: [
+          [{ text: 'Зупинити оповіщення' }],
+          [
+            {
+              text: 'Підтримка',
+            },
+          ],
+          [{ text: 'Головна' }],
+        ],
+        resize_keyboard: true,
+      },
+    };
+
+    const generalKeyboard = {
+      reply_markup: {
+        keyboard: [
+          [
+            {
+              text: 'Відправити номер телефону',
+              request_contact: true,
+            },
+          ],
+          [{ text: 'Головна' }],
+        ],
+        resize_keyboard: true,
+      },
+    };
+
     const optURL = {
       reply_markup: {
         inline_keyboard: [
@@ -300,10 +341,6 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
       reply_markup: {
         keyboard: [
           [
-            {
-              text: 'Перейти на сайт',
-              url: 'https://www.wechirka.com/',
-            },
             {
               text: 'Відправити номер телефону',
               request_contact: true,
@@ -326,7 +363,7 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
 
 З нетерпінням чекаємо можливості обслуговувати вас та допомагати у здійсненні ваших ідей та проєктів. Бажаємо вам приємного користування нашим ресурсом!
 
-З найкращими побажаннями,
+З найкращими побажаннями 🚀,
 Команда Wechirka.com`,
           optCont,
         );
@@ -335,7 +372,7 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
       }
     });
 
-    this.tg_bot.onText(/\/orders/, async (msg) => {
+    this.tg_bot.onText(/Замовлення/, async (msg) => {
       try {
         const chatId = msg.chat.id;
         const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
@@ -344,14 +381,14 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
           await this.tg_bot.sendMessage(
             chatId,
             'Ми не знайшли ваші заявки, імовірно, ви ще не зареєстровані. Будь ласка, натисніть кнопку "Відправити номер телефону" для реєстрації у боті та отримання доступу до всіх можливостей нашого сервісу. Якщо у вас є будь-які питання, не соромтеся звертатися. Бажаємо вам приємного користування!',
-            optCont,
+            generalKeyboard,
           );
         }
         if (user && Array.isArray(find) && find.length === 0) {
           await this.tg_bot.sendMessage(
             chatId,
             'Схоже, що у вас немає зареєстрованого замовлення. Якщо ви замовник, Будь ласка, натисніть кнопку "Відправити номер телефону" для реєстрації і отримання доступу до послуг та можливостей нашого сервісу. Якщо ви маєте будь-які інші питання, не соромтеся питати. Дякуємо за розуміння!',
-            optCont,
+            generalKeyboard,
           );
         }
         if (find || user.tg_chat === find[0].tg_chat) {
@@ -365,7 +402,7 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
       Кількість відгуків: ${finded.approve_count}.
       Статус: ${finded.active ? 'Активний' : 'Неактивний'}.\n`;
             if (finded.active === true) {
-              const keyboard: InlineKeyboardMarkup = {
+              const keyboard = {
                 inline_keyboard: [
                   [
                     {
@@ -389,7 +426,7 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
                 reply_markup: keyboard,
               });
             } else {
-              const keyboard: InlineKeyboardMarkup = {
+              const keyboard = {
                 inline_keyboard: [
                   [
                     {
@@ -420,7 +457,7 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
       }
     });
 
-    this.tg_bot.onText(/\/reviews/, async (msg) => {
+    this.tg_bot.onText(/Відгуки/, async (msg) => {
       try {
         const chatId = msg.chat.id;
         const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
@@ -429,7 +466,7 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
           await this.tg_bot.sendMessage(
             chatId,
             'Схоже, що у вас немає зареєстрованого облікового запису як виконавця.Якщо Ви зарєєструвались як виконавець, Будь ласка, натисніть кнопку "Відправити номер телефону" для реєстрації як виконавець та отримання доступу до можливостей нашого сервісу. Якщо у вас є будь-які інші питання, не соромтеся питати. Дякуємо за розуміння!',
-            optCont,
+            generalKeyboard,
           );
         }
         if (
@@ -440,7 +477,7 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
           await this.tg_bot.sendMessage(
             chatId,
             'Схоже, що у нашій системі відсутні відгуки від вас на пропозиції замовників. Якщо у вас виникнуть будь-які труднощі або питання, не соромтеся звертатися до нас. Дякуємо за розуміння!',
-            optCont,
+            generalKeyboard,
           );
         }
         if (
@@ -473,6 +510,25 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
       }
     });
 
+    this.tg_bot.onText(/Головна/, async (msg: any) => {
+      const chatId = msg.chat.id;
+      this.tg_bot.sendMessage(chatId, '🔔', mainKeyboard);
+    });
+
+    this.tg_bot.onText(/Налаштування/, async (msg: any) => {
+      const chatId = msg.chat.id;
+      this.tg_bot.sendMessage(chatId, '🔍', settingsKeyboard);
+    });
+
+    this.tg_bot.onText(/Підтримка/, async (msg: any) => {
+      const chatId = msg.chat.id;
+      this.tg_bot.sendMessage(
+        chatId,
+        '\n<a href="https://www.wechirka.com/">Перейти на WECHIRKA</a> \n\n<a href="https://t.me/+tG6pSpHWPPFiYzMy">Написати нам у Телеграм</a> \n\nНаписати нам Email support@wechirka.com ',
+        { parse_mode: 'HTML' },
+      );
+    });
+
     this.tg_bot.on('contact', async (msg) => {
       try {
         const chatId = msg.chat.id;
@@ -492,7 +548,7 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
           await this.tg_bot.sendMessage(
             chatId,
             `Дякуємо, ${msg.from.first_name}! Тепер вам будуть надходити повідомлення про нові пропозиції в обраній категорії. Щоб вимкнути оповіщення, виберіть "Меню" та натисніть /stop. Якщо у вас є будь-які питання або потребуєте додаткової допомоги, не соромтеся звертатися!`,
-            optURL,
+            mainKeyboard,
           );
         }
         if (order && order.tg_chat === null) {
@@ -502,7 +558,7 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
           await this.tg_bot.sendMessage(
             chatId,
             `Дякуємо, ${msg.from.first_name}! Тепер вам будуть надходити повідомлення про нові пропозиції в обраній категорії. Щоб вимкнути оповіщення, виберіть "Меню" та натисніть /stop. Якщо у вас є будь-які питання або потребуєте додаткової допомоги, не соромтеся звертатися!`,
-            optURL,
+            mainKeyboard,
           );
           if (order.verify === false) {
             await this.tg_bot.sendMessage(
@@ -543,7 +599,7 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
             await this.tg_bot.sendMessage(
               chatId,
               `Ви відмовились від виконання замовлення: ${orders.description}.`,
-              optURL,
+              mainKeyboard,
             );
             break;
           case 'delete':
@@ -551,7 +607,7 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
             await this.tg_bot.sendMessage(
               chatId,
               `Ви видалили замевлення: ${delOrder.description}.`,
-              optURL,
+              mainKeyboard,
             );
             const archivedOrder = new this.ordersArchiveModel(
               delOrder.toObject(),
@@ -571,7 +627,7 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
             await this.tg_bot.sendMessage(
               chatId,
               `Ви активували замевлення: ${actiOrder.description}.`,
-              optURL,
+              mainKeyboard,
             );
 
             break;
@@ -583,7 +639,7 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
             await this.tg_bot.sendMessage(
               chatId,
               `Ви деактивували замевлення: ${deactiOrder.description}.`,
-              optURL,
+              mainKeyboard,
             );
             break;
           case 'users':
@@ -592,7 +648,7 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
               await this.tg_bot.sendMessage(
                 chatId,
                 `На жаль, немає жодних відгуків на цю пропозицію.`,
-                optURL,
+                mainKeyboard,
               );
             } else {
               findOrder.accepted_users.map(async (user: any) => {
@@ -600,6 +656,7 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
                 const msgOrder = `Замовлення:\n${findOrder.description}\nКористувач: ${findedUser.firstName}.\nКатегорія: ${findedUser.category[0].subcategories[0].name}\nОплата: ${findedUser.price}\nТелефон: +${findedUser.phone}.\nПосилання на профіль:\n${process.env.FRONT_LINK}artists/${findedUser._id}.`;
                 await this.tg_bot.sendMessage(chatId, msgOrder);
               });
+              await this.tg_bot.sendMessage(chatId, '', mainKeyboard);
             }
             break;
           default:
@@ -610,7 +667,7 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
       }
     });
 
-    this.tg_bot.onText(/\/stop/, async (msg) => {
+    this.tg_bot.onText(/Зупинити оповіщення/, async (msg) => {
       const chatId = msg.chat.id;
       const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
       if (user) {
@@ -628,7 +685,7 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
       await this.tg_bot.sendMessage(
         chatId,
         `Ви призупинили отримання сповіщень. Для їх відновлення, будь ласка, натисніть кнопку "Відправити номер телефону".`,
-        optCont,
+        generalKeyboard,
       );
     });
   }
