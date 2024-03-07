@@ -90,6 +90,7 @@ export class UsersService {
         });
         createdUser.setPassword(password);
         createdUser.save();
+        await this.createToken(createdUser);
         await this.sendVerificationEmail(email);
         return await this.userModel
           .findById(createdUser._id)

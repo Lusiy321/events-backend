@@ -76,6 +76,7 @@ let UsersService = class UsersService {
                 const createdUser = await this.userModel.create(Object.assign(Object.assign({}, user), { trial: true, trialEnds, paidEnds: trialEnds }));
                 createdUser.setPassword(password);
                 createdUser.save();
+                await this.createToken(createdUser);
                 await this.sendVerificationEmail(email);
                 return await this.userModel
                     .findById(createdUser._id)

@@ -273,7 +273,7 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
 
     //TELEGRAM BOT CODE START
     const token = process.env.BOT_TELEGRAM;
-    this.tg_bot = new TelegramBot(token, { polling: true });
+    this.tg_bot = new TelegramBot(token, { polling: false });
     this.tg_bot.setMyCommands([
       { command: '/stop', description: 'Зупинити оповіщення' },
       { command: '/orders', description: 'Управління замовленнями' },
