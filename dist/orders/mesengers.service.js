@@ -227,11 +227,6 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
         });
         const token = process.env.BOT_TELEGRAM;
         this.tg_bot = new TelegramBot(token, { polling: true });
-        this.tg_bot.setMyCommands([
-            { command: '/stop', description: 'Зупинити оповіщення' },
-            { command: '/orders', description: 'Управління замовленнями' },
-            { command: '/reviews', description: 'Управління відгуками' },
-        ]);
         const mainKeyboard = {
             reply_markup: {
                 keyboard: [
