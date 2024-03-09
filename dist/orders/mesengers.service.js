@@ -53,14 +53,13 @@ let MesengersService = class MesengersService {
 Команда Wechirka.com`;
             this.viber_bot.sendMessage({ id: response.userProfile.id }, [
                 new TextMessage(msg),
-                new KeyboardMessage(main_keyboard_1.MAIN_KEYBOARD_VIBER),
             ]);
         });
         this.viber_bot.onTextMessage(/./, async (msg, res) => {
             try {
                 const userProfile = res.userProfile.name;
                 const userId = res.userProfile.id;
-                const MAIN_KEYBOARD = (0, main_keyboard_1.mainKeyboardViber)(userProfile, userId);
+                const MAIN_KEYBOARD = await (0, main_keyboard_1.mainKeyboardViber)(userProfile, userId);
                 await this.viber_bot.sendMessage({ id: res.userProfile.id }, new KeyboardMessage(MAIN_KEYBOARD));
                 const messageText = msg.text;
                 const phoneNumber = parseInt(messageText);
@@ -88,9 +87,8 @@ let MesengersService = class MesengersService {
                         await this.myReviewList(chatId);
                         break;
                     case 'support':
-                        await this.viber_bot.sendMessage({ id: chatId }, [
-                            new TextMessage(`<a href="https://www.wechirka.com/">Перейти на WECHIRKA</a>\n 
-                Написати нам Email support@wechirka.com`),
+                        await this.viber_bot.sendMessage({ id: userId }, [
+                            new TextMessage(' Перейти у свій профіль WECHIRKA https://www.wechirka.com/profile Написати нам Email support@wechirka.com'),
                             new KeyboardMessage(MAIN_KEYBOARD),
                         ]);
                         break;

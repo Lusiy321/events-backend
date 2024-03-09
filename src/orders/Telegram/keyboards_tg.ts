@@ -56,7 +56,7 @@ export const contactKeyboard = {
 };
 
 export async function msgKeyboardFalse(finded: Orders, chatId: number) {
-  const keyboard = {
+  return {
     inline_keyboard: [
       [
         {
@@ -76,11 +76,10 @@ export async function msgKeyboardFalse(finded: Orders, chatId: number) {
       ],
     ],
   };
-  return keyboard;
 }
 
 export async function msgKeyboardTrue(finded: Orders, chatId: number) {
-  const keyboard = {
+  return {
     inline_keyboard: [
       [
         {
@@ -100,5 +99,4 @@ export async function msgKeyboardTrue(finded: Orders, chatId: number) {
       ],
     ],
   };
-  return keyboard;
 }

@@ -53,7 +53,7 @@ exports.contactKeyboard = {
     },
 };
 async function msgKeyboardFalse(finded, chatId) {
-    const keyboard = {
+    return {
         inline_keyboard: [
             [
                 {
@@ -73,11 +73,10 @@ async function msgKeyboardFalse(finded, chatId) {
             ],
         ],
     };
-    return keyboard;
 }
 exports.msgKeyboardFalse = msgKeyboardFalse;
 async function msgKeyboardTrue(finded, chatId) {
-    const keyboard = {
+    return {
         inline_keyboard: [
             [
                 {
@@ -97,7 +96,6 @@ async function msgKeyboardTrue(finded, chatId) {
             ],
         ],
     };
-    return keyboard;
 }
 exports.msgKeyboardTrue = msgKeyboardTrue;
 //# sourceMappingURL=keyboards_tg.js.map

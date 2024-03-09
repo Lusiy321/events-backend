@@ -126,6 +126,15 @@ async function findKeyboardViber(finded, chatId) {
                 TextHAlign: 'center',
                 BgColor: '#a259ff',
             },
+            {
+                ActionType: 'reply',
+                ActionBody: `support`,
+                Text: '<font color="#FFFFFF" size="5">Підтримка</font>',
+                TextSize: 'regular',
+                TextVAlign: 'middle',
+                TextHAlign: 'center',
+                BgColor: '#a259ff',
+            },
         ],
     };
 }
@@ -253,6 +262,15 @@ async function reviewsKeyboard(chatId) {
                 TextHAlign: 'center',
                 BgColor: '#a259ff',
             },
+            {
+                ActionType: 'reply',
+                ActionBody: `support`,
+                Text: '<font color="#FFFFFF" size="5">Підтримка</font>',
+                TextSize: 'regular',
+                TextVAlign: 'middle',
+                TextHAlign: 'center',
+                BgColor: '#a259ff',
+            },
         ],
     };
 }
@@ -286,6 +304,15 @@ async function reviewsKeyboardUser(user) {
                 ActionType: 'reply',
                 ActionBody: `review:${user.viber_chat}:${user.viber_chat}`,
                 Text: '<font color="#FFFFFF" size="5">Мої відгуки (лише для виконавців)</font>',
+                TextSize: 'regular',
+                TextVAlign: 'middle',
+                TextHAlign: 'center',
+                BgColor: '#a259ff',
+            },
+            {
+                ActionType: 'reply',
+                ActionBody: `support`,
+                Text: '<font color="#FFFFFF" size="5">Підтримка</font>',
                 TextSize: 'regular',
                 TextVAlign: 'middle',
                 TextHAlign: 'center',

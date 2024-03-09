@@ -69,7 +69,6 @@ export class MesengersService {
 Команда Wechirka.com`;
       this.viber_bot.sendMessage({ id: response.userProfile.id }, [
         new TextMessage(msg),
-        new KeyboardMessage(MAIN_KEYBOARD_VIBER),
       ]);
     });
 
@@ -79,7 +78,8 @@ export class MesengersService {
         const userProfile = res.userProfile.name;
         const userId = res.userProfile.id;
 
-        const MAIN_KEYBOARD = mainKeyboardViber(userProfile, userId);
+        const MAIN_KEYBOARD = await mainKeyboardViber(userProfile, userId);
+
         await this.viber_bot.sendMessage(
           { id: res.userProfile.id },
           new KeyboardMessage(MAIN_KEYBOARD),
@@ -113,10 +113,9 @@ export class MesengersService {
             await this.myReviewList(chatId);
             break;
           case 'support':
-            await this.viber_bot.sendMessage({ id: chatId }, [
+            await this.viber_bot.sendMessage({ id: userId }, [
               new TextMessage(
-                `<a href="https://www.wechirka.com/">Перейти на WECHIRKA</a>\n 
-                Написати нам Email support@wechirka.com`,
+                ' Перейти у свій профіль WECHIRKA https://www.wechirka.com/profile Написати нам Email support@wechirka.com',
               ),
               new KeyboardMessage(MAIN_KEYBOARD),
             ]);
@@ -766,6 +765,7 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
     try {
       const user = await this.userModel.findOne({ viber_chat: chatId }).exec();
       const KEYBOARD = await reviewsKeyboard(chatId);
+
       if (
         user &&
         user.viber_chat !== null &&
