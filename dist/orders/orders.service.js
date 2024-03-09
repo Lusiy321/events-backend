@@ -176,7 +176,7 @@ let OrdersService = class OrdersService {
                     return usersArr;
                 }
                 else {
-                    const message = 'На жаль, ніхто не підійшов під ваше замовлення. Спробуйте пізніше або виконайте пошук самостійно https://www.wechirka.com/artists';
+                    const message = 'На жаль, ніхто не відгукнувся на ваше замовлення. Спробуйте пізніше або використайте пошук самостійно за посиланням: https://www.wechirka.com/artists';
                     if (order.tg_chat !== null) {
                         await this.mesengersService.sendMessageTg(order.tg_chat, message);
                     }
@@ -198,81 +198,91 @@ let OrdersService = class OrdersService {
         }
     }
     async checkTrialStatus(id) {
-        const user = await this.userModel.findById(id);
-        if (!user) {
-            throw new http_errors_1.NotFound('User not found');
+        try {
+            const user = await this.userModel.findById(id);
+            if (!user) {
+                throw new http_errors_1.NotFound('User not found');
+            }
+            if (user.trialEnds > new Date() || user.paidEnds > new Date()) {
+                return true;
+            }
+            else {
+                user.trial = false;
+                user.paid = false;
+                await user.save();
+                return false;
+            }
         }
-        if (user.trialEnds > new Date() || user.paidEnds > new Date()) {
-            return true;
-        }
-        else {
-            user.trial = false;
-            user.paid = false;
-            await user.save();
-            return false;
+        catch (error) {
+            throw error;
         }
     }
     async findUserByCategory(order) {
-        const orderCategories = order.category;
-        function extractIds(data) {
-            const ids = [];
-            function recursiveExtract(obj) {
-                for (const key in obj) {
-                    if (key === 'id') {
-                        ids.push(obj[key]);
-                    }
-                    else if (typeof obj[key] === 'object') {
-                        recursiveExtract(obj[key]);
+        try {
+            const orderCategories = order.category;
+            function extractIds(data) {
+                const ids = [];
+                function recursiveExtract(obj) {
+                    for (const key in obj) {
+                        if (key === 'id') {
+                            ids.push(obj[key]);
+                        }
+                        else if (typeof obj[key] === 'object') {
+                            recursiveExtract(obj[key]);
+                        }
                     }
                 }
+                recursiveExtract(data);
+                return ids;
             }
-            recursiveExtract(data);
-            return ids;
-        }
-        const subcategoriesId = extractIds(orderCategories);
-        const findId = subcategoriesId[0];
-        const subcategory = await this.userModel
-            .find({
-            'category.subcategories': {
-                $elemMatch: {
-                    id: findId,
+            const subcategoriesId = extractIds(orderCategories);
+            const findId = subcategoriesId[0];
+            const subcategory = await this.userModel
+                .find({
+                'category.subcategories': {
+                    $elemMatch: {
+                        id: findId,
+                    },
                 },
-            },
-            location: order.location,
-        })
-            .exec();
-        if (Array.isArray(subcategory) && subcategory.length === 0) {
-            const [city, municipality, district, region, index, country] = order.location.split(', ');
-            if (city === 'Київ') {
-                const regexLocation = new RegExp('Київська область', 'i');
-                const category = await this.userModel
-                    .find({
-                    'category.subcategories': {
-                        $elemMatch: {
-                            id: findId,
+                location: order.location,
+            })
+                .exec();
+            if (Array.isArray(subcategory) && subcategory.length === 0) {
+                const [city, municipality, district, region, index, country] = order.location.split(', ');
+                if (city === 'Київ') {
+                    const regexLocation = new RegExp('Київська область', 'i');
+                    const category = await this.userModel
+                        .find({
+                        'category.subcategories': {
+                            $elemMatch: {
+                                id: findId,
+                            },
                         },
-                    },
-                    location: { $regex: regexLocation },
-                })
-                    .exec();
-                return category;
-            }
-            else {
-                const regexLocation = new RegExp(region, 'i');
-                const category = await this.userModel
-                    .find({
-                    'category.subcategories': {
-                        $elemMatch: {
-                            id: findId,
+                        location: { $regex: regexLocation },
+                    })
+                        .exec();
+                    return category;
+                }
+                else {
+                    const regexLocation = new RegExp(region, 'i');
+                    const category = await this.userModel
+                        .find({
+                        'category.subcategories': {
+                            $elemMatch: {
+                                id: findId,
+                            },
                         },
-                    },
-                    location: { $regex: regexLocation },
-                })
-                    .exec();
-                return category;
+                        location: { $regex: regexLocation },
+                    })
+                        .exec();
+                    return category;
+                }
             }
+            return subcategory;
         }
-        return subcategory;
+        catch (error) {
+            throw error;
+        }
     }
 };
 exports.OrdersService = OrdersService;

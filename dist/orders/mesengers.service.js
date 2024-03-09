@@ -30,6 +30,8 @@ const main_keyboard_1 = require("./Viber/main.keyboard");
 const order_archive_model_1 = require("./order.archive.model");
 const mongoose_2 = require("mongoose");
 const http_errors_1 = require("http-errors");
+const keyboards_tg_1 = require("./Telegram/keyboards_tg");
+const new_order_msg_viber_1 = require("./Viber/new.order.msg.viber");
 let MesengersService = class MesengersService {
     constructor(ordersModel, ordersArchiveModel, userModel) {
         this.ordersModel = ordersModel;
@@ -84,6 +86,13 @@ let MesengersService = class MesengersService {
                         break;
                     case 'review':
                         await this.myReviewList(chatId);
+                        break;
+                    case 'support':
+                        await this.viber_bot.sendMessage({ id: chatId }, [
+                            new TextMessage(`<a href="https://www.wechirka.com/">Перейти на WECHIRKA</a>\n 
+                Написати нам Email support@wechirka.com`),
+                            new KeyboardMessage(MAIN_KEYBOARD),
+                        ]);
                         break;
                     case 'delete':
                         const order = await this.ordersModel.findById(phone);
@@ -227,70 +236,6 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
         });
         const token = process.env.BOT_TELEGRAM;
         this.tg_bot = new TelegramBot(token, { polling: true });
-        const mainKeyboard = {
-            reply_markup: {
-                keyboard: [
-                    [{ text: 'Замовлення' }],
-                    [{ text: 'Відгуки' }],
-                    [{ text: 'Налаштування' }],
-                ],
-                resize_keyboard: true,
-            },
-        };
-        const settingsKeyboard = {
-            reply_markup: {
-                keyboard: [
-                    [{ text: 'Зупинити оповіщення' }],
-                    [
-                        {
-                            text: 'Підтримка',
-                        },
-                    ],
-                    [{ text: 'Головна' }],
-                ],
-                resize_keyboard: true,
-            },
-        };
-        const generalKeyboard = {
-            reply_markup: {
-                keyboard: [
-                    [
-                        {
-                            text: 'Відправити номер телефону',
-                            request_contact: true,
-                        },
-                    ],
-                    [{ text: 'Головна' }],
-                ],
-                resize_keyboard: true,
-            },
-        };
-        const optURL = {
-            reply_markup: {
-                inline_keyboard: [
-                    [
-                        {
-                            text: 'Перейти на сайт',
-                            url: 'https://www.wechirka.com/',
-                        },
-                    ],
-                ],
-                resize_keyboard: true,
-            },
-        };
-        const optCont = {
-            reply_markup: {
-                keyboard: [
-                    [
-                        {
-                            text: 'Відправити номер телефону',
-                            request_contact: true,
-                        },
-                    ],
-                ],
-                resize_keyboard: true,
-            },
-        };
         this.tg_bot.onText(/\/start/, async (msg) => {
             try {
                 const chatId = msg.chat.id;
@@ -301,7 +246,7 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
 З нетерпінням чекаємо можливості обслуговувати вас та допомагати у здійсненні ваших ідей та проєктів. Бажаємо вам приємного користування нашим ресурсом!
 
 З найкращими побажаннями 🚀,
-Команда Wechirka.com`, optCont);
+Команда Wechirka.com`, keyboards_tg_1.contactKeyboard);
             }
             catch (e) {
                 throw new Error(`Помилка надсилання повідомлення: ${e}`);
@@ -313,67 +258,22 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
                 const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
                 const find = await this.ordersModel.find({ tg_chat: chatId }).exec();
                 if (!user && Array.isArray(find) && find.length === 0) {
-                    await this.tg_bot.sendMessage(chatId, 'Ми не знайшли ваші заявки, імовірно, ви ще не зареєстровані. Будь ласка, натисніть кнопку "Відправити номер телефону" для реєстрації у боті та отримання доступу до всіх можливостей нашого сервісу. Якщо у вас є будь-які питання, не соромтеся звертатися. Бажаємо вам приємного користування!', generalKeyboard);
+                    await this.tg_bot.sendMessage(chatId, 'Ми не знайшли ваші заявки, імовірно, ви ще не зареєстровані. Будь ласка, натисніть кнопку "Відправити номер телефону" для реєстрації у боті та отримання доступу до всіх можливостей нашого сервісу. Якщо у вас є будь-які питання, не соромтеся звертатися. Бажаємо вам приємного користування!', keyboards_tg_1.generalKeyboard);
                 }
                 if (user && Array.isArray(find) && find.length === 0) {
-                    await this.tg_bot.sendMessage(chatId, 'Схоже, що у вас немає зареєстрованого замовлення. Якщо ви замовник, Будь ласка, натисніть кнопку "Відправити номер телефону" для реєстрації і отримання доступу до послуг та можливостей нашого сервісу. Якщо ви маєте будь-які інші питання, не соромтеся питати. Дякуємо за розуміння!', generalKeyboard);
+                    await this.tg_bot.sendMessage(chatId, 'Схоже, що у вас немає зареєстрованого замовлення. Якщо ви замовник, Будь ласка, натисніть кнопку "Відправити номер телефону" для реєстрації і отримання доступу до послуг та можливостей нашого сервісу. Якщо ви маєте будь-які інші питання, не соромтеся питати. Дякуємо за розуміння!', keyboards_tg_1.generalKeyboard);
                 }
                 if (find || user.tg_chat === find[0].tg_chat) {
                     find.map(async (finded) => {
-                        const msg = `Замовник: ${finded.name}.
-      Дата події: ${finded.date}.
-      Категорія: ${finded.category[0].subcategories[0].name}.
-      Вимоги: ${finded.description}.
-      Локація: ${finded.location}.
-      Гонорар: ${finded.price}.
-      Кількість відгуків: ${finded.approve_count}.
-      Статус: ${finded.active ? 'Активний' : 'Неактивний'}.\n`;
+                        const msg = await (0, main_keyboard_1.findMsgViber)(finded);
                         if (finded.active === true) {
-                            const keyboard = {
-                                inline_keyboard: [
-                                    [
-                                        {
-                                            text: 'Видалити',
-                                            callback_data: `delete:${finded._id}:${chatId}`,
-                                        },
-                                        {
-                                            text: 'Деактивувати',
-                                            callback_data: `deactive:${finded._id}:${chatId}`,
-                                        },
-                                    ],
-                                    [
-                                        {
-                                            text: 'Відгуки на пропозицію',
-                                            callback_data: `users:${finded._id}:${chatId}`,
-                                        },
-                                    ],
-                                ],
-                            };
+                            const keyboard = await (0, keyboards_tg_1.msgKeyboardFalse)(finded, chatId);
                             await this.tg_bot.sendMessage(chatId, msg, {
                                 reply_markup: keyboard,
                             });
                         }
                         else {
-                            const keyboard = {
-                                inline_keyboard: [
-                                    [
-                                        {
-                                            text: 'Видалити',
-                                            callback_data: `delete:${finded._id}:${chatId}`,
-                                        },
-                                        {
-                                            text: 'Активувати',
-                                            callback_data: `active:${finded._id}:${chatId}`,
-                                        },
-                                    ],
-                                    [
-                                        {
-                                            text: 'Відгуки на пропозицію',
-                                            callback_data: `users:${finded._id}:${chatId}`,
-                                        },
-                                    ],
-                                ],
-                            };
+                            const keyboard = await (0, keyboards_tg_1.msgKeyboardTrue)(finded, chatId);
                             await this.tg_bot.sendMessage(chatId, msg, {
                                 reply_markup: keyboard,
                             });
@@ -390,12 +290,12 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
                 const chatId = msg.chat.id;
                 const user = await this.userModel.findOne({ tg_chat: chatId }).exec();
                 if (!user) {
-                    await this.tg_bot.sendMessage(chatId, 'Схоже, що у вас немає зареєстрованого облікового запису як виконавця.Якщо Ви зарєєструвались як виконавець, Будь ласка, натисніть кнопку "Відправити номер телефону" для реєстрації як виконавець та отримання доступу до можливостей нашого сервісу. Якщо у вас є будь-які інші питання, не соромтеся питати. Дякуємо за розуміння!', generalKeyboard);
+                    await this.tg_bot.sendMessage(chatId, 'Схоже, що у вас немає зареєстрованого облікового запису як виконавця.Якщо Ви зарєєструвались як виконавець, Будь ласка, натисніть кнопку "Відправити номер телефону" для реєстрації як виконавець та отримання доступу до можливостей нашого сервісу. Якщо у вас є будь-які інші питання, не соромтеся питати. Дякуємо за розуміння!', keyboards_tg_1.generalKeyboard);
                 }
                 if (user &&
                     Array.isArray(user.accepted_orders) &&
                     user.accepted_orders.length === 0) {
-                    await this.tg_bot.sendMessage(chatId, 'Схоже, що у нашій системі відсутні відгуки від вас на пропозиції замовників. Якщо у вас виникнуть будь-які труднощі або питання, не соромтеся звертатися до нас. Дякуємо за розуміння!', generalKeyboard);
+                    await this.tg_bot.sendMessage(chatId, 'Схоже, що у нашій системі відсутні відгуки від вас на пропозиції замовників. Якщо у вас виникнуть будь-які труднощі або питання, не соромтеся звертатися до нас. Дякуємо за розуміння!', keyboards_tg_1.generalKeyboard);
                 }
                 if (user &&
                     Array.isArray(user.accepted_orders) &&
@@ -405,18 +305,12 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
                             const findetOrder = await this.ordersModel.findOne({
                                 _id: finded,
                             });
-                            const msg = `Замовник: ${findetOrder.name}.
-      Дата події: ${findetOrder.date}.
-      Категорія: ${findetOrder.category[0].subcategories[0].name}.
-      Вимоги: ${findetOrder.description}.
-      Локація: ${findetOrder.location}.
-      Гонорар: ${findetOrder.price}.      
-      Статус: ${findetOrder.active ? 'Активний' : 'Неактивний'}.\n`;
-                            await this.tg_bot.sendMessage(chatId, msg, optCont);
+                            const msg = await (0, main_keyboard_1.findMsgViber)(findetOrder);
+                            await this.tg_bot.sendMessage(chatId, msg, keyboards_tg_1.contactKeyboard);
                         });
                     }
                     catch (e) {
-                        return await this.tg_bot.sendMessage(chatId, e, optCont);
+                        return await this.tg_bot.sendMessage(chatId, e, keyboards_tg_1.contactKeyboard);
                     }
                 }
             }
@@ -426,15 +320,15 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
         });
         this.tg_bot.onText(/Головна/, async (msg) => {
             const chatId = msg.chat.id;
-            this.tg_bot.sendMessage(chatId, '🔔', mainKeyboard);
+            this.tg_bot.sendMessage(chatId, '🔔', keyboards_tg_1.mainKeyboard);
         });
         this.tg_bot.onText(/Налаштування/, async (msg) => {
             const chatId = msg.chat.id;
-            this.tg_bot.sendMessage(chatId, '🔍', settingsKeyboard);
+            this.tg_bot.sendMessage(chatId, '🔍', keyboards_tg_1.settingsKeyboard);
         });
         this.tg_bot.onText(/Підтримка/, async (msg) => {
             const chatId = msg.chat.id;
-            this.tg_bot.sendMessage(chatId, '\n<a href="https://www.wechirka.com/">Перейти на WECHIRKA</a> \n\n<a href="https://t.me/+tG6pSpHWPPFiYzMy">Написати нам у Телеграм</a> \n\nНаписати нам Email support@wechirka.com ', { parse_mode: 'HTML' });
+            this.tg_bot.sendMessage(chatId, '\n<a href="https://www.wechirka.com/">Перейти на WECHIRKA</a> \n\n<a href="https://t.me/+tG6pSpHWPPFiYzMy">Написати нам у Телеграм</a> \n\nНаписати нам Email support@wechirka.com', { parse_mode: 'HTML' });
         });
         this.tg_bot.on('contact', async (msg) => {
             try {
@@ -451,13 +345,13 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
                         tg_chat: chatId,
                         verify: true,
                     });
-                    await this.tg_bot.sendMessage(chatId, `Дякуємо, ${msg.from.first_name}! Тепер вам будуть надходити повідомлення про нові пропозиції в обраній категорії. Щоб вимкнути оповіщення, виберіть "Меню" та натисніть /stop. Якщо у вас є будь-які питання або потребуєте додаткової допомоги, не соромтеся звертатися!`, mainKeyboard);
+                    await this.tg_bot.sendMessage(chatId, `Дякуємо, ${msg.from.first_name}! Тепер вам будуть надходити повідомлення про нові пропозиції в обраній категорії. Щоб вимкнути оповіщення, виберіть "Меню" та натисніть /stop. Якщо у вас є будь-які питання або потребуєте додаткової допомоги, не соромтеся звертатися!`, keyboards_tg_1.mainKeyboard);
                 }
                 if (order && order.tg_chat === null) {
                     await this.ordersModel.findByIdAndUpdate(order.id, {
                         tg_chat: chatId,
                     });
-                    await this.tg_bot.sendMessage(chatId, `Дякуємо, ${msg.from.first_name}! Тепер вам будуть надходити повідомлення про нові пропозиції в обраній категорії. Щоб вимкнути оповіщення, виберіть "Меню" та натисніть /stop. Якщо у вас є будь-які питання або потребуєте додаткової допомоги, не соромтеся звертатися!`, mainKeyboard);
+                    await this.tg_bot.sendMessage(chatId, `Дякуємо, ${msg.from.first_name}! Тепер вам будуть надходити повідомлення про нові пропозиції в обраній категорії. Щоб вимкнути оповіщення, виберіть "Меню" та натисніть /stop. Якщо у вас є будь-які питання або потребуєте додаткової допомоги, не соромтеся звертатися!`, keyboards_tg_1.mainKeyboard);
                     if (order.verify === false) {
                         await this.tg_bot.sendMessage(chatId, `Ваш код підтвердження: ${order.sms}
 Перейдіть на сайт за посиланням: ${process.env.CODE_LINK}`);
@@ -490,11 +384,11 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
                         await this.userModel.findByIdAndUpdate(user.id, {
                             disagree_order: user.disagree_order,
                         });
-                        await this.tg_bot.sendMessage(chatId, `Ви відмовились від виконання замовлення: ${orders.description}.`, mainKeyboard);
+                        await this.tg_bot.sendMessage(chatId, `Ви відмовились від виконання замовлення: ${orders.description}.`, keyboards_tg_1.mainKeyboard);
                         break;
                     case 'delete':
                         const delOrder = await this.ordersModel.findById(phone);
-                        await this.tg_bot.sendMessage(chatId, `Ви видалили замевлення: ${delOrder.description}.`, mainKeyboard);
+                        await this.tg_bot.sendMessage(chatId, `Ви видалили замевлення: ${delOrder.description}.`, keyboards_tg_1.mainKeyboard);
                         const archivedOrder = new this.ordersArchiveModel(delOrder.toObject());
                         await archivedOrder.save();
                         await this.userModel.updateMany({ accepted_orders: phone }, { $pull: { accepted_orders: phone } });
@@ -505,19 +399,19 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
                         await this.ordersModel.findByIdAndUpdate(actiOrder.id, {
                             active: true,
                         });
-                        await this.tg_bot.sendMessage(chatId, `Ви активували замевлення: ${actiOrder.description}.`, mainKeyboard);
+                        await this.tg_bot.sendMessage(chatId, `Ви активували замевлення: ${actiOrder.description}.`, keyboards_tg_1.mainKeyboard);
                         break;
                     case 'deactive':
                         const deactiOrder = await this.ordersModel.findById(phone);
                         await this.ordersModel.findByIdAndUpdate(deactiOrder.id, {
                             active: false,
                         });
-                        await this.tg_bot.sendMessage(chatId, `Ви деактивували замевлення: ${deactiOrder.description}.`, mainKeyboard);
+                        await this.tg_bot.sendMessage(chatId, `Ви деактивували замевлення: ${deactiOrder.description}.`, keyboards_tg_1.mainKeyboard);
                         break;
                     case 'users':
                         const findOrder = await this.ordersModel.findOne({ _id: phone });
                         if (findOrder.accepted_users.length === 0) {
-                            await this.tg_bot.sendMessage(chatId, `На жаль, немає жодних відгуків на цю пропозицію.`, mainKeyboard);
+                            await this.tg_bot.sendMessage(chatId, `На жаль, немає жодних відгуків на цю пропозицію.`, keyboards_tg_1.mainKeyboard);
                         }
                         else {
                             findOrder.accepted_users.map(async (user) => {
@@ -525,7 +419,7 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
                                 const msgOrder = `Замовлення:\n${findOrder.description}\nКористувач: ${findedUser.firstName}.\nКатегорія: ${findedUser.category[0].subcategories[0].name}\nОплата: ${findedUser.price}\nТелефон: +${findedUser.phone}.\nПосилання на профіль:\n${process.env.FRONT_LINK}artists/${findedUser._id}.`;
                                 await this.tg_bot.sendMessage(chatId, msgOrder);
                             });
-                            await this.tg_bot.sendMessage(chatId, '', mainKeyboard);
+                            await this.tg_bot.sendMessage(chatId, '', keyboards_tg_1.mainKeyboard);
                         }
                         break;
                     default:
@@ -552,44 +446,13 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
                     });
                 }
             }
-            await this.tg_bot.sendMessage(chatId, `Ви призупинили отримання сповіщень. Для їх відновлення, будь ласка, натисніть кнопку "Відправити номер телефону".`, generalKeyboard);
+            await this.tg_bot.sendMessage(chatId, `Ви призупинили отримання сповіщень. Для їх відновлення, будь ласка, натисніть кнопку "Відправити номер телефону".`, keyboards_tg_1.generalKeyboard);
         });
     }
     async sendNewViberOrder(userId, order) {
         try {
-            const msg = `Доброго дня, з'явилось нове замовлення по Вашому профілю. \n
-      *Замовник*: ${order.name}.
-      *Дата події*: ${order.date}.
-      *Категорія*: ${order.category[0].subcategories[0].name}.
-      *Вимоги замовника*: ${order.description}.
-      *Локація*: ${order.location}.
-      *Гонорар*: ${order.price}`;
-            const KEYBOARD = {
-                Type: 'keyboard',
-                Revision: 1,
-                ButtonsGroupColumns: 3,
-                ButtonsGroupRows: 1,
-                Buttons: [
-                    {
-                        ActionType: 'reply',
-                        ActionBody: `accept:${order.phone}:${userId}`,
-                        Text: '<font color="#FFFFFF" size="5">Згоден</font>',
-                        TextSize: 'regular',
-                        TextVAlign: 'middle',
-                        TextHAlign: 'center',
-                        BgColor: '#094356',
-                    },
-                    {
-                        ActionType: 'reply',
-                        ActionBody: `disagree:${order.phone}:${userId}`,
-                        Text: '<font color="#FFFFFF" size="5">Не згоден</font>',
-                        TextSize: 'regular',
-                        TextVAlign: 'middle',
-                        TextHAlign: 'center',
-                        BgColor: '#094356',
-                    },
-                ],
-            };
+            const msg = await (0, new_order_msg_viber_1.newViberMsgOrder)(order);
+            const KEYBOARD = await (0, new_order_msg_viber_1.newViberKeyboardOrder)(userId, order);
             await this.viber_bot.sendMessage({ id: userId }, [
                 new TextMessage(msg),
                 new RichMediaMessage(KEYBOARD),
@@ -713,93 +576,11 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
             }
             if (find || user.viber_chat === find[0].viber_chat) {
                 find.map(async (finded) => {
-                    const FIND_KEYBOARD = {
-                        Type: 'keyboard',
-                        Revision: 1,
-                        ButtonsGroupColumns: 3,
-                        ButtonsGroupRows: 1,
-                        Buttons: [
-                            {
-                                ActionType: 'open-url',
-                                ActionBody: 'https://www.wechirka.com',
-                                Text: '<font color="#FFFFFF" size="5">Перейти на наш сайт</font>',
-                                TextSize: 'regular',
-                                TextVAlign: 'middle',
-                                TextHAlign: 'center',
-                                BgColor: '#094356',
-                            },
-                            {
-                                ActionType: 'reply',
-                                ActionBody: `orders:${finded.name}:${finded.viber_chat}`,
-                                Text: '<font color="#FFFFFF" size="5">Мої заявки (лише для замовників)</font>',
-                                TextSize: 'regular',
-                                TextVAlign: 'middle',
-                                TextHAlign: 'center',
-                                BgColor: '#094356',
-                            },
-                            {
-                                ActionType: 'reply',
-                                ActionBody: `review:${finded.name}:${chatId}`,
-                                Text: '<font color="#FFFFFF" size="5">Мої відгуки (лише для виконавців)</font>',
-                                TextSize: 'regular',
-                                TextVAlign: 'middle',
-                                TextHAlign: 'center',
-                                BgColor: '#094356',
-                            },
-                        ],
-                    };
-                    const msg = `Замовник: ${finded.name}.
-      *Дата події*: ${finded.date}.
-      *Категорія*: ${finded.category[0].subcategories[0].name}.
-      *Вимоги замовника*: ${finded.description}.
-      *Локація*: ${finded.location}.
-      *Гонорар*: ${finded.price}.
-      *Кількість відгуків*: ${finded.approve_count}.
-      *Статус*: ${finded.active ? 'Активний' : 'Неактивний'}.\n`;
+                    const FIND_KEYBOARD = await (0, main_keyboard_1.findKeyboardViber)(finded, chatId);
+                    const msg = await (0, main_keyboard_1.findMsgViber)(finded);
                     if (finded.active === true) {
-                        const KEYBOARD = {
-                            Type: 'keyboard',
-                            Revision: 1,
-                            ButtonsGroupColumns: 3,
-                            ButtonsGroupRows: 1,
-                            Buttons: [
-                                {
-                                    ActionType: 'reply',
-                                    ActionBody: `delete:${finded._id}:${finded.viber_chat}`,
-                                    Text: '<font color="#FFFFFF" size="5">Видалити</font>',
-                                    TextSize: 'regular',
-                                    TextVAlign: 'middle',
-                                    TextHAlign: 'center',
-                                    BgColor: '#094356',
-                                },
-                                {
-                                    ActionType: 'reply',
-                                    ActionBody: `deactive:${finded._id}:${finded.viber_chat}`,
-                                    Text: '<font color="#FFFFFF" size="5">Деактивувати</font>',
-                                    TextSize: 'regular',
-                                    TextVAlign: 'middle',
-                                    TextHAlign: 'center',
-                                    BgColor: '#094356',
-                                },
-                            ],
-                        };
-                        const USERS = {
-                            Type: 'keyboard',
-                            Revision: 1,
-                            ButtonsGroupColumns: 6,
-                            ButtonsGroupRows: 1,
-                            Buttons: [
-                                {
-                                    ActionType: 'reply',
-                                    ActionBody: `users:${finded._id}:${finded.viber_chat}`,
-                                    Text: '<font color="#FFFFFF" size="5">Відгуки на пропозицію</font>',
-                                    TextSize: 'regular',
-                                    TextVAlign: 'middle',
-                                    TextHAlign: 'center',
-                                    BgColor: '#094356',
-                                },
-                            ],
-                        };
+                        const KEYBOARD = await (0, main_keyboard_1.findOrderKeyboardViber)(finded);
+                        const USERS = await (0, main_keyboard_1.findUsersKeyboardViber)(finded);
                         await this.viber_bot.sendMessage({ id: chatId }, [
                             new TextMessage(msg),
                             new RichMediaMessage(KEYBOARD, USERS),
@@ -808,49 +589,8 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
                         ]);
                     }
                     else {
-                        const KEYBOARD = {
-                            Type: 'keyboard',
-                            Revision: 1,
-                            ButtonsGroupColumns: 3,
-                            ButtonsGroupRows: 1,
-                            Buttons: [
-                                {
-                                    ActionType: 'reply',
-                                    ActionBody: `delete:${finded._id}:${finded.viber_chat}`,
-                                    Text: '<font color="#FFFFFF" size="5">Видалити</font>',
-                                    TextSize: 'regular',
-                                    TextVAlign: 'middle',
-                                    TextHAlign: 'center',
-                                    BgColor: '#094356',
-                                },
-                                {
-                                    ActionType: 'reply',
-                                    ActionBody: `active:${finded._id}:${finded.viber_chat}`,
-                                    Text: '<font color="#FFFFFF" size="5">Активувати</font>',
-                                    TextSize: 'regular',
-                                    TextVAlign: 'middle',
-                                    TextHAlign: 'center',
-                                    BgColor: '#094356',
-                                },
-                            ],
-                        };
-                        const USERS = {
-                            Type: 'keyboard',
-                            Revision: 1,
-                            ButtonsGroupColumns: 6,
-                            ButtonsGroupRows: 1,
-                            Buttons: [
-                                {
-                                    ActionType: 'reply',
-                                    ActionBody: `users:${finded._id}:${finded.viber_chat}`,
-                                    Text: '<font color="#FFFFFF" size="5">Відгуки на пропозицію</font>',
-                                    TextSize: 'regular',
-                                    TextVAlign: 'middle',
-                                    TextHAlign: 'center',
-                                    BgColor: '#094356',
-                                },
-                            ],
-                        };
+                        const KEYBOARD = await (0, main_keyboard_1.findOrderKeyboardViberActive)(finded);
+                        const USERS = await (0, main_keyboard_1.findUsersKeyboardViber)(finded);
                         await this.viber_bot.sendMessage({ id: chatId }, [
                             new TextMessage(msg),
                             new RichMediaMessage(KEYBOARD),
@@ -868,41 +608,7 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
     async myReviewList(chatId) {
         try {
             const user = await this.userModel.findOne({ viber_chat: chatId }).exec();
-            const KEYBOARD = {
-                Type: 'keyboard',
-                Revision: 1,
-                ButtonsGroupColumns: 3,
-                ButtonsGroupRows: 1,
-                Buttons: [
-                    {
-                        ActionType: 'open-url',
-                        ActionBody: 'https://www.wechirka.com',
-                        Text: '<font color="#FFFFFF" size="5">Перейти на наш сайт</font>',
-                        TextSize: 'regular',
-                        TextVAlign: 'middle',
-                        TextHAlign: 'center',
-                        BgColor: '#094356',
-                    },
-                    {
-                        ActionType: 'reply',
-                        ActionBody: `orders:${chatId}:${chatId}`,
-                        Text: '<font color="#FFFFFF" size="5">Мої заявки (лише для замовників)</font>',
-                        TextSize: 'regular',
-                        TextVAlign: 'middle',
-                        TextHAlign: 'center',
-                        BgColor: '#094356',
-                    },
-                    {
-                        ActionType: 'reply',
-                        ActionBody: `review:${chatId}:${chatId}`,
-                        Text: '<font color="#FFFFFF" size="5">Мої відгуки (лише для виконавців)</font>',
-                        TextSize: 'regular',
-                        TextVAlign: 'middle',
-                        TextHAlign: 'center',
-                        BgColor: '#094356',
-                    },
-                ],
-            };
+            const KEYBOARD = await (0, main_keyboard_1.reviewsKeyboard)(chatId);
             if (user &&
                 user.viber_chat !== null &&
                 Array.isArray(user.accepted_orders) &&
@@ -924,48 +630,8 @@ ${process.env.FRONT_LINK}artists/${findedUser._id}
                 const orederArr = user.accepted_orders;
                 orederArr.map(async (finded) => {
                     const myOrders = await this.ordersModel.findOne({ _id: finded });
-                    const FIND_KEYBOARD = {
-                        Type: 'keyboard',
-                        Revision: 1,
-                        ButtonsGroupColumns: 3,
-                        ButtonsGroupRows: 1,
-                        Buttons: [
-                            {
-                                ActionType: 'open-url',
-                                ActionBody: 'https://www.wechirka.com',
-                                Text: '<font color="#FFFFFF" size="5">Перейти на наш сайт</font>',
-                                TextSize: 'regular',
-                                TextVAlign: 'middle',
-                                TextHAlign: 'center',
-                                BgColor: '#094356',
-                            },
-                            {
-                                ActionType: 'reply',
-                                ActionBody: `orders:${user.name}:${user.viber_chat}`,
-                                Text: '<font color="#FFFFFF" size="5">Мої заявки (лише для замовників)</font>',
-                                TextSize: 'regular',
-                                TextVAlign: 'middle',
-                                TextHAlign: 'center',
-                                BgColor: '#094356',
-                            },
-                            {
-                                ActionType: 'reply',
-                                ActionBody: `review:${user.viber_chat}:${user.viber_chat}`,
-                                Text: '<font color="#FFFFFF" size="5">Мої відгуки (лише для виконавців)</font>',
-                                TextSize: 'regular',
-                                TextVAlign: 'middle',
-                                TextHAlign: 'center',
-                                BgColor: '#094356',
-                            },
-                        ],
-                    };
-                    const msg = `*Замовник*: ${myOrders.name}.
-      *Дата події*: ${myOrders.date}.
-      *Категорія*: ${myOrders.category[0].subcategories[0].name}.
-      *Вимоги замовника*: ${myOrders.description}.
-      *Локація*: ${myOrders.location}.
-      *Гонорар*: ${myOrders.price}.      
-      *Статус*: ${myOrders.active ? 'Активний' : 'Неактивний'}.\n`;
+                    const FIND_KEYBOARD = await (0, main_keyboard_1.reviewsKeyboardUser)(user);
+                    const msg = await (0, main_keyboard_1.findMsgViber)(myOrders);
                     await this.viber_bot.sendMessage({ id: chatId }, [
                         new TextMessage(msg),
                         new KeyboardMessage(FIND_KEYBOARD),

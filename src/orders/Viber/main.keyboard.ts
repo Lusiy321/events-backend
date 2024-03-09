@@ -1,3 +1,6 @@
+import { User } from 'src/users/users.model';
+import { Orders } from '../order.model';
+
 export const MAIN_KEYBOARD_VIBER = {
   Type: 'keyboard',
   Revision: 1,
@@ -11,7 +14,7 @@ export const MAIN_KEYBOARD_VIBER = {
       TextSize: 'regular',
       TextVAlign: 'middle',
       TextHAlign: 'center',
-      BgColor: '#094356',
+      BgColor: '#a259ff',
     },
     {
       ActionType: 'reply',
@@ -20,7 +23,7 @@ export const MAIN_KEYBOARD_VIBER = {
       TextSize: 'regular',
       TextVAlign: 'middle',
       TextHAlign: 'center',
-      BgColor: '#094356',
+      BgColor: '#a259ff',
     },
     {
       ActionType: 'reply',
@@ -29,12 +32,21 @@ export const MAIN_KEYBOARD_VIBER = {
       TextSize: 'regular',
       TextVAlign: 'middle',
       TextHAlign: 'center',
-      BgColor: '#094356',
+      BgColor: '#a259ff',
+    },
+    {
+      ActionType: 'reply',
+      ActionBody: `support`,
+      Text: '<font color="#FFFFFF" size="5">Підтримка</font>',
+      TextSize: 'regular',
+      TextVAlign: 'middle',
+      TextHAlign: 'center',
+      BgColor: '#a259ff',
     },
   ],
 };
 
-export function mainKeyboardViber(userProfile: string, userId: string) {
+export async function mainKeyboardViber(userProfile: string, userId: string) {
   const MAIN_KEYBOARD = {
     Type: 'keyboard',
     Revision: 1,
@@ -48,7 +60,7 @@ export function mainKeyboardViber(userProfile: string, userId: string) {
         TextSize: 'large',
         TextVAlign: 'middle',
         TextHAlign: 'center',
-        BgColor: '#094356',
+        BgColor: '#a259ff',
       },
       {
         ActionType: 'reply',
@@ -57,7 +69,7 @@ export function mainKeyboardViber(userProfile: string, userId: string) {
         TextSize: 'large',
         TextVAlign: 'middle',
         TextHAlign: 'center',
-        BgColor: '#094356',
+        BgColor: '#a259ff',
       },
       {
         ActionType: 'reply',
@@ -66,9 +78,228 @@ export function mainKeyboardViber(userProfile: string, userId: string) {
         TextSize: 'regular',
         TextVAlign: 'middle',
         TextHAlign: 'center',
-        BgColor: '#094356',
+        BgColor: '#a259ff',
+      },
+      {
+        ActionType: 'reply',
+        ActionBody: `support`,
+        Text: '<font color="#FFFFFF" size="5">Підтримка</font>',
+        TextSize: 'regular',
+        TextVAlign: 'middle',
+        TextHAlign: 'center',
+        BgColor: '#a259ff',
       },
     ],
   };
   return MAIN_KEYBOARD;
+}
+
+export async function findKeyboardViber(finded: Orders, chatId: string) {
+  const findKeyboard = {
+    Type: 'keyboard',
+    Revision: 1,
+    ButtonsGroupColumns: 3,
+    ButtonsGroupRows: 1,
+    Buttons: [
+      {
+        ActionType: 'open-url',
+        ActionBody: 'https://www.wechirka.com',
+        Text: '<font color="#FFFFFF" size="5">Перейти на наш сайт</font>',
+        TextSize: 'regular',
+        TextVAlign: 'middle',
+        TextHAlign: 'center',
+        BgColor: '#a259ff',
+      },
+      {
+        ActionType: 'reply',
+        ActionBody: `orders:${finded.name}:${finded.viber_chat}`,
+        Text: '<font color="#FFFFFF" size="5">Мої заявки (лише для замовників)</font>',
+        TextSize: 'regular',
+        TextVAlign: 'middle',
+        TextHAlign: 'center',
+        BgColor: '#a259ff',
+      },
+      {
+        ActionType: 'reply',
+        ActionBody: `review:${finded.name}:${chatId}`,
+        Text: '<font color="#FFFFFF" size="5">Мої відгуки (лише для виконавців)</font>',
+        TextSize: 'regular',
+        TextVAlign: 'middle',
+        TextHAlign: 'center',
+        BgColor: '#a259ff',
+      },
+    ],
+  };
+  return findKeyboard;
+}
+
+export async function findMsgViber(finded: Orders) {
+  const msg = `Замовник: ${finded.name}.
+      Дата події: ${finded.date}.
+      Категорія: ${finded.category[0].subcategories[0].name}.
+      Вимоги замовника: ${finded.description}.
+      Локація: ${finded.location}.
+      Гонорар: ${finded.price}.
+      Кількість відгуків: ${finded.approve_count}.
+      Статус: ${finded.active ? 'Активний' : 'Неактивний'}.\n`;
+  return msg;
+}
+
+export async function findOrderKeyboardViber(finded: Orders) {
+  const keyboard = {
+    Type: 'keyboard',
+    Revision: 1,
+    ButtonsGroupColumns: 3,
+    ButtonsGroupRows: 1,
+    Buttons: [
+      {
+        ActionType: 'reply',
+        ActionBody: `delete:${finded._id}:${finded.viber_chat}`,
+        Text: '<font color="#FFFFFF" size="5">Видалити</font>',
+        TextSize: 'regular',
+        TextVAlign: 'middle',
+        TextHAlign: 'center',
+        BgColor: '#a259ff',
+      },
+      {
+        ActionType: 'reply',
+        ActionBody: `deactive:${finded._id}:${finded.viber_chat}`,
+        Text: '<font color="#FFFFFF" size="5">Деактивувати</font>',
+        TextSize: 'regular',
+        TextVAlign: 'middle',
+        TextHAlign: 'center',
+        BgColor: '#a259ff',
+      },
+    ],
+  };
+  return keyboard;
+}
+
+export async function findUsersKeyboardViber(finded: Orders) {
+  const keyboard = {
+    Type: 'keyboard',
+    Revision: 1,
+    ButtonsGroupColumns: 6,
+    ButtonsGroupRows: 1,
+    Buttons: [
+      {
+        ActionType: 'reply',
+        ActionBody: `users:${finded._id}:${finded.viber_chat}`,
+        Text: '<font color="#FFFFFF" size="5">Відгуки на пропозицію</font>',
+        TextSize: 'regular',
+        TextVAlign: 'middle',
+        TextHAlign: 'center',
+        BgColor: '#a259ff',
+      },
+    ],
+  };
+  return keyboard;
+}
+
+export async function findOrderKeyboardViberActive(finded: Orders) {
+  const keyboard = {
+    Type: 'keyboard',
+    Revision: 1,
+    ButtonsGroupColumns: 3,
+    ButtonsGroupRows: 1,
+    Buttons: [
+      {
+        ActionType: 'reply',
+        ActionBody: `delete:${finded._id}:${finded.viber_chat}`,
+        Text: '<font color="#FFFFFF" size="5">Видалити</font>',
+        TextSize: 'regular',
+        TextVAlign: 'middle',
+        TextHAlign: 'center',
+        BgColor: '#a259ff',
+      },
+      {
+        ActionType: 'reply',
+        ActionBody: `active:${finded._id}:${finded.viber_chat}`,
+        Text: '<font color="#FFFFFF" size="5">Активувати</font>',
+        TextSize: 'regular',
+        TextVAlign: 'middle',
+        TextHAlign: 'center',
+        BgColor: '#a259ff',
+      },
+    ],
+  };
+  return keyboard;
+}
+
+export async function reviewsKeyboard(chatId: string) {
+  const keyboard = {
+    Type: 'keyboard',
+    Revision: 1,
+    ButtonsGroupColumns: 3,
+    ButtonsGroupRows: 1,
+    Buttons: [
+      {
+        ActionType: 'open-url',
+        ActionBody: 'https://www.wechirka.com',
+        Text: '<font color="#FFFFFF" size="5">Перейти на наш сайт</font>',
+        TextSize: 'regular',
+        TextVAlign: 'middle',
+        TextHAlign: 'center',
+        BgColor: '#a259ff',
+      },
+      {
+        ActionType: 'reply',
+        ActionBody: `orders:${chatId}:${chatId}`,
+        Text: '<font color="#FFFFFF" size="5">Мої заявки (лише для замовників)</font>',
+        TextSize: 'regular',
+        TextVAlign: 'middle',
+        TextHAlign: 'center',
+        BgColor: '#a259ff',
+      },
+      {
+        ActionType: 'reply',
+        ActionBody: `review:${chatId}:${chatId}`,
+        Text: '<font color="#FFFFFF" size="5">Мої відгуки (лише для виконавців)</font>',
+        TextSize: 'regular',
+        TextVAlign: 'middle',
+        TextHAlign: 'center',
+        BgColor: '#a259ff',
+      },
+    ],
+  };
+  return keyboard;
+}
+
+export async function reviewsKeyboardUser(user: User) {
+  const keyboard = {
+    Type: 'keyboard',
+    Revision: 1,
+    ButtonsGroupColumns: 3,
+    ButtonsGroupRows: 1,
+    Buttons: [
+      {
+        ActionType: 'open-url',
+        ActionBody: 'https://www.wechirka.com',
+        Text: '<font color="#FFFFFF" size="5">Перейти на наш сайт</font>',
+        TextSize: 'regular',
+        TextVAlign: 'middle',
+        TextHAlign: 'center',
+        BgColor: '#a259ff',
+      },
+      {
+        ActionType: 'reply',
+        ActionBody: `orders:${user.name}:${user.viber_chat}`,
+        Text: '<font color="#FFFFFF" size="5">Мої заявки (лише для замовників)</font>',
+        TextSize: 'regular',
+        TextVAlign: 'middle',
+        TextHAlign: 'center',
+        BgColor: '#a259ff',
+      },
+      {
+        ActionType: 'reply',
+        ActionBody: `review:${user.viber_chat}:${user.viber_chat}`,
+        Text: '<font color="#FFFFFF" size="5">Мої відгуки (лише для виконавців)</font>',
+        TextSize: 'regular',
+        TextVAlign: 'middle',
+        TextHAlign: 'center',
+        BgColor: '#a259ff',
+      },
+    ],
+  };
+  return keyboard;
 }
