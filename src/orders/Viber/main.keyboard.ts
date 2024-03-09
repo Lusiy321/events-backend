@@ -47,7 +47,7 @@ export const MAIN_KEYBOARD_VIBER = {
 };
 
 export async function mainKeyboardViber(userProfile: string, userId: string) {
-  const MAIN_KEYBOARD = {
+  return {
     Type: 'keyboard',
     Revision: 1,
     ButtonsGroupColumns: 3,
@@ -91,11 +91,10 @@ export async function mainKeyboardViber(userProfile: string, userId: string) {
       },
     ],
   };
-  return MAIN_KEYBOARD;
 }
 
 export async function findKeyboardViber(finded: Orders, chatId: string) {
-  const findKeyboard = {
+  return {
     Type: 'keyboard',
     Revision: 1,
     ButtonsGroupColumns: 3,
@@ -130,11 +129,10 @@ export async function findKeyboardViber(finded: Orders, chatId: string) {
       },
     ],
   };
-  return findKeyboard;
 }
 
 export async function findMsgViber(finded: Orders) {
-  const msg = `Замовник: ${finded.name}.
+  return `Замовник: ${finded.name}.
       Дата події: ${finded.date}.
       Категорія: ${finded.category[0].subcategories[0].name}.
       Вимоги замовника: ${finded.description}.
@@ -142,11 +140,10 @@ export async function findMsgViber(finded: Orders) {
       Гонорар: ${finded.price}.
       Кількість відгуків: ${finded.approve_count}.
       Статус: ${finded.active ? 'Активний' : 'Неактивний'}.\n`;
-  return msg;
 }
 
 export async function findOrderKeyboardViber(finded: Orders) {
-  const keyboard = {
+  return {
     Type: 'keyboard',
     Revision: 1,
     ButtonsGroupColumns: 3,
@@ -172,11 +169,10 @@ export async function findOrderKeyboardViber(finded: Orders) {
       },
     ],
   };
-  return keyboard;
 }
 
 export async function findUsersKeyboardViber(finded: Orders) {
-  const keyboard = {
+  return {
     Type: 'keyboard',
     Revision: 1,
     ButtonsGroupColumns: 6,
@@ -193,11 +189,10 @@ export async function findUsersKeyboardViber(finded: Orders) {
       },
     ],
   };
-  return keyboard;
 }
 
 export async function findOrderKeyboardViberActive(finded: Orders) {
-  const keyboard = {
+  return {
     Type: 'keyboard',
     Revision: 1,
     ButtonsGroupColumns: 3,
@@ -223,11 +218,10 @@ export async function findOrderKeyboardViberActive(finded: Orders) {
       },
     ],
   };
-  return keyboard;
 }
 
 export async function reviewsKeyboard(chatId: string) {
-  const keyboard = {
+  return {
     Type: 'keyboard',
     Revision: 1,
     ButtonsGroupColumns: 3,
@@ -262,11 +256,10 @@ export async function reviewsKeyboard(chatId: string) {
       },
     ],
   };
-  return keyboard;
 }
 
 export async function reviewsKeyboardUser(user: User) {
-  const keyboard = {
+  return {
     Type: 'keyboard',
     Revision: 1,
     ButtonsGroupColumns: 3,
@@ -301,5 +294,4 @@ export async function reviewsKeyboardUser(user: User) {
       },
     ],
   };
-  return keyboard;
 }

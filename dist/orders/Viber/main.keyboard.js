@@ -46,7 +46,7 @@ exports.MAIN_KEYBOARD_VIBER = {
     ],
 };
 async function mainKeyboardViber(userProfile, userId) {
-    const MAIN_KEYBOARD = {
+    return {
         Type: 'keyboard',
         Revision: 1,
         ButtonsGroupColumns: 3,
@@ -90,11 +90,10 @@ async function mainKeyboardViber(userProfile, userId) {
             },
         ],
     };
-    return MAIN_KEYBOARD;
 }
 exports.mainKeyboardViber = mainKeyboardViber;
 async function findKeyboardViber(finded, chatId) {
-    const findKeyboard = {
+    return {
         Type: 'keyboard',
         Revision: 1,
         ButtonsGroupColumns: 3,
@@ -129,11 +128,10 @@ async function findKeyboardViber(finded, chatId) {
             },
         ],
     };
-    return findKeyboard;
 }
 exports.findKeyboardViber = findKeyboardViber;
 async function findMsgViber(finded) {
-    const msg = `Замовник: ${finded.name}.
+    return `Замовник: ${finded.name}.
       Дата події: ${finded.date}.
       Категорія: ${finded.category[0].subcategories[0].name}.
       Вимоги замовника: ${finded.description}.
@@ -141,11 +139,10 @@ async function findMsgViber(finded) {
       Гонорар: ${finded.price}.
       Кількість відгуків: ${finded.approve_count}.
       Статус: ${finded.active ? 'Активний' : 'Неактивний'}.\n`;
-    return msg;
 }
 exports.findMsgViber = findMsgViber;
 async function findOrderKeyboardViber(finded) {
-    const keyboard = {
+    return {
         Type: 'keyboard',
         Revision: 1,
         ButtonsGroupColumns: 3,
@@ -171,11 +168,10 @@ async function findOrderKeyboardViber(finded) {
             },
         ],
     };
-    return keyboard;
 }
 exports.findOrderKeyboardViber = findOrderKeyboardViber;
 async function findUsersKeyboardViber(finded) {
-    const keyboard = {
+    return {
         Type: 'keyboard',
         Revision: 1,
         ButtonsGroupColumns: 6,
@@ -192,11 +188,10 @@ async function findUsersKeyboardViber(finded) {
             },
         ],
     };
-    return keyboard;
 }
 exports.findUsersKeyboardViber = findUsersKeyboardViber;
 async function findOrderKeyboardViberActive(finded) {
-    const keyboard = {
+    return {
         Type: 'keyboard',
         Revision: 1,
         ButtonsGroupColumns: 3,
@@ -222,11 +217,10 @@ async function findOrderKeyboardViberActive(finded) {
             },
         ],
     };
-    return keyboard;
 }
 exports.findOrderKeyboardViberActive = findOrderKeyboardViberActive;
 async function reviewsKeyboard(chatId) {
-    const keyboard = {
+    return {
         Type: 'keyboard',
         Revision: 1,
         ButtonsGroupColumns: 3,
@@ -261,11 +255,10 @@ async function reviewsKeyboard(chatId) {
             },
         ],
     };
-    return keyboard;
 }
 exports.reviewsKeyboard = reviewsKeyboard;
 async function reviewsKeyboardUser(user) {
-    const keyboard = {
+    return {
         Type: 'keyboard',
         Revision: 1,
         ButtonsGroupColumns: 3,
@@ -300,7 +293,6 @@ async function reviewsKeyboardUser(user) {
             },
         ],
     };
-    return keyboard;
 }
 exports.reviewsKeyboardUser = reviewsKeyboardUser;
 //# sourceMappingURL=main.keyboard.js.map
