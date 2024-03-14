@@ -290,8 +290,7 @@ export class UsersController {
     @Req() request: any,
     @Body() password: PasswordUserDto,
   ) {
-    await this.usersService.deleteUserProfile(request, password);
-    return res.redirect(`${process.env.FRONT_LINK}`);
+    return await this.usersService.deleteUserProfile(request, password);
   }
 
   @ApiOperation({

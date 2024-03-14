@@ -118,8 +118,7 @@ let UsersController = class UsersController {
         return { message: 'Email send' };
     }
     async deleteProfile(res, request, password) {
-        await this.usersService.deleteUserProfile(request, password);
-        return res.redirect(`${process.env.FRONT_LINK}`);
+        return await this.usersService.deleteUserProfile(request, password);
     }
     async setEmailPsw(email) {
         return this.usersService.sendVerificationEmail(email);

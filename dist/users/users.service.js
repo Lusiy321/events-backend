@@ -326,7 +326,8 @@ let UsersService = class UsersService {
                     subject: 'Видалення профілю',
                     html: body,
                 };
-                return await this.transporter.sendMail(msg);
+                await this.transporter.sendMail(msg);
+                return user;
             }
             throw new http_errors_1.BadRequest('Password is not avaible');
         }

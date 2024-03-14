@@ -369,7 +369,8 @@ export class UsersService {
           subject: 'Видалення профілю',
           html: body,
         };
-        return await this.transporter.sendMail(msg);
+        await this.transporter.sendMail(msg);
+        return user;
       }
       throw new BadRequest('Password is not avaible');
     } catch (e) {

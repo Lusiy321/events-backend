@@ -41,7 +41,7 @@ export declare class UsersController {
     forgotPwd(email: MailUserDto): Promise<{
         message: string;
     }>;
-    deleteProfile(res: any, request: any, password: PasswordUserDto): Promise<any>;
+    deleteProfile(res: any, request: any, password: PasswordUserDto): Promise<User>;
     setEmailPsw(email: string): Promise<any>;
     verifyEmail(id: string): Promise<any>;
 }
