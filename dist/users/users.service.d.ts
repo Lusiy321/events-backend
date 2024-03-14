@@ -9,12 +9,14 @@ import { Categories } from './dto/caterory.interface';
 import * as nodemailer from 'nodemailer';
 import { LoginUserDto } from './dto/login.user.dto';
 import { PasswordUserDto } from './dto/password.user.dto';
+import { CloudinaryService } from './cloudinary.service';
 export declare const TRANSPORTER_PROVIDER = "TRANSPORTER_PROVIDER";
 export declare class UsersService {
     private userModel;
     private categoryModel;
     private transporter;
-    constructor(userModel: User, categoryModel: Category, transporter: nodemailer.Transporter);
+    private readonly cloudinaryService;
+    constructor(userModel: User, categoryModel: Category, transporter: nodemailer.Transporter, cloudinaryService: CloudinaryService);
     findAllUsers(): Promise<User[]>;
     findById(id: string): Promise<User>;
     create(user: CreateUserDto): Promise<User>;

@@ -25,12 +25,15 @@ const parse_user_1 = require("./utils/parse.user");
 const nodemailer = require("nodemailer");
 const email_changePassword_1 = require("./utils/emails/email.changePassword");
 const email_restorePassword_1 = require("./utils/emails/email.restorePassword");
+const cloudinary_service_1 = require("./cloudinary.service");
+const email_delete_1 = require("./utils/emails/email.delete");
 exports.TRANSPORTER_PROVIDER = 'TRANSPORTER_PROVIDER';
 let UsersService = class UsersService {
-    constructor(userModel, categoryModel, transporter) {
+    constructor(userModel, categoryModel, transporter, cloudinaryService) {
         this.userModel = userModel;
         this.categoryModel = categoryModel;
         this.transporter = transporter;
+        this.cloudinaryService = cloudinaryService;
         this.transporter = nodemailer.createTransport({
             host: 'smtp.zoho.eu',
             port: 465,
@@ -305,15 +308,18 @@ let UsersService = class UsersService {
         }
     }
     async deleteUserProfile(req, userPassword) {
-        const user = await this.findToken(req);
-        if (!user) {
-            throw new http_errors_1.Unauthorized('jwt expired');
-        }
         try {
+            const user = await this.findToken(req);
+            if (!user) {
+                throw new http_errors_1.Unauthorized('jwt expired');
+            }
             const { password } = userPassword;
             if (user.comparePassword(password) === true) {
+                for (const photo of user.photo) {
+                    await this.cloudinaryService.deleteImage(user, photo.publicId);
+                }
                 await this.userModel.findByIdAndRemove({ _id: user._id });
-                const body = delUserMsg;
+                const body = email_delete_1.delUserMsg;
                 const msg = {
                     to: user.email,
                     from: process.env.NOREPLY_MAIL,
@@ -590,7 +596,7 @@ exports.UsersService = UsersService = __decorate([
     __param(1, (0, mongoose_1.InjectModel)(category_model_1.Category.name)),
     __param(2, (0, common_1.Inject)(exports.TRANSPORTER_PROVIDER)),
     __metadata("design:paramtypes", [users_model_1.User,
-        category_model_1.Category, Object])
+        category_model_1.Category, Object, cloudinary_service_1.CloudinaryService])
 ], UsersService);
 users_model_1.UserSchema.methods.setPassword = async function (password) {
     return (this.password = (0, bcryptjs_1.hashSync)(password, 10));

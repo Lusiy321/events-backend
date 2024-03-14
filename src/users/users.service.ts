@@ -25,6 +25,8 @@ import { LoginUserDto } from './dto/login.user.dto';
 import { PasswordUserDto } from './dto/password.user.dto';
 import { changePasswordEmailMsg } from './utils/emails/email.changePassword';
 import { restorePasswordEmailMsg } from './utils/emails/email.restorePassword';
+import { CloudinaryService } from './cloudinary.service';
+import { delUserMsg } from './utils/emails/email.delete';
 export const TRANSPORTER_PROVIDER = 'TRANSPORTER_PROVIDER';
 
 @Injectable()
@@ -35,6 +37,7 @@ export class UsersService {
     @InjectModel(Category.name) private categoryModel: Category,
     @Inject(TRANSPORTER_PROVIDER)
     private transporter: nodemailer.Transporter,
+    private readonly cloudinaryService: CloudinaryService,
   ) {
     this.transporter = nodemailer.createTransport({
       host: 'smtp.zoho.eu',
@@ -348,13 +351,16 @@ export class UsersService {
     req: any,
     userPassword: PasswordUserDto,
   ): Promise<User> {
-    const user = await this.findToken(req);
-    if (!user) {
-      throw new Unauthorized('jwt expired');
-    }
     try {
+      const user = await this.findToken(req);
+      if (!user) {
+        throw new Unauthorized('jwt expired');
+      }
       const { password } = userPassword;
       if (user.comparePassword(password) === true) {
+        for (const photo of user.photo) {
+          await this.cloudinaryService.deleteImage(user, photo.publicId);
+        }
         await this.userModel.findByIdAndRemove({ _id: user._id });
         const body = delUserMsg;
         const msg = {
