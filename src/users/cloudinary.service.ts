@@ -81,6 +81,20 @@ export class CloudinaryService {
     });
   }
 
+  async deleteAllImages(user: User): Promise<void> {
+    try {
+      const publicIds = user.photo.map((photo) => photo.publicId);
+
+      const deletePromises = publicIds.map((publicId) =>
+        this.deleteImage(user, publicId),
+      );
+
+      await Promise.all(deletePromises);
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async deleteImage(user: User, photoId: string): Promise<void> {
     return new Promise(async (resolve, reject) => {
       try {

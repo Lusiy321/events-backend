@@ -358,9 +358,7 @@ export class UsersService {
       }
       const { password } = userPassword;
       if (user.comparePassword(password) === true) {
-        for (const photo of user.photo) {
-          await this.cloudinaryService.deleteImage(user, photo.publicId);
-        }
+        await this.cloudinaryService.deleteAllImages(user);
         await this.userModel.findByIdAndRemove({ _id: user._id });
         const body = delUserMsg;
         const msg = {
