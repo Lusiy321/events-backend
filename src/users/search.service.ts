@@ -33,7 +33,13 @@ export class SearchService {
       if (!req && !loc && !cat && !subcat) {
         const result = await this.userModel
           .aggregate([
-            { $match: { verify: true } },
+            {
+              $match: {
+                verify: true,
+                title: { $exists: true },
+                description: { $exists: true },
+              },
+            },
             { $sample: { size: limit } },
           ])
           .limit(limit)
