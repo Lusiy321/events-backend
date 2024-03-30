@@ -37,9 +37,9 @@ import { diskStorage } from 'multer';
 import * as path from 'path';
 import { DelUserMediaDto } from './dto/delete.user.dto';
 import { FacebookAuthGuard } from './utils/GuardFacebook';
-import { Categories } from './dto/caterory.interface';
 import { SearchService } from './search.service';
 import { PasswordUserDto } from './dto/password.user.dto';
+import { Categories } from './utils/user.types';
 
 @ApiTags('User')
 @Controller('users')

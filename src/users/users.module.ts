@@ -14,12 +14,19 @@ import { FacebookStrategy } from './utils/FacebookStrategy';
 import * as nodemailer from 'nodemailer';
 import { SearchService } from './search.service';
 import { OrderSchema, Orders } from 'src/orders/order.model';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { UsersResolver } from './users.resolver';
 
 @Module({
   imports: [
     JwtModule.register({
       secret: process.env.SECRET_KEY,
       signOptions: { expiresIn: '1day' },
+    }),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: true,
     }),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema, collection: 'users' },
@@ -53,6 +60,7 @@ import { OrderSchema, Orders } from 'src/orders/order.model';
         });
       },
     },
+    UsersResolver,
   ],
   exports: [
     UsersService,

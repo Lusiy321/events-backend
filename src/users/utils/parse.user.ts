@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { UpdateUserDto } from '../dto/update.user.dto';
+import { User } from '../users.model';
 
 export async function mergeAndRemoveDuplicates(...arrays: any[]) {
   const mergedArray = [].concat(...arrays);
@@ -10,7 +10,7 @@ export async function mergeAndRemoveDuplicates(...arrays: any[]) {
   return randomArray;
 }
 
-export async function paginateArray(array: UpdateUserDto[], page: any) {
+export async function paginateArray(array: User[], page: any) {
   const pageSize = 8;
   const startIndex = (page - 1) * pageSize;
   const endIndex = startIndex + pageSize;

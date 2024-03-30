@@ -1,4 +1,4 @@
-import { Categories } from 'src/users/dto/caterory.interface';
+import { Categories } from 'src/users/utils/user.types';
 export declare class CreateOrderDto {
     readonly phone: string;
     readonly name: string;

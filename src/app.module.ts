@@ -22,6 +22,8 @@ import { Banner, BannerSchema } from './banners/banners.model';
 import { PostSchema, Posts } from './posts/posts.model';
 import { ValidationOrders } from './middleware/validation.orders';
 import { ValidationUsers } from './middleware/validation.users';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { GraphQLModule } from '@nestjs/graphql';
 
 @Module({
   controllers: [UsersController, AdminController],
@@ -29,6 +31,10 @@ import { ValidationUsers } from './middleware/validation.users';
   imports: [
     ConfigModule.forRoot({
       envFilePath: `.env`,
+    }),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: true,
     }),
     MongooseModule.forRoot(process.env.DB_HOST),
     MongooseModule.forFeature([

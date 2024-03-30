@@ -32,6 +32,7 @@ const delete_user_dto_1 = require("./dto/delete.user.dto");
 const GuardFacebook_1 = require("./utils/GuardFacebook");
 const search_service_1 = require("./search.service");
 const password_user_dto_1 = require("./dto/password.user.dto");
+const user_types_1 = require("./utils/user.types");
 let UsersController = class UsersController {
     constructor(usersService, searchService, cloudinaryService) {
         this.usersService = usersService;
@@ -214,7 +215,7 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:paramtypes", [user_types_1.Categories, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "updateCat", null);
 __decorate([

@@ -5,11 +5,11 @@ import { PasswordChangeDto } from './dto/change-password.user.dto';
 import { MailUserDto } from './dto/email.user.dto';
 import { GoogleUserDto } from './dto/google.user.dto';
 import { Category } from './category.model';
-import { Categories } from './dto/caterory.interface';
 import * as nodemailer from 'nodemailer';
 import { LoginUserDto } from './dto/login.user.dto';
 import { PasswordUserDto } from './dto/password.user.dto';
 import { CloudinaryService } from './cloudinary.service';
+import { Categories } from './utils/user.types';
 export declare const TRANSPORTER_PROVIDER = "TRANSPORTER_PROVIDER";
 export declare class UsersService {
     private userModel;

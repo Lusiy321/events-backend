@@ -28,6 +28,8 @@ const banners_model_1 = require("./banners/banners.model");
 const posts_model_1 = require("./posts/posts.model");
 const validation_orders_1 = require("./middleware/validation.orders");
 const validation_users_1 = require("./middleware/validation.users");
+const apollo_1 = require("@nestjs/apollo");
+const graphql_1 = require("@nestjs/graphql");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer.apply(validation_orders_1.ValidationOrders).forRoutes('./orders/orders.controller');
@@ -42,6 +44,10 @@ exports.AppModule = AppModule = __decorate([
         imports: [
             config_1.ConfigModule.forRoot({
                 envFilePath: `.env`,
+            }),
+            graphql_1.GraphQLModule.forRoot({
+                driver: apollo_1.ApolloDriver,
+                autoSchemaFile: true,
             }),
             mongoose_1.MongooseModule.forRoot(process.env.DB_HOST),
             mongoose_1.MongooseModule.forFeature([

@@ -8,8 +8,8 @@ import {
   shuffleArray,
 } from './utils/parse.user';
 import { NotFound } from 'http-errors';
-import { search_result } from './dto/update.user.dto';
 import { Orders } from '../orders/order.model';
+import { search_result } from './dto/update.user.dto';
 
 @Injectable()
 export class SearchService {

@@ -8,9 +8,9 @@ import { MailUserDto } from './dto/email.user.dto';
 import { Category } from './category.model';
 import { CloudinaryService } from './cloudinary.service';
 import { DelUserMediaDto } from './dto/delete.user.dto';
-import { Categories } from './dto/caterory.interface';
 import { SearchService } from './search.service';
 import { PasswordUserDto } from './dto/password.user.dto';
+import { Categories } from './utils/user.types';
 export declare class UsersController {
     private readonly usersService;
     private readonly searchService;

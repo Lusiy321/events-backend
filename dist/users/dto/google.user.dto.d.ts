@@ -1,4 +1,4 @@
-import { Photo } from '../users.model';
+import { Photo } from '../utils/user.types';
 export declare class GoogleUserDto {
     readonly firstName: string;
     readonly email: string;

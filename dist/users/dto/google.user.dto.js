@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GoogleUserDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
+const user_types_1 = require("../utils/user.types");
 class GoogleUserDto {
 }
 exports.GoogleUserDto = GoogleUserDto;
@@ -41,6 +42,6 @@ __decorate([
         },
         description: 'User master photo',
     }),
-    __metadata("design:type", Object)
+    __metadata("design:type", user_types_1.Photo)
 ], GoogleUserDto.prototype, "avatar", void 0);
 //# sourceMappingURL=google.user.dto.js.map

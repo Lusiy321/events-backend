@@ -23,7 +23,7 @@
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
 import { Model } from 'mongoose';
-import { Categories } from 'src/users/dto/caterory.interface';
+import { Categories } from 'src/users/utils/user.types';
 export type OrdersDocument = Orders & Document;
 export declare class Orders extends Model<Orders> {
     phone: string;

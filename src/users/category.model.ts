@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Model } from 'mongoose';
-import { Subcategory } from './dto/caterory.interface';
+import { Subcategory } from './utils/user.types';
 
 export type CategoryDocument = Category & Document;
 

@@ -16,7 +16,7 @@ import { admSelect } from './dto/role.admin.dto';
 import { CreateCategoryDto } from 'src/users/dto/create.category.dto';
 import { Category } from 'src/users/category.model';
 import { rows } from 'src/users/utils/parse.user';
-import { Subcategory } from 'src/users/dto/caterory.interface';
+import { Subcategory } from 'src/users/utils/user.types';
 
 @Injectable()
 export class AdminService {

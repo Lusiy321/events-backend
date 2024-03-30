@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
-import { Categories } from 'src/users/dto/caterory.interface';
+import { Categories } from 'src/users/utils/user.types';
 
 export class CreateOrderDto {
   @ApiProperty({ example: '380985633225', description: 'User phone' })

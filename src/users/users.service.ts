@@ -17,7 +17,6 @@ import { PasswordChangeDto } from './dto/change-password.user.dto';
 import { MailUserDto } from './dto/email.user.dto';
 import { GoogleUserDto } from './dto/google.user.dto';
 import { Category } from './category.model';
-import { Categories } from './dto/caterory.interface';
 import { verifyEmailMsg } from './utils/emails/email.schemas';
 import { rows } from './utils/parse.user';
 import * as nodemailer from 'nodemailer';
@@ -27,6 +26,7 @@ import { changePasswordEmailMsg } from './utils/emails/email.changePassword';
 import { restorePasswordEmailMsg } from './utils/emails/email.restorePassword';
 import { CloudinaryService } from './cloudinary.service';
 import { delUserMsg } from './utils/emails/email.delete';
+import { Categories } from './utils/user.types';
 export const TRANSPORTER_PROVIDER = 'TRANSPORTER_PROVIDER';
 
 @Injectable()

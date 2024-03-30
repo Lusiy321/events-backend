@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Model } from 'mongoose';
-import { Categories } from 'src/users/dto/caterory.interface';
+import { Categories } from 'src/users/utils/user.types';
 
 export type OrdersDocument = OrdersArchive & Document;
 

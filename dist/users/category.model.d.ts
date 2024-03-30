@@ -23,7 +23,7 @@
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
 import { Model } from 'mongoose';
-import { Subcategory } from './dto/caterory.interface';
+import { Subcategory } from './utils/user.types';
 export type CategoryDocument = Category & Document;
 export declare class Category extends Model<Category> {
     name: string;

@@ -7,7 +7,7 @@ import { UpdateUserAdmDto } from './dto/update.user.adm.dto';
 import { LoginAdminDto } from './dto/login.admin.dto';
 import { CreateCategoryDto } from 'src/users/dto/create.category.dto';
 import { Category } from 'src/users/category.model';
-import { Subcategory } from 'src/users/dto/caterory.interface';
+import { Subcategory } from 'src/users/utils/user.types';
 export declare class AdminService {
     private adminModel;
     private userModel;

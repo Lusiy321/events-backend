@@ -10,12 +10,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PasswordUserDto = void 0;
+const graphql_1 = require("@nestjs/graphql");
 const swagger_1 = require("@nestjs/swagger");
-class PasswordUserDto {
-}
+let PasswordUserDto = class PasswordUserDto {
+};
 exports.PasswordUserDto = PasswordUserDto;
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'Vovan-123545', description: 'User password' }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], PasswordUserDto.prototype, "password", void 0);
+exports.PasswordUserDto = PasswordUserDto = __decorate([
+    (0, graphql_1.InputType)('PasswordUser')
+], PasswordUserDto);
 //# sourceMappingURL=password.user.dto.js.map

@@ -2,13 +2,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Model } from 'mongoose';
-import { Categories } from './dto/caterory.interface';
-import { verify } from './dto/verify.user.dto';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Photo, Social, Categories } from './utils/user.types';
 
 export type UserDocument = User & Document;
-
+@ObjectType('User')
 @Schema({ versionKey: false, timestamps: true })
 export class User extends Model<User> {
+  @Field(() => ID)
+  _id: string;
   @ApiProperty({ example: 'Volodymyr', description: 'User first name' })
   @Prop({
     type: String,
@@ -16,10 +18,12 @@ export class User extends Model<User> {
     maxlength: 20,
     required: [true, 'User name is required'],
   })
+  @Field()
   firstName: string;
 
   @ApiProperty({ example: 'zelenskiy@gmail.com', description: 'User email' })
   @Prop({ type: String, required: [true, 'Email is required'] })
+  @Field()
   email: string;
 
   @ApiProperty({ example: 'Vovan-123545', description: 'User password' })
@@ -28,6 +32,7 @@ export class User extends Model<User> {
     minlength: 8,
     required: [true, 'Password is required'],
   })
+  @Field()
   password: string;
 
   @ApiProperty({ example: 'My music work', description: 'User post title' })
@@ -36,12 +41,14 @@ export class User extends Model<User> {
     minlength: 2,
     maxlength: 30,
   })
+  @Field()
   title: string;
 
   @ApiProperty({ example: 'I sing song', description: 'User post description' })
   @Prop({
     type: String,
   })
+  @Field()
   description: string;
 
   @ApiProperty({
@@ -53,6 +60,7 @@ export class User extends Model<User> {
     minlength: 10,
     maxlength: 13,
   })
+  @Field()
   phone: string;
 
   @ApiProperty({
@@ -64,12 +72,14 @@ export class User extends Model<User> {
     minlength: 3,
     maxlength: 15,
   })
+  @Field()
   telegram: string;
 
   @Prop({
     type: Number,
     default: null,
   })
+  @Field()
   tg_chat: number;
 
   @ApiProperty({
@@ -79,12 +89,14 @@ export class User extends Model<User> {
   @Prop({
     type: String,
   })
+  @Field()
   viber: string;
 
   @Prop({
     type: String,
     default: null,
   })
+  @Field()
   viber_chat: string;
 
   @ApiProperty({
@@ -96,6 +108,7 @@ export class User extends Model<User> {
     minlength: 10,
     maxlength: 13,
   })
+  @Field()
   whatsapp: string;
 
   @ApiProperty({
@@ -106,6 +119,7 @@ export class User extends Model<User> {
     type: String,
     default: 'Місто не обрано',
   })
+  @Field()
   location: string;
 
   @ApiProperty({
@@ -116,12 +130,13 @@ export class User extends Model<User> {
     description: 'User master photo',
   })
   @Prop({
-    type: Object,
+    type: Photo,
     default: {
       publicId: '1',
       url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kidn51ekkbiuqne4mbpl.jpg',
     },
   })
+  @Field()
   master_photo: Photo;
 
   @ApiProperty({
@@ -132,12 +147,13 @@ export class User extends Model<User> {
     description: 'User master photo',
   })
   @Prop({
-    type: Object,
+    type: Photo,
     default: {
       publicId: '1',
       url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kglf7c13u3aagffbdlmo.png',
     },
   })
+  @Field()
   avatar: Photo;
 
   @ApiProperty({
@@ -154,9 +170,10 @@ export class User extends Model<User> {
     description: 'User photo',
   })
   @Prop({
-    type: Array<Object>,
+    type: [Photo],
     default: [],
   })
+  @Field(() => [Photo])
   photo: Photo[];
 
   @ApiProperty({
@@ -173,9 +190,10 @@ export class User extends Model<User> {
     description: 'User video',
   })
   @Prop({
-    type: Array<Object>,
+    type: [Photo],
     default: [],
   })
+  @Field(() => [Photo])
   video: Photo[];
 
   @ApiProperty({
@@ -206,9 +224,10 @@ export class User extends Model<User> {
     description: 'User category',
   })
   @Prop({
-    type: Array<Object>,
+    type: [Categories],
     default: [],
   })
+  @Field(() => [Categories])
   category: Categories[];
 
   @ApiProperty({ example: 'true', description: 'User status' })
@@ -216,6 +235,7 @@ export class User extends Model<User> {
     type: Boolean,
     default: false,
   })
+  @Field()
   isOnline: boolean;
 
   @ApiProperty({ example: 'true', description: 'User paid' })
@@ -223,6 +243,7 @@ export class User extends Model<User> {
     type: Boolean,
     default: false,
   })
+  @Field()
   paid: boolean;
 
   @ApiProperty({ example: 'true', description: 'User trial period' })
@@ -230,6 +251,7 @@ export class User extends Model<User> {
     type: Boolean,
     default: false,
   })
+  @Field()
   trial: boolean;
 
   @ApiProperty({
@@ -237,6 +259,7 @@ export class User extends Model<User> {
     description: 'User price',
   })
   @Prop({ type: String })
+  @Field()
   price: string;
 
   @ApiProperty({
@@ -255,6 +278,7 @@ export class User extends Model<User> {
     description: 'JWT token',
   })
   @Prop({ type: String, default: null })
+  @Field()
   token: string;
 
   @ApiProperty({
@@ -263,6 +287,7 @@ export class User extends Model<User> {
     description: 'JWT token',
   })
   @Prop({ type: String, default: null })
+  @Field()
   refresh_token: string;
 
   @ApiProperty({ example: 'new', description: 'User moderate status' })
@@ -270,18 +295,23 @@ export class User extends Model<User> {
     type: String,
     default: 'new',
   })
+  @Field()
   verified: string;
+
   @ApiProperty({ example: false, description: 'User email verify' })
   @Prop({
     type: Boolean,
     default: false,
   })
+  @Field()
   verify: boolean;
+
   @ApiProperty({
     example: 'wVl3VGGX675UCqOFrLx-1xNH-GObq9v7GbZj0s',
     description: 'Google ID',
   })
   @Prop({ type: String })
+  @Field()
   googleId: string;
 
   @ApiProperty({
@@ -289,12 +319,14 @@ export class User extends Model<User> {
     description: 'facebook ID',
   })
   @Prop({ type: String })
+  @Field()
   facebookId: string;
 
   @Prop({
     type: String,
     default: process.env.MASTER,
   })
+  @Field()
   metaUrl: string;
 
   @ApiProperty({ example: 'false', description: 'User ban status' })
@@ -302,27 +334,37 @@ export class User extends Model<User> {
     type: Boolean,
     default: false,
   })
+  @Field()
   ban: boolean;
+
   @Prop({
     type: Number,
     default: 0,
   })
+  @Field()
   totalRating: number;
+
   @Prop({
     type: Number,
     default: 0,
   })
+  @Field()
   numberOfRatings: number;
+
   @Prop({
     type: Number,
     default: 0,
   })
+  @Field()
   agree_order: number;
+
   @Prop({
     type: Number,
     default: 0,
   })
+  @Field()
   disagree_order: number;
+
   @Prop({
     type: Date,
   })
@@ -331,11 +373,14 @@ export class User extends Model<User> {
     type: Date,
     default: new Date(),
   })
+  @Field()
   paidEnds: Date;
+
   @Prop({
     type: Boolean,
     default: false,
   })
+  @Field()
   register: boolean;
 
   @Prop({ type: Array, default: [] })
@@ -343,21 +388,3 @@ export class User extends Model<User> {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
-
-export interface Photo {
-  publicId: string;
-  url: string;
-}
-
-export interface Social {
-  Instagram?: string;
-  Facebook?: string;
-  Youtube?: string;
-  TikTok?: string;
-  Vimeo?: string;
-  SoundCloud?: string;
-  Spotify?: string;
-  AppleMusic?: string;
-  Deezer?: string;
-  WebSite?: string;
-}

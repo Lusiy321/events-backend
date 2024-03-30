@@ -10,20 +10,24 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateUserDto = void 0;
+const graphql_1 = require("@nestjs/graphql");
 const swagger_1 = require("@nestjs/swagger");
-class CreateUserDto {
-}
+let CreateUserDto = class CreateUserDto {
+};
 exports.CreateUserDto = CreateUserDto;
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'zelenskiy@gmail.com', description: 'User email' }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "email", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'Vovan-123545', description: 'User password' }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "password", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'Volodymyr', description: 'User first name' }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "firstName", void 0);
 __decorate([
@@ -31,6 +35,10 @@ __decorate([
         example: '380987894556',
         description: 'User phone number',
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "phone", void 0);
+exports.CreateUserDto = CreateUserDto = __decorate([
+    (0, graphql_1.InputType)()
+], CreateUserDto);
 //# sourceMappingURL=create.user.dto.js.map

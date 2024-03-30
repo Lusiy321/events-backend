@@ -13,9 +13,15 @@ exports.UserSchema = exports.User = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const swagger_1 = require("@nestjs/swagger");
 const mongoose_2 = require("mongoose");
+const graphql_1 = require("@nestjs/graphql");
+const user_types_1 = require("./utils/user.types");
 let User = class User extends mongoose_2.Model {
 };
 exports.User = User;
+__decorate([
+    (0, graphql_1.Field)(() => graphql_1.ID),
+    __metadata("design:type", String)
+], User.prototype, "_id", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'Volodymyr', description: 'User first name' }),
     (0, mongoose_1.Prop)({
@@ -24,11 +30,13 @@ __decorate([
         maxlength: 20,
         required: [true, 'User name is required'],
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], User.prototype, "firstName", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'zelenskiy@gmail.com', description: 'User email' }),
     (0, mongoose_1.Prop)({ type: String, required: [true, 'Email is required'] }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
 __decorate([
@@ -38,6 +46,7 @@ __decorate([
         minlength: 8,
         required: [true, 'Password is required'],
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
 __decorate([
@@ -47,6 +56,7 @@ __decorate([
         minlength: 2,
         maxlength: 30,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], User.prototype, "title", void 0);
 __decorate([
@@ -54,6 +64,7 @@ __decorate([
     (0, mongoose_1.Prop)({
         type: String,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], User.prototype, "description", void 0);
 __decorate([
@@ -66,6 +77,7 @@ __decorate([
         minlength: 10,
         maxlength: 13,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], User.prototype, "phone", void 0);
 __decorate([
@@ -78,6 +90,7 @@ __decorate([
         minlength: 3,
         maxlength: 15,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], User.prototype, "telegram", void 0);
 __decorate([
@@ -85,6 +98,7 @@ __decorate([
         type: Number,
         default: null,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", Number)
 ], User.prototype, "tg_chat", void 0);
 __decorate([
@@ -95,6 +109,7 @@ __decorate([
     (0, mongoose_1.Prop)({
         type: String,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], User.prototype, "viber", void 0);
 __decorate([
@@ -102,6 +117,7 @@ __decorate([
         type: String,
         default: null,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], User.prototype, "viber_chat", void 0);
 __decorate([
@@ -114,6 +130,7 @@ __decorate([
         minlength: 10,
         maxlength: 13,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], User.prototype, "whatsapp", void 0);
 __decorate([
@@ -125,6 +142,7 @@ __decorate([
         type: String,
         default: 'Місто не обрано',
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], User.prototype, "location", void 0);
 __decorate([
@@ -136,13 +154,14 @@ __decorate([
         description: 'User master photo',
     }),
     (0, mongoose_1.Prop)({
-        type: Object,
+        type: user_types_1.Photo,
         default: {
             publicId: '1',
             url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kidn51ekkbiuqne4mbpl.jpg',
         },
     }),
-    __metadata("design:type", Object)
+    (0, graphql_1.Field)(),
+    __metadata("design:type", user_types_1.Photo)
 ], User.prototype, "master_photo", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
@@ -153,13 +172,14 @@ __decorate([
         description: 'User master photo',
     }),
     (0, mongoose_1.Prop)({
-        type: Object,
+        type: user_types_1.Photo,
         default: {
             publicId: '1',
             url: 'https://res.cloudinary.com/dciy3u6un/image/upload/v1701114073/service/kglf7c13u3aagffbdlmo.png',
         },
     }),
-    __metadata("design:type", Object)
+    (0, graphql_1.Field)(),
+    __metadata("design:type", user_types_1.Photo)
 ], User.prototype, "avatar", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
@@ -176,9 +196,10 @@ __decorate([
         description: 'User photo',
     }),
     (0, mongoose_1.Prop)({
-        type: (Array),
+        type: [user_types_1.Photo],
         default: [],
     }),
+    (0, graphql_1.Field)(() => [user_types_1.Photo]),
     __metadata("design:type", Array)
 ], User.prototype, "photo", void 0);
 __decorate([
@@ -196,9 +217,10 @@ __decorate([
         description: 'User video',
     }),
     (0, mongoose_1.Prop)({
-        type: (Array),
+        type: [user_types_1.Photo],
         default: [],
     }),
+    (0, graphql_1.Field)(() => [user_types_1.Photo]),
     __metadata("design:type", Array)
 ], User.prototype, "video", void 0);
 __decorate([
@@ -230,9 +252,10 @@ __decorate([
         description: 'User category',
     }),
     (0, mongoose_1.Prop)({
-        type: (Array),
+        type: [user_types_1.Categories],
         default: [],
     }),
+    (0, graphql_1.Field)(() => [user_types_1.Categories]),
     __metadata("design:type", Array)
 ], User.prototype, "category", void 0);
 __decorate([
@@ -241,6 +264,7 @@ __decorate([
         type: Boolean,
         default: false,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", Boolean)
 ], User.prototype, "isOnline", void 0);
 __decorate([
@@ -249,6 +273,7 @@ __decorate([
         type: Boolean,
         default: false,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", Boolean)
 ], User.prototype, "paid", void 0);
 __decorate([
@@ -257,6 +282,7 @@ __decorate([
         type: Boolean,
         default: false,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", Boolean)
 ], User.prototype, "trial", void 0);
 __decorate([
@@ -265,6 +291,7 @@ __decorate([
         description: 'User price',
     }),
     (0, mongoose_1.Prop)({ type: String }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], User.prototype, "price", void 0);
 __decorate([
@@ -276,7 +303,7 @@ __decorate([
         type: Object,
         default: null,
     }),
-    __metadata("design:type", Object)
+    __metadata("design:type", user_types_1.Social)
 ], User.prototype, "social", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
@@ -284,6 +311,7 @@ __decorate([
         description: 'JWT token',
     }),
     (0, mongoose_1.Prop)({ type: String, default: null }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], User.prototype, "token", void 0);
 __decorate([
@@ -292,6 +320,7 @@ __decorate([
         description: 'JWT token',
     }),
     (0, mongoose_1.Prop)({ type: String, default: null }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], User.prototype, "refresh_token", void 0);
 __decorate([
@@ -300,6 +329,7 @@ __decorate([
         type: String,
         default: 'new',
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], User.prototype, "verified", void 0);
 __decorate([
@@ -308,6 +338,7 @@ __decorate([
         type: Boolean,
         default: false,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", Boolean)
 ], User.prototype, "verify", void 0);
 __decorate([
@@ -316,6 +347,7 @@ __decorate([
         description: 'Google ID',
     }),
     (0, mongoose_1.Prop)({ type: String }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], User.prototype, "googleId", void 0);
 __decorate([
@@ -324,6 +356,7 @@ __decorate([
         description: 'facebook ID',
     }),
     (0, mongoose_1.Prop)({ type: String }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], User.prototype, "facebookId", void 0);
 __decorate([
@@ -331,6 +364,7 @@ __decorate([
         type: String,
         default: process.env.MASTER,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], User.prototype, "metaUrl", void 0);
 __decorate([
@@ -339,6 +373,7 @@ __decorate([
         type: Boolean,
         default: false,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", Boolean)
 ], User.prototype, "ban", void 0);
 __decorate([
@@ -346,6 +381,7 @@ __decorate([
         type: Number,
         default: 0,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", Number)
 ], User.prototype, "totalRating", void 0);
 __decorate([
@@ -353,6 +389,7 @@ __decorate([
         type: Number,
         default: 0,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", Number)
 ], User.prototype, "numberOfRatings", void 0);
 __decorate([
@@ -360,6 +397,7 @@ __decorate([
         type: Number,
         default: 0,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", Number)
 ], User.prototype, "agree_order", void 0);
 __decorate([
@@ -367,6 +405,7 @@ __decorate([
         type: Number,
         default: 0,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", Number)
 ], User.prototype, "disagree_order", void 0);
 __decorate([
@@ -380,6 +419,7 @@ __decorate([
         type: Date,
         default: new Date(),
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", Date)
 ], User.prototype, "paidEnds", void 0);
 __decorate([
@@ -387,6 +427,7 @@ __decorate([
         type: Boolean,
         default: false,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", Boolean)
 ], User.prototype, "register", void 0);
 __decorate([
@@ -394,6 +435,7 @@ __decorate([
     __metadata("design:type", Array)
 ], User.prototype, "accepted_orders", void 0);
 exports.User = User = __decorate([
+    (0, graphql_1.ObjectType)('User'),
     (0, mongoose_1.Schema)({ versionKey: false, timestamps: true })
 ], User);
 exports.UserSchema = mongoose_1.SchemaFactory.createForClass(User);

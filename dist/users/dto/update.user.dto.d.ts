@@ -1,5 +1,5 @@
-import { Photo, Social } from '../users.model';
-import { verify } from './verify.user.dto';
+import { Photo, Social } from '../utils/user.types';
+import { User } from '../users.model';
 export declare class UpdateUserDto {
     readonly firstName: string;
     readonly title: string;
@@ -18,12 +18,12 @@ export declare class UpdateUserDto {
     readonly price: string;
     readonly paid: boolean;
     readonly trial: boolean;
-    readonly verify: verify;
+    readonly verify: string;
     readonly ban: boolean;
     readonly register: boolean;
 }
-export interface search_result {
+export declare class search_result {
     totalPages: number;
     currentPage: number;
-    data: UpdateUserDto[];
+    data: User[];
 }

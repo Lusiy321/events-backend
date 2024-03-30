@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
-import { Photo } from '../users.model';
+import { Photo } from '../utils/user.types';
 
 export class GoogleUserDto {
   @ApiProperty({ example: 'Volodymyr', description: 'User first name' })

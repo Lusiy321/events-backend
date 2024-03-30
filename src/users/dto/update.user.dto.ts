@@ -1,28 +1,37 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
-import { Photo, Social } from '../users.model';
-import { Categories } from './caterory.interface';
-import { verify } from './verify.user.dto';
+import { Photo, Social } from '../utils/user.types';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { User } from '../users.model';
 
+@InputType('UpdateUser')
 export class UpdateUserDto {
   @ApiProperty({ example: 'Volodymyr', description: 'User first name' })
+  @Field()
   readonly firstName: string;
   @ApiProperty({ example: 'My music work', description: 'User post title' })
+  @Field()
   readonly title: string;
   @ApiProperty({ example: 'I sing song', description: 'User post description' })
+  @Field()
   readonly description: string;
   @ApiProperty({ example: '380984561225', description: 'User phone' })
+  @Field()
   readonly phone: string;
   @ApiProperty({ example: 'YourLogin', description: 'User telegram login' })
+  @Field()
   readonly telegram: string;
   @ApiProperty({ example: 'YourLogin', description: 'User viber login' })
+  @Field()
   readonly viber: string;
   @ApiProperty({
     example: '380984561225',
     description: 'User whatsapp phone number',
   })
+  @Field()
   readonly whatsapp: string;
   @ApiProperty({ example: 'Kyiv', description: 'User location' })
+  @Field()
   readonly location: string;
   @ApiProperty({
     example: {
@@ -31,6 +40,7 @@ export class UpdateUserDto {
     },
     description: 'User master photo',
   })
+  @Field(() => Photo)
   readonly master_photo: Photo;
   @ApiProperty({
     example: {
@@ -39,6 +49,7 @@ export class UpdateUserDto {
     },
     description: 'User master photo',
   })
+  @Field(() => Photo)
   readonly avatar: Photo;
   @ApiProperty({
     example: {
@@ -47,6 +58,7 @@ export class UpdateUserDto {
     },
     description: 'User video',
   })
+  @Field(() => [Photo])
   readonly video: Photo[];
   @ApiProperty({
     example: [
@@ -61,30 +73,43 @@ export class UpdateUserDto {
     ],
     description: 'User photo',
   })
+  @Field(() => [Photo])
   readonly photo: Photo[];
   @ApiProperty({
     example: { Facebook: 'https://www.facebook.com/psmirnyj/' },
     description: 'User social links',
   })
+  @Field()
   readonly social: Social;
   @ApiProperty({ example: 'true', description: 'User status' })
+  @Field()
   readonly isOnline: boolean;
   @ApiProperty({ example: '100$', description: 'Price' })
+  @Field()
   readonly price: string;
   @ApiProperty({ example: 'true', description: 'User paid' })
+  @Field()
   readonly paid: boolean;
   @ApiProperty({ example: 'true', description: 'User trial period' })
+  @Field()
   readonly trial: boolean;
   @ApiProperty({ example: 'new', description: 'User moderate status' })
-  readonly verify: verify;
+  @Field()
+  readonly verify: string;
   @ApiProperty({ example: 'false', description: 'User ban status' })
+  @Field()
   readonly ban: boolean;
   @ApiProperty({ example: 'false', description: 'User register status' })
+  @Field()
   readonly register: boolean;
 }
 
-export interface search_result {
+@ObjectType('search_result')
+export class search_result {
+  @Field()
   totalPages: number;
+  @Field()
   currentPage: number;
-  data: UpdateUserDto[];
+  @Field(() => [User])
+  data: User[];
 }

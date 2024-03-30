@@ -1,6 +1,6 @@
 import { User } from './users.model';
-import { search_result } from './dto/update.user.dto';
 import { Orders } from '../orders/order.model';
+import { search_result } from './dto/update.user.dto';
 export declare class SearchService {
     private userModel;
     private ordersModel;

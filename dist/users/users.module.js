@@ -23,6 +23,9 @@ const FacebookStrategy_1 = require("./utils/FacebookStrategy");
 const nodemailer = require("nodemailer");
 const search_service_1 = require("./search.service");
 const order_model_1 = require("../orders/order.model");
+const graphql_1 = require("@nestjs/graphql");
+const apollo_1 = require("@nestjs/apollo");
+const users_resolver_1 = require("./users.resolver");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;
@@ -32,6 +35,10 @@ exports.UsersModule = UsersModule = __decorate([
             jwt_1.JwtModule.register({
                 secret: process.env.SECRET_KEY,
                 signOptions: { expiresIn: '1day' },
+            }),
+            graphql_1.GraphQLModule.forRoot({
+                driver: apollo_1.ApolloDriver,
+                autoSchemaFile: true,
             }),
             mongoose_1.MongooseModule.forFeature([
                 { name: users_model_1.User.name, schema: users_model_1.UserSchema, collection: 'users' },
@@ -65,6 +72,7 @@ exports.UsersModule = UsersModule = __decorate([
                     });
                 },
             },
+            users_resolver_1.UsersResolver,
         ],
         exports: [
             users_service_1.UsersService,

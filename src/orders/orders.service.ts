@@ -4,8 +4,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { NotFound, BadRequest, Conflict } from 'http-errors';
 import { CreateOrderDto } from './dto/create.order.dto';
 import { User } from 'src/users/users.model';
-import { Categories } from 'src/users/dto/caterory.interface';
 import { MesengersService } from 'src/orders/mesengers.service';
+import { Categories } from 'src/users/utils/user.types';
 
 @Injectable()
 export class OrdersService {
