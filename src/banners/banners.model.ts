@@ -16,7 +16,7 @@ export class Banner extends Model<Banner> {
   @Prop({
     type: String,
   })
-  img: string;
+  bannerImg: string;
 
   @ApiProperty({ example: 'Some text of banner', description: 'Banner text' })
   @Prop({
@@ -24,11 +24,16 @@ export class Banner extends Model<Banner> {
   })
   description: string;
 
-  @ApiProperty({ example: 'Link to user or site', description: 'Banner URL' })
+  @ApiProperty({ example: 'https://', description: 'Banner URL' })
   @Prop({
     type: String,
   })
   link: string;
+  @ApiProperty({ example: 'go', description: 'Button Name' })
+  @Prop({
+    type: String,
+  })
+  linkName: string;
 }
 
 export const BannerSchema = SchemaFactory.createForClass(Banner);

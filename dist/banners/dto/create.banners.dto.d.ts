@@ -1,5 +1,7 @@
 export declare class CreateBannerDto {
-    readonly img: string;
-    readonly text: string;
-    readonly role: string;
+    readonly title: string;
+    readonly bannerImg: string;
+    readonly description: string;
+    readonly link: string;
+    readonly linkName: string;
 }

@@ -9,50 +9,68 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BannerSchema = exports.Banner = void 0;
+exports.LiveSchema = exports.Live = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const swagger_1 = require("@nestjs/swagger");
 const mongoose_2 = require("mongoose");
-let Banner = class Banner extends mongoose_2.Model {
+let Live = class Live extends mongoose_2.Model {
 };
-exports.Banner = Banner;
+exports.Live = Live;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'title of banner', description: 'Banner title' }),
+    (0, swagger_1.ApiProperty)({ example: 'User ID', description: 'author of text' }),
     (0, mongoose_1.Prop)({
         type: String,
     }),
     __metadata("design:type", String)
-], Banner.prototype, "title", void 0);
+], Live.prototype, "author", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'https://', description: 'Banner img' }),
+    (0, swagger_1.ApiProperty)({ example: 'https://', description: 'User avatar img' }),
     (0, mongoose_1.Prop)({
         type: String,
     }),
     __metadata("design:type", String)
-], Banner.prototype, "bannerImg", void 0);
+], Live.prototype, "avatar", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Some text of banner', description: 'Banner text' }),
+    (0, swagger_1.ApiProperty)({ example: 'Some text', description: 'Users text of post' }),
     (0, mongoose_1.Prop)({
         type: String,
     }),
     __metadata("design:type", String)
-], Banner.prototype, "description", void 0);
+], Live.prototype, "content", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'https://', description: 'Banner URL' }),
+    (0, swagger_1.ApiProperty)({ example: 'https://', description: 'Img URL' }),
     (0, mongoose_1.Prop)({
         type: String,
+        default: null,
     }),
     __metadata("design:type", String)
-], Banner.prototype, "link", void 0);
+], Live.prototype, "image", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'go', description: 'Button Name' }),
     (0, mongoose_1.Prop)({
-        type: String,
+        type: Date,
+        default: new Date(),
     }),
-    __metadata("design:type", String)
-], Banner.prototype, "linkName", void 0);
-exports.Banner = Banner = __decorate([
-    (0, mongoose_1.Schema)({ versionKey: false, timestamps: true })
-], Banner);
-exports.BannerSchema = mongoose_1.SchemaFactory.createForClass(Banner);
-//# sourceMappingURL=banners.model.js.map
+    __metadata("design:type", Date)
+], Live.prototype, "date", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'some user ID', description: 'user IDs' }),
+    (0, mongoose_1.Prop)({
+        type: String,
+        default: [],
+    }),
+    __metadata("design:type", Array)
+], Live.prototype, "like", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'some user ID', description: 'user IDs' }),
+    (0, mongoose_1.Prop)({
+        type: String,
+        default: [],
+    }),
+    __metadata("design:type", Array)
+], Live.prototype, "dislikes", void 0);
+exports.Live = Live = __decorate([
+    (0, mongoose_1.Schema)({ versionKey: false, timestamps: false })
+], Live);
+exports.LiveSchema = mongoose_1.SchemaFactory.createForClass(Live);
+//# sourceMappingURL=live.model.js.map

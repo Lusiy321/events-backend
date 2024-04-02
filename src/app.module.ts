@@ -29,11 +29,16 @@ import { ValidationOrders } from './middleware/validation.orders';
 import { ValidationUsers } from './middleware/validation.users';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
+import { LiveModule } from './live/live.module';
 import * as cors from 'cors';
+import { Live, LiveSchema } from './live/live.model';
+import { LiveService } from './live/live.service';
+import { LiveController } from './live/live.controller';
+import { BannersService } from './banners/banners.service';
 
 @Module({
-  controllers: [UsersController, AdminController],
-  providers: [UsersService, AdminService],
+  controllers: [UsersController, AdminController, LiveController],
+  providers: [UsersService, AdminService, LiveService, BannersService],
   imports: [
     ConfigModule.forRoot({
       envFilePath: `.env`,
@@ -54,7 +59,7 @@ import * as cors from 'cors';
       { name: Orders.name, schema: OrderSchema, collection: 'orders' },
       { name: Banner.name, schema: BannerSchema, collection: 'banners' },
       { name: Posts.name, schema: PostSchema, collection: 'posts' },
-
+      { name: Live.name, schema: LiveSchema, collection: 'live' },
       {
         name: OrdersArchive.name,
         schema: OrdersArchiveSchema,
@@ -66,6 +71,7 @@ import * as cors from 'cors';
     AdminModule,
     PostsModule,
     BannersModule,
+    LiveModule,
   ],
 })
 export class AppModule implements NestModule {

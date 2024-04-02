@@ -12,7 +12,6 @@ import { OrdersService } from './orders.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Orders } from './order.model';
 import { CreateOrderDto } from './dto/create.order.dto';
-import { InjectModel } from '@nestjs/mongoose';
 import { SearchService } from 'src/users/search.service';
 
 @ApiTags('Orders')

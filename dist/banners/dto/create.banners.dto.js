@@ -15,18 +15,23 @@ class CreateBannerDto {
 }
 exports.CreateBannerDto = CreateBannerDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'title of banner', description: 'Banner title' }),
+    __metadata("design:type", String)
+], CreateBannerDto.prototype, "title", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({ example: 'https://', description: 'Banner img' }),
     __metadata("design:type", String)
-], CreateBannerDto.prototype, "img", void 0);
+], CreateBannerDto.prototype, "bannerImg", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'Some text of banner', description: 'Banner text' }),
     __metadata("design:type", String)
-], CreateBannerDto.prototype, "text", void 0);
+], CreateBannerDto.prototype, "description", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({
-        example: 'top',
-        description: 'Banner position: enum [top, left, right]',
-    }),
+    (0, swagger_1.ApiProperty)({ example: 'https://', description: 'Banner URL' }),
     __metadata("design:type", String)
-], CreateBannerDto.prototype, "role", void 0);
+], CreateBannerDto.prototype, "link", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'go', description: 'Button Name' }),
+    __metadata("design:type", String)
+], CreateBannerDto.prototype, "linkName", void 0);
 //# sourceMappingURL=create.banners.dto.js.map

@@ -30,7 +30,12 @@ const validation_orders_1 = require("./middleware/validation.orders");
 const validation_users_1 = require("./middleware/validation.users");
 const apollo_1 = require("@nestjs/apollo");
 const graphql_1 = require("@nestjs/graphql");
+const live_module_1 = require("./live/live.module");
 const cors = require("cors");
+const live_model_1 = require("./live/live.model");
+const live_service_1 = require("./live/live.service");
+const live_controller_1 = require("./live/live.controller");
+const banners_service_1 = require("./banners/banners.service");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer.apply(validation_orders_1.ValidationOrders).forRoutes('./orders/orders.controller');
@@ -44,8 +49,8 @@ let AppModule = class AppModule {
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        controllers: [users_controller_1.UsersController, admin_controller_1.AdminController],
-        providers: [users_service_1.UsersService, admin_service_1.AdminService],
+        controllers: [users_controller_1.UsersController, admin_controller_1.AdminController, live_controller_1.LiveController],
+        providers: [users_service_1.UsersService, admin_service_1.AdminService, live_service_1.LiveService, banners_service_1.BannersService],
         imports: [
             config_1.ConfigModule.forRoot({
                 envFilePath: `.env`,
@@ -65,6 +70,7 @@ exports.AppModule = AppModule = __decorate([
                 { name: order_model_1.Orders.name, schema: order_model_1.OrderSchema, collection: 'orders' },
                 { name: banners_model_1.Banner.name, schema: banners_model_1.BannerSchema, collection: 'banners' },
                 { name: posts_model_1.Posts.name, schema: posts_model_1.PostSchema, collection: 'posts' },
+                { name: live_model_1.Live.name, schema: live_model_1.LiveSchema, collection: 'live' },
                 {
                     name: order_archive_model_1.OrdersArchive.name,
                     schema: order_archive_model_1.OrdersArchiveSchema,
@@ -76,6 +82,7 @@ exports.AppModule = AppModule = __decorate([
             admin_module_1.AdminModule,
             posts_module_1.PostsModule,
             banners_module_1.BannersModule,
+            live_module_1.LiveModule,
         ],
     })
 ], AppModule);

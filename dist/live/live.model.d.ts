@@ -23,16 +23,18 @@
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
 import { Model } from 'mongoose';
-export type BannerDocument = Banner & Document;
-export declare class Banner extends Model<Banner> {
-    title: string;
-    bannerImg: string;
-    description: string;
-    link: string;
-    linkName: string;
+export type LiveDocument = Live & Document;
+export declare class Live extends Model<Live> {
+    author: string;
+    avatar: string;
+    content: string;
+    image: string;
+    date: Date;
+    like: Array<string>;
+    dislikes: Array<string>;
 }
-export declare const BannerSchema: import("mongoose").Schema<Banner, Model<Banner, any, any, any, import("mongoose").Document<unknown, any, Banner> & Banner & {
+export declare const LiveSchema: import("mongoose").Schema<Live, Model<Live, any, any, any, import("mongoose").Document<unknown, any, Live> & Live & {
     _id: import("mongoose").Types.ObjectId;
-}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Banner, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<Banner>> & import("mongoose").FlatRecord<Banner> & {
+}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Live, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<Live>> & import("mongoose").FlatRecord<Live> & {
     _id: import("mongoose").Types.ObjectId;
 }>;
