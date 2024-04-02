@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Subcategory = exports.Categories = exports.Social = exports.Photo = void 0;
+exports.Subcategories = exports.Categories = exports.Social = exports.Photo = void 0;
 const graphql_1 = require("@nestjs/graphql");
 let Photo = class Photo {
 };
@@ -83,24 +83,24 @@ __decorate([
     __metadata("design:type", String)
 ], Categories.prototype, "name", void 0);
 __decorate([
-    (0, graphql_1.Field)(() => [Subcategory]),
+    (0, graphql_1.Field)(() => [Subcategories]),
     __metadata("design:type", Array)
 ], Categories.prototype, "subcategories", void 0);
 exports.Categories = Categories = __decorate([
     (0, graphql_1.ObjectType)('Categories')
 ], Categories);
-let Subcategory = class Subcategory {
+let Subcategories = class Subcategories {
 };
-exports.Subcategory = Subcategory;
+exports.Subcategories = Subcategories;
 __decorate([
     (0, graphql_1.Field)(() => graphql_1.ID),
     __metadata("design:type", String)
-], Subcategory.prototype, "id", void 0);
+], Subcategories.prototype, "id", void 0);
 __decorate([
     (0, graphql_1.Field)(),
     __metadata("design:type", String)
-], Subcategory.prototype, "name", void 0);
-exports.Subcategory = Subcategory = __decorate([
+], Subcategories.prototype, "name", void 0);
+exports.Subcategories = Subcategories = __decorate([
     (0, graphql_1.ObjectType)('Subcategory')
-], Subcategory);
+], Subcategories);
 //# sourceMappingURL=user.types.js.map

@@ -17,9 +17,9 @@ export declare class Social {
 export declare class Categories {
     _id: string;
     name: string;
-    subcategories: Subcategory[];
+    subcategories: Subcategories[];
 }
-export declare class Subcategory {
+export declare class Subcategories {
     id: string;
     name: string;
 }

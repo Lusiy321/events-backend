@@ -16,7 +16,7 @@ import { admSelect } from './dto/role.admin.dto';
 import { CreateCategoryDto } from 'src/users/dto/create.category.dto';
 import { Category } from 'src/users/category.model';
 import { rows } from 'src/users/utils/parse.user';
-import { Subcategory } from 'src/users/utils/user.types';
+import { Subcategories } from 'src/users/utils/user.types';
 
 @Injectable()
 export class AdminService {
@@ -381,7 +381,7 @@ export class AdminService {
   async addSubcategory(
     req: any,
     catId: string,
-    subCategory: Subcategory,
+    subCategory: Subcategories,
   ): Promise<Category> {
     try {
       // const admin = await this.findToken(req);

@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Model } from 'mongoose';
-import { Subcategory } from './utils/user.types';
+import { Subcategories } from './utils/user.types';
 
 export type CategoryDocument = Category & Document;
 
@@ -25,10 +25,10 @@ export class Category extends Model<Category> {
     default: [],
   })
   @Prop({
-    type: Array<Object>,
+    type: Array<Subcategories>,
     default: [],
   })
-  subcategories: Array<Subcategory>;
+  subcategories: Array<Subcategories>;
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);

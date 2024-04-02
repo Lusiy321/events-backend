@@ -48,21 +48,17 @@ type Photo {
 type Categories {
   _id: ID!
   name: String!
-  subcategories: [SubcategoryInput!]!
+  subcategories: [SubcategoriesInput!]!
 }
 
-type Subcategory {
-  name: String!
-  id: String!
-}
 
 input CategoriesInput {
   _id: ID!
   name: String!
-  subcategories: [SubcategoryInput!]!
+  subcategories: [SubcategoriesInput!]!
 }
 
-input SubcategoryInput {
+input SubcategoriesInput {
   name: String!
   id: String!
 }

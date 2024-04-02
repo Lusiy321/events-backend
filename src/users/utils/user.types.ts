@@ -36,11 +36,11 @@ export class Categories {
   _id: string;
   @Field()
   name: string;
-  @Field(() => [Subcategory])
-  subcategories: Subcategory[];
+  @Field(() => [Subcategories])
+  subcategories: Subcategories[];
 }
 @ObjectType('Subcategory')
-export class Subcategory {
+export class Subcategories {
   @Field(() => ID)
   id: string;
   @Field()

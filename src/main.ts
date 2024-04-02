@@ -21,7 +21,7 @@ async function start() {
       },
     }),
   );
-  app.enableCors({});
+  app.enableCors();
   const config = new DocumentBuilder()
     .setTitle('Wechirka.com SERVER')
     .setDescription('Wechirka REAST API Documentation')

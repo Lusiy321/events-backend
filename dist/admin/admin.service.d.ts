@@ -7,7 +7,7 @@ import { UpdateUserAdmDto } from './dto/update.user.adm.dto';
 import { LoginAdminDto } from './dto/login.admin.dto';
 import { CreateCategoryDto } from 'src/users/dto/create.category.dto';
 import { Category } from 'src/users/category.model';
-import { Subcategory } from 'src/users/utils/user.types';
+import { Subcategories } from 'src/users/utils/user.types';
 export declare class AdminService {
     private adminModel;
     private userModel;
@@ -29,7 +29,7 @@ export declare class AdminService {
     }): Promise<any>;
     refreshAccessToken(req: any): Promise<Admin>;
     createCategory(req: any, category: CreateCategoryDto): Promise<Category>;
-    addSubcategory(req: any, catId: string, subCategory: Subcategory): Promise<Category>;
+    addSubcategory(req: any, catId: string, subCategory: Subcategories): Promise<Category>;
     findUserCategory(req: any, id: string): Promise<any>;
     findUserSubcategory(req: any, id: string): Promise<any>;
 }

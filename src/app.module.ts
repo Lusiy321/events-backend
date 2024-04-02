@@ -41,7 +41,9 @@ import * as cors from 'cors';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: true,
+      context: ({ req }) => req,
     }),
+
     MongooseModule.forRoot(process.env.DB_HOST),
     MongooseModule.forFeature([
       { name: Admin.name, schema: AdminSchema, collection: 'admins' },
