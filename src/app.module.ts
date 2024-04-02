@@ -1,4 +1,9 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import {
+  Module,
+  NestModule,
+  MiddlewareConsumer,
+  RequestMethod,
+} from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { User, UserSchema } from './users/users.model';
 import { ConfigModule } from '@nestjs/config';
@@ -24,6 +29,7 @@ import { ValidationOrders } from './middleware/validation.orders';
 import { ValidationUsers } from './middleware/validation.users';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
+import * as cors from 'cors';
 
 @Module({
   controllers: [UsersController, AdminController],
@@ -62,5 +68,9 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(ValidationOrders).forRoutes('./orders/orders.controller');
     consumer.apply(ValidationUsers).forRoutes('./users/users.controller');
+    consumer.apply(cors()).forRoutes({
+      path: '*',
+      method: RequestMethod.ALL,
+    });
   }
 }

@@ -30,10 +30,15 @@ const validation_orders_1 = require("./middleware/validation.orders");
 const validation_users_1 = require("./middleware/validation.users");
 const apollo_1 = require("@nestjs/apollo");
 const graphql_1 = require("@nestjs/graphql");
+const cors = require("cors");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer.apply(validation_orders_1.ValidationOrders).forRoutes('./orders/orders.controller');
         consumer.apply(validation_users_1.ValidationUsers).forRoutes('./users/users.controller');
+        consumer.apply(cors()).forRoutes({
+            path: '*',
+            method: common_1.RequestMethod.ALL,
+        });
     }
 };
 exports.AppModule = AppModule;
