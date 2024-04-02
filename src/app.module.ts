@@ -40,7 +40,7 @@ import * as cors from 'cors';
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: true,
+      autoSchemaFile: './utils/user.graphql',
       context: ({ req }) => req,
       csrfPrevention: false,
       playground: true,

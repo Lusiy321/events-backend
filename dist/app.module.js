@@ -52,7 +52,7 @@ exports.AppModule = AppModule = __decorate([
             }),
             graphql_1.GraphQLModule.forRoot({
                 driver: apollo_1.ApolloDriver,
-                autoSchemaFile: true,
+                autoSchemaFile: './utils/user.graphql',
                 context: ({ req }) => req,
                 csrfPrevention: false,
                 playground: true,

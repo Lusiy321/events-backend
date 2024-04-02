@@ -1,0 +1,84 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Photo {
+  publicId: String!
+  url: String!
+}
+
+type Categories {
+  _id: ID!
+  name: String!
+  subcategories: [Subcategory!]!
+}
+
+type Subcategory {
+  id: ID!
+  name: String!
+}
+
+type User {
+  _id: ID!
+  firstName: String!
+  email: String!
+  password: String!
+  title: String!
+  description: String!
+  phone: String!
+  telegram: String!
+  tg_chat: Float!
+  viber: String!
+  viber_chat: String!
+  whatsapp: String!
+  location: String!
+  master_photo: Photo!
+  avatar: Photo!
+  photo: [Photo!]!
+  video: [Photo!]!
+  category: [Categories!]!
+  isOnline: Boolean!
+  paid: Boolean!
+  trial: Boolean!
+  price: String!
+  token: String!
+  refresh_token: String!
+  verified: String!
+  verify: Boolean!
+  googleId: String!
+  facebookId: String!
+  metaUrl: String!
+  ban: Boolean!
+  totalRating: Float!
+  numberOfRatings: Float!
+  agree_order: Float!
+  disagree_order: Float!
+  paidEnds: DateTime!
+  register: Boolean!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Query {
+  users: [User!]!
+  user(id: String!): User!
+}
+
+type Mutation {
+  createUser(data: CreateUserDto!): User!
+  deleteUser(password: PasswordUser!): User!
+}
+
+input CreateUserDto {
+  email: String!
+  password: String!
+  firstName: String!
+  phone: String!
+}
+
+input PasswordUser {
+  password: String!
+}
