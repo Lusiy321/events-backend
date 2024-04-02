@@ -17,6 +17,13 @@ let Banner = class Banner extends mongoose_2.Model {
 };
 exports.Banner = Banner;
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'title of banner', description: 'Banner title' }),
+    (0, mongoose_1.Prop)({
+        type: String,
+    }),
+    __metadata("design:type", String)
+], Banner.prototype, "title", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({ example: 'https://', description: 'Banner img' }),
     (0, mongoose_1.Prop)({
         type: String,
@@ -29,14 +36,14 @@ __decorate([
         type: String,
     }),
     __metadata("design:type", String)
-], Banner.prototype, "text", void 0);
+], Banner.prototype, "description", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'Link to user or site', description: 'Banner URL' }),
     (0, mongoose_1.Prop)({
         type: String,
     }),
     __metadata("design:type", String)
-], Banner.prototype, "url", void 0);
+], Banner.prototype, "link", void 0);
 exports.Banner = Banner = __decorate([
     (0, mongoose_1.Schema)({ versionKey: false, timestamps: true })
 ], Banner);

@@ -38,7 +38,7 @@ exports.UsersModule = UsersModule = __decorate([
             }),
             graphql_1.GraphQLModule.forRoot({
                 driver: apollo_1.ApolloDriver,
-                autoSchemaFile: true,
+                autoSchemaFile: './src/users/utils/user.gql',
                 context: ({ req }) => req,
                 csrfPrevention: false,
                 playground: true,

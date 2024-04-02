@@ -25,9 +25,10 @@
 import { Model } from 'mongoose';
 export type BannerDocument = Banner & Document;
 export declare class Banner extends Model<Banner> {
+    title: string;
     img: string;
-    text: string;
-    url: string;
+    description: string;
+    link: string;
 }
 export declare const BannerSchema: import("mongoose").Schema<Banner, Model<Banner, any, any, any, import("mongoose").Document<unknown, any, Banner> & Banner & {
     _id: import("mongoose").Types.ObjectId;

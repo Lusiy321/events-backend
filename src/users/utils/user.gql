@@ -1,174 +1,84 @@
-type User {
-  _id: ID!
-  firstName: String!
-  email: String!
-  password: String!
-  title: String
-  description: String
-  phone: String!
-  telegram: String
-  tg_chat: Int
-  viber: String
-  viber_chat: String
-  whatsapp: String
-  location: String!
-  master_photo: PhotoInput
-  avatar: PhotoInput
-  video: [PhotoInput]
-  photo: [PhotoInput]
-  category: [CategoriesInput]
-  isOnline: Boolean!
-  paid: Boolean
-  trial: Boolean
-  price: String
-  social: Social
-  token: String
-  refresh_token: String!
-  verified: String
-  verify: Boolean!
-  googleId: String
-  facebookId: String
-  metaUrl: String
-  ban: Boolean!
-  totalRating: Int
-  numberOfRatings: Int
-  agree_order: Int
-  disagree_order: Int
-  trialEnds: Date
-  paidEnds: Date
-  register: Boolean
-  accepted_orders: [String]
-}
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
 
 type Photo {
-  publicId: ID!
+  publicId: String!
   url: String!
 }
 
 type Categories {
   _id: ID!
   name: String!
-  subcategories: [SubcategoriesInput!]!
+  subcategories: [Subcategory!]!
 }
 
+type Subcategory {
+  id: ID!
+  name: String!
+}
 
-input CategoriesInput {
+type User {
   _id: ID!
-  name: String!
-  subcategories: [SubcategoriesInput!]!
+  firstName: String!
+  email: String!
+  password: String!
+  title: String!
+  description: String!
+  phone: String!
+  telegram: String!
+  tg_chat: Float!
+  viber: String!
+  viber_chat: String!
+  whatsapp: String!
+  location: String!
+  master_photo: Photo!
+  avatar: Photo!
+  photo: [Photo!]!
+  video: [Photo!]!
+  category: [Categories!]!
+  isOnline: Boolean!
+  paid: Boolean!
+  trial: Boolean!
+  price: String!
+  token: String!
+  refresh_token: String!
+  verified: String!
+  verify: Boolean!
+  googleId: String!
+  facebookId: String!
+  metaUrl: String!
+  ban: Boolean!
+  totalRating: Float!
+  numberOfRatings: Float!
+  agree_order: Float!
+  disagree_order: Float!
+  paidEnds: DateTime!
+  register: Boolean!
 }
 
-input SubcategoriesInput {
-  name: String!
-  id: String!
-}
-
-type search_result {
-  totalPages: Int!
-  currentPage: Int!
-  data: [User!]!
-}
-
-type Social {
-  Instagram: String
-  Facebook: String
-  Youtube: String
-  TikTok: String
-  Vimeo: String
-  SoundCloud: String
-  Spotify: String
-  AppleMusic: String
-  Deezer: String
-  WebSite: String
-}
-
-input CreateUserInput {
-  email: String! @unique
-  password: String! @minlength(8)
-  firstName: String! @minlength(2) @maxlength(20)
-  phone: String @minlength(10) @maxlength(13)
-}
-
-input PasswordUserInput {
-  password: String! @minlength(8)
-}
-
-input UpdateUserInput {
-  firstName: String
-  title: String
-  description: String
-  phone: String
-  telegram: String
-  viber: String
-  whatsapp: String
-  location: String
-  master_photo: PhotoInput
-  avatar: PhotoInput
-  video: [PhotoInput]
-  photo: [PhotoInput]
-  social: SocialInput
-  isOnline: Boolean
-  price: String
-  paid: Boolean
-  trial: Boolean
-  verify: Boolean
-  ban: Boolean
-  register: Boolean
-}
-
-type UpdateUser {
-  firstName: String
-  title: String
-  description: String
-  phone: String
-  telegram: String
-  viber: String
-  whatsapp: String
-  location: String
-  master_photo: PhotoInput
-  avatar: PhotoInput
-  video: [PhotoInput]
-  photo: [PhotoInput]
-  social: SocialInput
-  isOnline: Boolean
-  price: String
-  paid: Boolean
-  trial: Boolean
-  verify: Boolean
-  ban: Boolean
-  register: Boolean
-}
-
-input RequestHeaders {
-  [key: string]: string | string[];
-}
-
-input PhotoInput {
-  publicId: String!
-  url: String!
-}
-
-input SocialInput {
-  Instagram: String
-  Facebook: String
-  Youtube: String
-  TikTok: String
-  Vimeo: String
-  SoundCloud: String
-  Spotify: String
-  AppleMusic: String
-  Deezer: String
-  WebSite: String
-}
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type Query {
-users(search: String): search_result!
   users: [User!]!
-  user(_id: ID!): User
+  user(id: String!): User!
 }
 
 type Mutation {
-  createUser(data: CreateUserInput!): User!
-  updateUser(data: UpdateUserInput!, req: RequestHeaders): User!
-  deleteUser(req: RequestHeaders, password: PasswordUserInput!): User!
+  createUser(data: CreateUserDto!): User!
+  deleteUser(password: PasswordUser!): User!
+}
+
+input CreateUserDto {
+  email: String!
+  password: String!
+  firstName: String!
+  phone: String!
+}
+
+input PasswordUser {
+  password: String!
 }
