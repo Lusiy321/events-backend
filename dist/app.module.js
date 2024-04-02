@@ -54,6 +54,7 @@ exports.AppModule = AppModule = __decorate([
                 driver: apollo_1.ApolloDriver,
                 autoSchemaFile: true,
                 context: ({ req }) => req,
+                csrfPrevention: false,
             }),
             mongoose_1.MongooseModule.forRoot(process.env.DB_HOST),
             mongoose_1.MongooseModule.forFeature([

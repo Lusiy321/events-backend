@@ -61,13 +61,4 @@ export class BannersController {
   async findBannerAndDel(@Param('id') id: string): Promise<Banner> {
     return this.bannerService.deleteBanner(id);
   }
-
-  @ApiOperation({
-    summary: 'Get Right banner',
-  })
-  @ApiResponse({ status: 200, type: Object })
-  @Get('right/get')
-  async getRight(): Promise<Object[]> {
-    return this.bannerService.getRightBanner();
-  }
 }

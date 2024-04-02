@@ -42,6 +42,7 @@ import * as cors from 'cors';
       driver: ApolloDriver,
       autoSchemaFile: true,
       context: ({ req }) => req,
+      csrfPrevention: false,
     }),
 
     MongooseModule.forRoot(process.env.DB_HOST),

@@ -40,6 +40,7 @@ exports.UsersModule = UsersModule = __decorate([
                 driver: apollo_1.ApolloDriver,
                 autoSchemaFile: true,
                 context: ({ req }) => req,
+                csrfPrevention: false,
             }),
             mongoose_1.MongooseModule.forFeature([
                 { name: users_model_1.User.name, schema: users_model_1.UserSchema, collection: 'users' },

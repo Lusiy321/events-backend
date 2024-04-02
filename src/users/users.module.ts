@@ -28,6 +28,7 @@ import { UsersResolver } from './users.resolver';
       driver: ApolloDriver,
       autoSchemaFile: true,
       context: ({ req }) => req,
+      csrfPrevention: false,
     }),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema, collection: 'users' },
