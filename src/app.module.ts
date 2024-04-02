@@ -43,6 +43,7 @@ import * as cors from 'cors';
       autoSchemaFile: true,
       context: ({ req }) => req,
       csrfPrevention: false,
+      playground: true,
     }),
 
     MongooseModule.forRoot(process.env.DB_HOST),

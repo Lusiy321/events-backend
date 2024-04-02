@@ -55,6 +55,7 @@ exports.AppModule = AppModule = __decorate([
                 autoSchemaFile: true,
                 context: ({ req }) => req,
                 csrfPrevention: false,
+                playground: true,
             }),
             mongoose_1.MongooseModule.forRoot(process.env.DB_HOST),
             mongoose_1.MongooseModule.forFeature([

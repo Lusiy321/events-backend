@@ -41,6 +41,7 @@ exports.UsersModule = UsersModule = __decorate([
                 autoSchemaFile: true,
                 context: ({ req }) => req,
                 csrfPrevention: false,
+                playground: true,
             }),
             mongoose_1.MongooseModule.forFeature([
                 { name: users_model_1.User.name, schema: users_model_1.UserSchema, collection: 'users' },

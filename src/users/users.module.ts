@@ -29,6 +29,7 @@ import { UsersResolver } from './users.resolver';
       autoSchemaFile: true,
       context: ({ req }) => req,
       csrfPrevention: false,
+      playground: true,
     }),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema, collection: 'users' },
