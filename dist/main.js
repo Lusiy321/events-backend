@@ -6,12 +6,15 @@ const platform_express_1 = require("@nestjs/platform-express");
 const express_1 = require("express");
 const mesengers_service_1 = require("./orders/mesengers.service");
 const session = require("express-session");
+const cookieParser = require("cookie-parser");
 const swagger_1 = require("@nestjs/swagger");
+const cors = require("cors");
 async function start() {
     const PORT = process.env.PORT || 5000;
     const app = await core_1.NestFactory.create(app_module_1.AppModule, new platform_express_1.ExpressAdapter(express_1.default), {
         cors: true,
     });
+    app.use(cookieParser());
     app.use(session({
         secret: process.env.GOOGLE_CLIENT_SECRET,
         resave: false,
@@ -21,6 +24,7 @@ async function start() {
         },
     }));
     app.enableCors();
+    app.use(cors());
     const config = new swagger_1.DocumentBuilder()
         .setTitle('Wechirka.com SERVER')
         .setDescription('Wechirka REAST API Documentation')
