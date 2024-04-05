@@ -29,4 +29,4 @@ export async function shuffleArray(array: any[]) {
 }
 
 export const rows =
-  'firstName email title description phone telegram viber whatsapp location master_photo avatar video photo category isOnline price verify social';
+  'firstName email title description phone telegram viber whatsapp location master_photo avatar video photo category isOnline price verify social createdAt trialEnds paidEnds';

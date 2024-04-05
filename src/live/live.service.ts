@@ -21,7 +21,7 @@ export class LiveService {
     private liveModel: Live,
   ) {}
 
-  async findAllUsers(): Promise<Live[]> {
+  async findAllUsersMessage(): Promise<Live[]> {
     try {
       const find = await this.liveModel.find();
       return find;
@@ -30,7 +30,7 @@ export class LiveService {
     }
   }
 
-  async create(req: any, content: CreateLiveDto): Promise<Live> {
+  async createMessage(req: any, content: CreateLiveDto): Promise<Live> {
     try {
       const user = await this.findToken(req);
       if (!user) {

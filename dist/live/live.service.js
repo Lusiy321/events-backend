@@ -24,7 +24,7 @@ let LiveService = class LiveService {
         this.userModel = userModel;
         this.liveModel = liveModel;
     }
-    async findAllUsers() {
+    async findAllUsersMessage() {
         try {
             const find = await this.liveModel.find();
             return find;
@@ -33,7 +33,7 @@ let LiveService = class LiveService {
             throw new http_errors_1.NotFound('User not found');
         }
     }
-    async create(req, content) {
+    async createMessage(req, content) {
         try {
             const user = await this.findToken(req);
             if (!user) {

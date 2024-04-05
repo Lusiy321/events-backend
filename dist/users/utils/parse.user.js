@@ -24,5 +24,5 @@ async function shuffleArray(array) {
     return array;
 }
 exports.shuffleArray = shuffleArray;
-exports.rows = 'firstName email title description phone telegram viber whatsapp location master_photo avatar video photo category isOnline price verify social';
+exports.rows = 'firstName email title description phone telegram viber whatsapp location master_photo avatar video photo category isOnline price verify social createdAt trialEnds paidEnds';
 //# sourceMappingURL=parse.user.js.map

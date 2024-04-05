@@ -5,7 +5,7 @@ export declare class LiveService {
     private userModel;
     private liveModel;
     constructor(userModel: User, liveModel: Live);
-    findAllUsers(): Promise<Live[]>;
-    create(req: any, content: CreateLiveDto): Promise<Live>;
+    findAllUsersMessage(): Promise<Live[]>;
+    createMessage(req: any, content: CreateLiveDto): Promise<Live>;
     findToken(req: any): Promise<User>;
 }
