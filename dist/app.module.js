@@ -36,6 +36,8 @@ const live_model_1 = require("./live/live.model");
 const live_service_1 = require("./live/live.service");
 const live_controller_1 = require("./live/live.controller");
 const banners_service_1 = require("./banners/banners.service");
+const path_1 = require("path");
+const graphql_2 = require("graphql");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer.apply(validation_orders_1.ValidationOrders).forRoutes('./orders/orders.controller');
@@ -57,10 +59,20 @@ exports.AppModule = AppModule = __decorate([
             }),
             graphql_1.GraphQLModule.forRoot({
                 driver: apollo_1.ApolloDriver,
-                autoSchemaFile: './src/users/utils/user.gql',
+                autoSchemaFile: (0, path_1.join)(process.cwd(), 'src/users/utils/user.gql'),
                 context: ({ req }) => req,
                 csrfPrevention: false,
+                introspection: true,
+                installSubscriptionHandlers: true,
                 playground: true,
+                buildSchemaOptions: {
+                    directives: [
+                        new graphql_2.GraphQLDirective({
+                            name: 'upper',
+                            locations: [graphql_2.DirectiveLocation.FIELD_DEFINITION],
+                        }),
+                    ],
+                },
             }),
             mongoose_1.MongooseModule.forRoot(process.env.DB_HOST),
             mongoose_1.MongooseModule.forFeature([

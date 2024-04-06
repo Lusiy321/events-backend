@@ -26,6 +26,8 @@ const order_model_1 = require("../orders/order.model");
 const graphql_1 = require("@nestjs/graphql");
 const apollo_1 = require("@nestjs/apollo");
 const users_resolver_1 = require("./users.resolver");
+const graphql_2 = require("graphql");
+const path_1 = require("path");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;
@@ -38,10 +40,20 @@ exports.UsersModule = UsersModule = __decorate([
             }),
             graphql_1.GraphQLModule.forRoot({
                 driver: apollo_1.ApolloDriver,
-                autoSchemaFile: './src/users/utils/user.gql',
+                autoSchemaFile: (0, path_1.join)(process.cwd(), 'src/users/utils/user.gql'),
                 context: ({ req }) => req,
                 csrfPrevention: false,
+                introspection: true,
+                installSubscriptionHandlers: true,
                 playground: true,
+                buildSchemaOptions: {
+                    directives: [
+                        new graphql_2.GraphQLDirective({
+                            name: 'upper',
+                            locations: [graphql_2.DirectiveLocation.FIELD_DEFINITION],
+                        }),
+                    ],
+                },
             }),
             mongoose_1.MongooseModule.forFeature([
                 { name: users_model_1.User.name, schema: users_model_1.UserSchema, collection: 'users' },

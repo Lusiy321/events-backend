@@ -17,6 +17,8 @@ import { OrderSchema, Orders } from 'src/orders/order.model';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UsersResolver } from './users.resolver';
+import { DirectiveLocation, GraphQLDirective } from 'graphql';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -26,10 +28,20 @@ import { UsersResolver } from './users.resolver';
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: './src/users/utils/user.gql',
+      autoSchemaFile: join(process.cwd(), 'src/users/utils/user.gql'),
       context: ({ req }) => req,
       csrfPrevention: false,
+      introspection: true,
+      installSubscriptionHandlers: true,
       playground: true,
+      buildSchemaOptions: {
+        directives: [
+          new GraphQLDirective({
+            name: 'upper',
+            locations: [DirectiveLocation.FIELD_DEFINITION],
+          }),
+        ],
+      },
     }),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema, collection: 'users' },

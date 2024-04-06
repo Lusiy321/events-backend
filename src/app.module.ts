@@ -35,6 +35,8 @@ import { Live, LiveSchema } from './live/live.model';
 import { LiveService } from './live/live.service';
 import { LiveController } from './live/live.controller';
 import { BannersService } from './banners/banners.service';
+import { join } from 'path';
+import { DirectiveLocation, GraphQLDirective } from 'graphql';
 
 @Module({
   controllers: [UsersController, AdminController, LiveController],
@@ -45,10 +47,20 @@ import { BannersService } from './banners/banners.service';
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: './src/users/utils/user.gql',
+      autoSchemaFile: join(process.cwd(), 'src/users/utils/user.gql'),
       context: ({ req }) => req,
       csrfPrevention: false,
+      introspection: true,
+      installSubscriptionHandlers: true,
       playground: true,
+      buildSchemaOptions: {
+        directives: [
+          new GraphQLDirective({
+            name: 'upper',
+            locations: [DirectiveLocation.FIELD_DEFINITION],
+          }),
+        ],
+      },
     }),
 
     MongooseModule.forRoot(process.env.DB_HOST),
