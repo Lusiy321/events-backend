@@ -25,13 +25,13 @@ let SearchService = class SearchService {
         this.ordersModel = ordersModel;
     }
     async searchUsers(query) {
-        const { req, loc, page, cat, subcat } = query;
+        const { req, loc, page, cat, subcat, limit } = query;
         try {
             const curentPage = page || 1;
-            const limit = 8;
+            const curentlimit = limit || 8;
             const totalCount = await this.userModel.countDocuments();
-            const totalPages = Math.ceil(totalCount / limit);
-            const offset = (curentPage - 1) * limit;
+            const totalPages = Math.ceil(totalCount / curentlimit);
+            const offset = (curentPage - 1) * curentlimit;
             if (!req && !loc && !cat && !subcat) {
                 const result = await this.userModel
                     .aggregate([
@@ -42,9 +42,9 @@ let SearchService = class SearchService {
                             description: { $exists: true },
                         },
                     },
-                    { $sample: { size: limit } },
+                    { $sample: { size: curentlimit } },
                 ])
-                    .limit(limit)
+                    .limit(curentlimit)
                     .skip(offset)
                     .exec();
                 return {
@@ -92,7 +92,7 @@ let SearchService = class SearchService {
                 }
                 else {
                     const result = await (0, parse_user_1.paginateArray)(resultArray, curentPage);
-                    const totalPages = Math.ceil(resultArray.length / limit);
+                    const totalPages = Math.ceil(resultArray.length / curentlimit);
                     return {
                         totalPages: totalPages,
                         currentPage: curentPage,
@@ -167,7 +167,7 @@ let SearchService = class SearchService {
                 }
                 else {
                     const result = await (0, parse_user_1.paginateArray)(resultArray, curentPage);
-                    const totalPages = Math.ceil(resultArray.length / limit);
+                    const totalPages = Math.ceil(resultArray.length / curentlimit);
                     return {
                         totalPages: totalPages,
                         currentPage: curentPage,
@@ -199,7 +199,7 @@ let SearchService = class SearchService {
                 }
                 else {
                     const result = await (0, parse_user_1.paginateArray)(randomArray, curentPage);
-                    const totalPages = Math.ceil(randomArray.length / limit);
+                    const totalPages = Math.ceil(randomArray.length / curentlimit);
                     return {
                         totalPages: totalPages,
                         currentPage: curentPage,
@@ -226,7 +226,7 @@ let SearchService = class SearchService {
                 }
                 else {
                     const result = await (0, parse_user_1.paginateArray)(randomArray, curentPage);
-                    const totalPages = Math.ceil(randomArray.length / limit);
+                    const totalPages = Math.ceil(randomArray.length / curentlimit);
                     return {
                         totalPages: totalPages,
                         currentPage: curentPage,
@@ -258,7 +258,7 @@ let SearchService = class SearchService {
                 }
                 else {
                     const result = await (0, parse_user_1.paginateArray)(randomArray, curentPage);
-                    const totalPages = Math.ceil(randomArray.length / limit);
+                    const totalPages = Math.ceil(randomArray.length / curentlimit);
                     return {
                         totalPages: totalPages,
                         currentPage: curentPage,
@@ -356,7 +356,7 @@ let SearchService = class SearchService {
                 }
                 else {
                     const result = await (0, parse_user_1.paginateArray)(resultArray, curentPage);
-                    const totalPages = Math.ceil(resultArray.length / limit);
+                    const totalPages = Math.ceil(resultArray.length / curentlimit);
                     return {
                         totalPages: totalPages,
                         currentPage: curentPage,
@@ -370,20 +370,20 @@ let SearchService = class SearchService {
         }
     }
     async searchOrders(query) {
-        const { req, loc, page, cat, subcat } = query;
+        const { req, loc, page, cat, subcat, limit } = query;
         try {
             const curentPage = page || 1;
-            const limit = 8;
+            const curentlimit = 8;
             const totalCount = await this.ordersModel.countDocuments();
-            const totalPages = Math.ceil(totalCount / limit);
-            const offset = (curentPage - 1) * limit;
+            const totalPages = Math.ceil(totalCount / curentlimit);
+            const offset = (curentPage - 1) * curentlimit;
             if (!req && !loc && !cat && !subcat) {
                 const result = await this.ordersModel
                     .find()
                     .select(parse_user_1.rows)
                     .skip(offset)
                     .sort({ createdAt: -1 })
-                    .limit(limit)
+                    .limit(curentlimit)
                     .exec();
                 return {
                     totalPages: totalPages,
@@ -423,7 +423,7 @@ let SearchService = class SearchService {
                 }
                 else {
                     const result = await (0, parse_user_1.paginateArray)(resultArray, curentPage);
-                    const totalPages = Math.ceil(resultArray.length / limit);
+                    const totalPages = Math.ceil(resultArray.length / curentlimit);
                     return {
                         totalPages: totalPages,
                         currentPage: curentPage,
@@ -496,7 +496,7 @@ let SearchService = class SearchService {
                 }
                 else {
                     const result = (0, parse_user_1.paginateArray)(resultArray, curentPage);
-                    const totalPages = Math.ceil(resultArray.length / limit);
+                    const totalPages = Math.ceil(resultArray.length / curentlimit);
                     return {
                         totalPages: totalPages,
                         currentPage: curentPage,
@@ -511,7 +511,7 @@ let SearchService = class SearchService {
                 })
                     .select(parse_user_1.rows)
                     .skip(offset)
-                    .limit(limit)
+                    .limit(curentlimit)
                     .exec();
                 const category = await this.ordersModel
                     .find({
@@ -539,7 +539,7 @@ let SearchService = class SearchService {
                 }
                 else {
                     const result = await (0, parse_user_1.paginateArray)(resultArray, curentPage);
-                    const totalPages = Math.ceil(resultArray.length / limit);
+                    const totalPages = Math.ceil(resultArray.length / curentlimit);
                     return {
                         totalPages: totalPages,
                         currentPage: curentPage,
@@ -612,7 +612,7 @@ let SearchService = class SearchService {
                 }
                 else {
                     const result = await (0, parse_user_1.paginateArray)(resultArray, curentPage);
-                    const totalPages = Math.ceil(resultArray.length / limit);
+                    const totalPages = Math.ceil(resultArray.length / curentlimit);
                     return {
                         totalPages: totalPages,
                         currentPage: curentPage,

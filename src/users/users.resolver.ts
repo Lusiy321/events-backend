@@ -1,16 +1,50 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ObjectType,
+  InputType,
+  Field,
+} from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from './users.model';
 import { CreateUserDto } from './dto/create.user.dto';
 import { PasswordUserDto } from './dto/password.user.dto';
+import { SearchService } from './search.service';
+import { search_result } from './dto/update.user.dto';
+
+// Определение интерфейса SearchQuery
+@InputType()
+export class SearchQuery {
+  @Field({ nullable: true })
+  req?: string;
+  @Field({ nullable: true })
+  loc?: string;
+  @Field({ nullable: true })
+  page?: number;
+  @Field({ nullable: true })
+  cat?: string;
+  @Field({ nullable: true })
+  subcat?: string;
+  @Field({ nullable: true })
+  limit?: number;
+}
 
 @Resolver(() => User)
 export class UsersResolver {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly searchService: SearchService,
+  ) {}
 
-  @Query(() => [User], { name: 'users' })
-  async getUsers() {
-    return this.usersService.findAllUsers();
+  @Query(() => search_result, { name: 'allUsers' })
+  async getUsers(@Args('query') query: SearchQuery): Promise<search_result> {
+    try {
+      return this.searchService.searchUsers(query);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Query(() => User, { name: 'user' })

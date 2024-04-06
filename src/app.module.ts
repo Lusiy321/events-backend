@@ -37,6 +37,7 @@ import { LiveController } from './live/live.controller';
 import { BannersService } from './banners/banners.service';
 import { join } from 'path';
 import { DirectiveLocation, GraphQLDirective } from 'graphql';
+import { upperDirectiveTransformer } from './users/utils/upper-case.directive';
 
 @Module({
   controllers: [UsersController, AdminController, LiveController],

@@ -10,6 +10,7 @@ import {
 import { NotFound } from 'http-errors';
 import { Orders } from '../orders/order.model';
 import { search_result } from './dto/update.user.dto';
+import { SearchQuery } from './users.resolver';
 
 @Injectable()
 export class SearchService {
@@ -20,15 +21,15 @@ export class SearchService {
     private ordersModel: Orders,
   ) {}
 
-  async searchUsers(query: any): Promise<search_result> {
-    const { req, loc, page, cat, subcat } = query;
+  async searchUsers(query: SearchQuery): Promise<search_result> {
+    const { req, loc, page, cat, subcat, limit } = query;
     try {
       const curentPage = page || 1;
-      const limit = 8;
+      const curentlimit = limit || 8;
       const totalCount = await this.userModel.countDocuments();
 
-      const totalPages = Math.ceil(totalCount / limit);
-      const offset = (curentPage - 1) * limit;
+      const totalPages = Math.ceil(totalCount / curentlimit);
+      const offset = (curentPage - 1) * curentlimit;
       // Если ничего не задано в строке
       if (!req && !loc && !cat && !subcat) {
         const result = await this.userModel
@@ -40,9 +41,9 @@ export class SearchService {
                 description: { $exists: true },
               },
             },
-            { $sample: { size: limit } },
+            { $sample: { size: curentlimit } },
           ])
-          .limit(limit)
+          .limit(curentlimit)
           .skip(offset)
           .exec();
         return {
@@ -97,7 +98,7 @@ export class SearchService {
         } else {
           const result = await paginateArray(resultArray, curentPage);
 
-          const totalPages = Math.ceil(resultArray.length / limit);
+          const totalPages = Math.ceil(resultArray.length / curentlimit);
           return {
             totalPages: totalPages,
             currentPage: curentPage,
@@ -180,7 +181,7 @@ export class SearchService {
           };
         } else {
           const result = await paginateArray(resultArray, curentPage);
-          const totalPages = Math.ceil(resultArray.length / limit);
+          const totalPages = Math.ceil(resultArray.length / curentlimit);
           return {
             totalPages: totalPages,
             currentPage: curentPage,
@@ -211,7 +212,7 @@ export class SearchService {
           };
         } else {
           const result = await paginateArray(randomArray, curentPage);
-          const totalPages = Math.ceil(randomArray.length / limit);
+          const totalPages = Math.ceil(randomArray.length / curentlimit);
           return {
             totalPages: totalPages,
             currentPage: curentPage,
@@ -236,7 +237,7 @@ export class SearchService {
           };
         } else {
           const result = await paginateArray(randomArray, curentPage);
-          const totalPages = Math.ceil(randomArray.length / limit);
+          const totalPages = Math.ceil(randomArray.length / curentlimit);
           return {
             totalPages: totalPages,
             currentPage: curentPage,
@@ -266,7 +267,7 @@ export class SearchService {
           };
         } else {
           const result = await paginateArray(randomArray, curentPage);
-          const totalPages = Math.ceil(randomArray.length / limit);
+          const totalPages = Math.ceil(randomArray.length / curentlimit);
           return {
             totalPages: totalPages,
             currentPage: curentPage,
@@ -378,7 +379,7 @@ export class SearchService {
           };
         } else {
           const result = await paginateArray(resultArray, curentPage);
-          const totalPages = Math.ceil(resultArray.length / limit);
+          const totalPages = Math.ceil(resultArray.length / curentlimit);
           return {
             totalPages: totalPages,
             currentPage: curentPage,
@@ -392,14 +393,14 @@ export class SearchService {
   }
   ////////////////  ORDERS SEARCH
   async searchOrders(query: any): Promise<any> {
-    const { req, loc, page, cat, subcat } = query;
+    const { req, loc, page, cat, subcat, limit } = query;
     try {
       const curentPage = page || 1;
-      const limit = 8;
+      const curentlimit = 8;
       const totalCount = await this.ordersModel.countDocuments();
 
-      const totalPages = Math.ceil(totalCount / limit);
-      const offset = (curentPage - 1) * limit;
+      const totalPages = Math.ceil(totalCount / curentlimit);
+      const offset = (curentPage - 1) * curentlimit;
       // Если ничего не задано в строке
       if (!req && !loc && !cat && !subcat) {
         const result = await this.ordersModel
@@ -407,7 +408,7 @@ export class SearchService {
           .select(rows)
           .skip(offset)
           .sort({ createdAt: -1 })
-          .limit(limit)
+          .limit(curentlimit)
           .exec();
         return {
           totalPages: totalPages,
@@ -453,7 +454,7 @@ export class SearchService {
           throw new NotFound('Orders not found');
         } else {
           const result = await paginateArray(resultArray, curentPage);
-          const totalPages = Math.ceil(resultArray.length / limit);
+          const totalPages = Math.ceil(resultArray.length / curentlimit);
           return {
             totalPages: totalPages,
             currentPage: curentPage,
@@ -535,7 +536,7 @@ export class SearchService {
           throw new NotFound('Orders not found');
         } else {
           const result = paginateArray(resultArray, curentPage);
-          const totalPages = Math.ceil(resultArray.length / limit);
+          const totalPages = Math.ceil(resultArray.length / curentlimit);
           return {
             totalPages: totalPages,
             currentPage: curentPage,
@@ -550,7 +551,7 @@ export class SearchService {
           })
           .select(rows)
           .skip(offset)
-          .limit(limit)
+          .limit(curentlimit)
           .exec();
         const category = await this.ordersModel
           .find({
@@ -583,7 +584,7 @@ export class SearchService {
           throw new NotFound('Orders not found');
         } else {
           const result = await paginateArray(resultArray, curentPage);
-          const totalPages = Math.ceil(resultArray.length / limit);
+          const totalPages = Math.ceil(resultArray.length / curentlimit);
           return {
             totalPages: totalPages,
             currentPage: curentPage,
@@ -665,7 +666,7 @@ export class SearchService {
           throw new NotFound('Orders not found');
         } else {
           const result = await paginateArray(resultArray, curentPage);
-          const totalPages = Math.ceil(resultArray.length / limit);
+          const totalPages = Math.ceil(resultArray.length / curentlimit);
           return {
             totalPages: totalPages,
             currentPage: curentPage,

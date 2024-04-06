@@ -64,9 +64,24 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type search_result {
+  totalPages: Float!
+  currentPage: Float!
+  data: [User!]!
+}
+
 type Query {
-  users: [User!]!
+  allUsers(query: SearchQuery!): search_result!
   user(id: String!): User!
+}
+
+input SearchQuery {
+  req: String
+  loc: String
+  page: Float
+  cat: String
+  subcat: String
+  limit: Float
 }
 
 type Mutation {

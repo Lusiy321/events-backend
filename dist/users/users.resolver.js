@@ -12,18 +12,56 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UsersResolver = void 0;
+exports.UsersResolver = exports.SearchQuery = void 0;
 const graphql_1 = require("@nestjs/graphql");
 const users_service_1 = require("./users.service");
 const users_model_1 = require("./users.model");
 const create_user_dto_1 = require("./dto/create.user.dto");
 const password_user_dto_1 = require("./dto/password.user.dto");
+const search_service_1 = require("./search.service");
+const update_user_dto_1 = require("./dto/update.user.dto");
+let SearchQuery = class SearchQuery {
+};
+exports.SearchQuery = SearchQuery;
+__decorate([
+    (0, graphql_1.Field)({ nullable: true }),
+    __metadata("design:type", String)
+], SearchQuery.prototype, "req", void 0);
+__decorate([
+    (0, graphql_1.Field)({ nullable: true }),
+    __metadata("design:type", String)
+], SearchQuery.prototype, "loc", void 0);
+__decorate([
+    (0, graphql_1.Field)({ nullable: true }),
+    __metadata("design:type", Number)
+], SearchQuery.prototype, "page", void 0);
+__decorate([
+    (0, graphql_1.Field)({ nullable: true }),
+    __metadata("design:type", String)
+], SearchQuery.prototype, "cat", void 0);
+__decorate([
+    (0, graphql_1.Field)({ nullable: true }),
+    __metadata("design:type", String)
+], SearchQuery.prototype, "subcat", void 0);
+__decorate([
+    (0, graphql_1.Field)({ nullable: true }),
+    __metadata("design:type", Number)
+], SearchQuery.prototype, "limit", void 0);
+exports.SearchQuery = SearchQuery = __decorate([
+    (0, graphql_1.InputType)()
+], SearchQuery);
 let UsersResolver = class UsersResolver {
-    constructor(usersService) {
+    constructor(usersService, searchService) {
         this.usersService = usersService;
+        this.searchService = searchService;
     }
-    async getUsers() {
-        return this.usersService.findAllUsers();
+    async getUsers(query) {
+        try {
+            return this.searchService.searchUsers(query);
+        }
+        catch (error) {
+            throw error;
+        }
     }
     async getUserById(id) {
         return this.usersService.findById(id);
@@ -37,9 +75,10 @@ let UsersResolver = class UsersResolver {
 };
 exports.UsersResolver = UsersResolver;
 __decorate([
-    (0, graphql_1.Query)(() => [users_model_1.User], { name: 'users' }),
+    (0, graphql_1.Query)(() => update_user_dto_1.search_result, { name: 'allUsers' }),
+    __param(0, (0, graphql_1.Args)('query')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [SearchQuery]),
     __metadata("design:returntype", Promise)
 ], UsersResolver.prototype, "getUsers", null);
 __decorate([
@@ -65,6 +104,7 @@ __decorate([
 ], UsersResolver.prototype, "deleteUser", null);
 exports.UsersResolver = UsersResolver = __decorate([
     (0, graphql_1.Resolver)(() => users_model_1.User),
-    __metadata("design:paramtypes", [users_service_1.UsersService])
+    __metadata("design:paramtypes", [users_service_1.UsersService,
+        search_service_1.SearchService])
 ], UsersResolver);
 //# sourceMappingURL=users.resolver.js.map
