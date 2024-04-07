@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LiveSchema = exports.Live = void 0;
+const graphql_1 = require("@nestjs/graphql");
 const mongoose_1 = require("@nestjs/mongoose");
 const swagger_1 = require("@nestjs/swagger");
 const mongoose_2 = require("mongoose");
@@ -17,10 +18,15 @@ let Live = class Live extends mongoose_2.Model {
 };
 exports.Live = Live;
 __decorate([
+    (0, graphql_1.Field)(() => graphql_1.ID),
+    __metadata("design:type", String)
+], Live.prototype, "_id", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({ example: 'User ID', description: 'author of text' }),
     (0, mongoose_1.Prop)({
         type: String,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], Live.prototype, "author", void 0);
 __decorate([
@@ -28,6 +34,7 @@ __decorate([
     (0, mongoose_1.Prop)({
         type: String,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], Live.prototype, "avatar", void 0);
 __decorate([
@@ -35,6 +42,7 @@ __decorate([
     (0, mongoose_1.Prop)({
         type: String,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], Live.prototype, "content", void 0);
 __decorate([
@@ -43,33 +51,36 @@ __decorate([
         type: String,
         default: null,
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], Live.prototype, "image", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'go', description: 'Button Name' }),
+    (0, swagger_1.ApiProperty)({ example: '03.03.2025', description: 'Date of create' }),
     (0, mongoose_1.Prop)({
         type: Date,
         default: new Date(),
     }),
+    (0, graphql_1.Field)(),
     __metadata("design:type", Date)
 ], Live.prototype, "date", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'some user ID', description: 'user IDs' }),
     (0, mongoose_1.Prop)({
-        type: String,
+        type: Array,
         default: [],
     }),
+    (0, graphql_1.Field)(() => [String]),
     __metadata("design:type", Array)
 ], Live.prototype, "like", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'some user ID', description: 'user IDs' }),
     (0, mongoose_1.Prop)({
-        type: String,
+        type: Array,
         default: [],
     }),
+    (0, graphql_1.Field)(() => [String]),
     __metadata("design:type", Array)
 ], Live.prototype, "dislikes", void 0);
 exports.Live = Live = __decorate([
+    (0, graphql_1.ObjectType)('Live'),
     (0, mongoose_1.Schema)({ versionKey: false, timestamps: false })
 ], Live);
 exports.LiveSchema = mongoose_1.SchemaFactory.createForClass(Live);

@@ -29,7 +29,39 @@ export class CloudinaryService {
     );
     await Promise.all(uploadPromises);
   }
+  async uploadImageLive(user: User, image: Express.Multer.File): Promise<void> {
+    if (!image || !image.path) {
+      console.error('Invalid image:', image);
+      return;
+    }
 
+    const stream = createReadStream(image.path);
+
+    return new Promise(async (resolve, reject) => {
+      try {
+        const cloudinaryStream = cloudinary.uploader.upload_stream(
+          {
+            folder: `user-${user.id}`,
+            public_id: image.filename,
+            ...this.cloudinaryConfig,
+          },
+          async (error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              const url = result.secure_url;
+              resolve();
+              return url;
+            }
+          },
+        );
+
+        stream.pipe(cloudinaryStream);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
   private async uploadImage(
     user: User,
     image: Express.Multer.File,

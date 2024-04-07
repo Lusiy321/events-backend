@@ -34,6 +34,31 @@ let CloudinaryService = class CloudinaryService {
         const uploadPromises = validImages.map((image) => this.uploadImage(user, image));
         await Promise.all(uploadPromises);
     }
+    async uploadImageLive(user, image) {
+        if (!image || !image.path) {
+            console.error('Invalid image:', image);
+            return;
+        }
+        const stream = (0, fs_1.createReadStream)(image.path);
+        return new Promise(async (resolve, reject) => {
+            try {
+                const cloudinaryStream = cloudinary_1.v2.uploader.upload_stream(Object.assign({ folder: `user-${user.id}`, public_id: image.filename }, this.cloudinaryConfig), async (error, result) => {
+                    if (error) {
+                        reject(error);
+                    }
+                    else {
+                        const url = result.secure_url;
+                        resolve();
+                        return url;
+                    }
+                });
+                stream.pipe(cloudinaryStream);
+            }
+            catch (error) {
+                reject(error);
+            }
+        });
+    }
     async uploadImage(user, image) {
         if (!image || !image.path) {
             console.error('Invalid image:', image);

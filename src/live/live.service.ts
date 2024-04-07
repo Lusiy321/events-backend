@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/users/users.model';
-import { CreateLiveDto } from './dto/create.live.dto';
+import { CreateLiveDto, SearchLive, search_live } from './dto/create.live.dto';
 import { Live } from './live.model';
 import {
   Conflict,
@@ -11,6 +11,7 @@ import {
   NotAcceptable,
 } from 'http-errors';
 import { verify, JwtPayload } from 'jsonwebtoken';
+import { CloudinaryService } from 'src/users/cloudinary.service';
 
 @Injectable()
 export class LiveService {
@@ -19,30 +20,61 @@ export class LiveService {
     private userModel: User,
     @InjectModel(Live.name)
     private liveModel: Live,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  async findAllUsersMessage(): Promise<Live[]> {
+  async findAllUsersMessage(query: SearchLive): Promise<search_live> {
+    const { page, limit } = query;
+    const curentPage = page || 1;
+    const curentlimit = limit || 8;
     try {
-      const find = await this.liveModel.find();
-      return find;
+      const totalCount = await this.liveModel.countDocuments();
+      const totalPages = Math.ceil(totalCount / curentlimit);
+      const offset = (curentPage - 1) * curentlimit;
+      const find = await this.liveModel
+        .find()
+        .limit(curentlimit)
+        .skip(offset)
+        .exec();
+      return {
+        totalPages: totalPages,
+        currentPage: curentPage,
+        data: find,
+      };
     } catch (e) {
       throw new NotFound('User not found');
     }
   }
 
-  async createMessage(req: any, content: CreateLiveDto): Promise<Live> {
+  async createMessage(
+    req: any,
+    content: CreateLiveDto,
+    file: any,
+  ): Promise<Live> {
     try {
       const user = await this.findToken(req);
       if (!user) {
         throw new Unauthorized('jwt expired');
       }
-      const createdLive = await this.liveModel.create({
-        ...content,
-        avatar: user.avatar.url,
-        author: user._id,
-      });
-      createdLive.save();
-      return await this.liveModel.findById(createdLive._id).exec();
+      if (file) {
+        const imgUrl = await this.cloudinaryService.uploadImageLive(user, file);
+        const createdLive = await this.liveModel.create({
+          ...content,
+          avatar: user.avatar.url,
+          author: user._id,
+          image: imgUrl,
+        });
+        createdLive.save();
+        return await this.liveModel.findById(createdLive._id).exec();
+      } else {
+        const createdLive = await this.liveModel.create({
+          ...content,
+          avatar: user.avatar.url,
+          author: user._id,
+        });
+        createdLive.save();
+        return await this.liveModel.findById(createdLive._id).exec();
+      }
     } catch (e) {
       throw e;
     }

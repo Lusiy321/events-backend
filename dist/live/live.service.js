@@ -19,29 +19,53 @@ const users_model_1 = require("../users/users.model");
 const live_model_1 = require("./live.model");
 const http_errors_1 = require("http-errors");
 const jsonwebtoken_1 = require("jsonwebtoken");
+const cloudinary_service_1 = require("../users/cloudinary.service");
 let LiveService = class LiveService {
-    constructor(userModel, liveModel) {
+    constructor(userModel, liveModel, cloudinaryService) {
         this.userModel = userModel;
         this.liveModel = liveModel;
+        this.cloudinaryService = cloudinaryService;
     }
-    async findAllUsersMessage() {
+    async findAllUsersMessage(query) {
+        const { page, limit } = query;
+        const curentPage = page || 1;
+        const curentlimit = limit || 8;
         try {
-            const find = await this.liveModel.find();
-            return find;
+            const totalCount = await this.liveModel.countDocuments();
+            const totalPages = Math.ceil(totalCount / curentlimit);
+            const offset = (curentPage - 1) * curentlimit;
+            const find = await this.liveModel
+                .find()
+                .limit(curentlimit)
+                .skip(offset)
+                .exec();
+            return {
+                totalPages: totalPages,
+                currentPage: curentPage,
+                data: find,
+            };
         }
         catch (e) {
             throw new http_errors_1.NotFound('User not found');
         }
     }
-    async createMessage(req, content) {
+    async createMessage(req, content, file) {
         try {
             const user = await this.findToken(req);
             if (!user) {
                 throw new http_errors_1.Unauthorized('jwt expired');
             }
-            const createdLive = await this.liveModel.create(Object.assign(Object.assign({}, content), { avatar: user.avatar.url, author: user._id }));
-            createdLive.save();
-            return await this.liveModel.findById(createdLive._id).exec();
+            if (file) {
+                const imgUrl = await this.cloudinaryService.uploadImageLive(user, file);
+                const createdLive = await this.liveModel.create(Object.assign(Object.assign({}, content), { avatar: user.avatar.url, author: user._id, image: imgUrl }));
+                createdLive.save();
+                return await this.liveModel.findById(createdLive._id).exec();
+            }
+            else {
+                const createdLive = await this.liveModel.create(Object.assign(Object.assign({}, content), { avatar: user.avatar.url, author: user._id }));
+                createdLive.save();
+                return await this.liveModel.findById(createdLive._id).exec();
+            }
         }
         catch (e) {
             throw e;
@@ -77,6 +101,7 @@ exports.LiveService = LiveService = __decorate([
     __param(0, (0, mongoose_1.InjectModel)(users_model_1.User.name)),
     __param(1, (0, mongoose_1.InjectModel)(live_model_1.Live.name)),
     __metadata("design:paramtypes", [users_model_1.User,
-        live_model_1.Live])
+        live_model_1.Live,
+        cloudinary_service_1.CloudinaryService])
 ], LiveService);
 //# sourceMappingURL=live.service.js.map

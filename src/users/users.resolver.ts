@@ -3,7 +3,6 @@ import {
   Query,
   Mutation,
   Args,
-  ObjectType,
   InputType,
   Field,
 } from '@nestjs/graphql';
@@ -14,7 +13,6 @@ import { PasswordUserDto } from './dto/password.user.dto';
 import { SearchService } from './search.service';
 import { search_result } from './dto/update.user.dto';
 
-// Определение интерфейса SearchQuery
 @InputType()
 export class SearchQuery {
   @Field({ nullable: true })

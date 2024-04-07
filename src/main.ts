@@ -7,12 +7,17 @@ import * as session from 'express-session';
 import * as cookieParser from 'cookie-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cors from 'cors';
+import * as graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
 
 async function start() {
   const PORT = process.env.PORT || 5000;
   const app = await NestFactory.create(AppModule, new ExpressAdapter(express), {
     cors: true,
   });
+  app.use(
+    'graphql',
+    graphqlUploadExpress({ maxFileSize: 1000000, maxFiles: 10 }),
+  );
   app.use(cookieParser());
   app.use(
     session({
@@ -25,7 +30,7 @@ async function start() {
     }),
   );
   app.enableCors();
-  app.use(cors());
+
   const config = new DocumentBuilder()
     .setTitle('Wechirka.com SERVER')
     .setDescription('Wechirka REAST API Documentation')

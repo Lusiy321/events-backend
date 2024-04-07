@@ -25,6 +25,7 @@
 import { Model } from 'mongoose';
 export type LiveDocument = Live & Document;
 export declare class Live extends Model<Live> {
+    _id: string;
     author: string;
     avatar: string;
     content: string;
@@ -33,8 +34,8 @@ export declare class Live extends Model<Live> {
     like: Array<string>;
     dislikes: Array<string>;
 }
-export declare const LiveSchema: import("mongoose").Schema<Live, Model<Live, any, any, any, import("mongoose").Document<unknown, any, Live> & Live & {
-    _id: import("mongoose").Types.ObjectId;
-}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Live, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<Live>> & import("mongoose").FlatRecord<Live> & {
-    _id: import("mongoose").Types.ObjectId;
-}>;
+export declare const LiveSchema: import("mongoose").Schema<Live, Model<Live, any, any, any, import("mongoose").Document<unknown, any, Live> & Live & Required<{
+    _id: string;
+}>, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Live, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<Live>> & import("mongoose").FlatRecord<Live> & Required<{
+    _id: string;
+}>>;

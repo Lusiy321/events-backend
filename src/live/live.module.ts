@@ -5,6 +5,7 @@ import { Live, LiveSchema } from './live.model';
 import { User, UserSchema } from 'src/users/users.model';
 import { LiveController } from './live.controller';
 import { LiveResolver } from './live.resolver';
+import { CloudinaryService } from 'src/users/cloudinary.service';
 
 @Module({
   imports: [
@@ -14,6 +15,6 @@ import { LiveResolver } from './live.resolver';
     ]),
   ],
   controllers: [LiveController],
-  providers: [LiveService, LiveResolver],
+  providers: [LiveService, LiveResolver, CloudinaryService],
 })
 export class LiveModule {}

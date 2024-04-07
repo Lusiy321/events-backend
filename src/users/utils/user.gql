@@ -70,9 +70,27 @@ type search_result {
   data: [User!]!
 }
 
+type Live {
+  _id: ID!
+  author: String!
+  avatar: String!
+  content: String!
+  image: String!
+  date: DateTime!
+  like: [String!]!
+  dislikes: [String!]!
+}
+
+type search_live {
+  totalPages: Float!
+  currentPage: Float!
+  data: [Live!]!
+}
+
 type Query {
   allUsers(query: SearchQuery!): search_result!
   user(id: String!): User!
+  messages(query: SearchLive!): search_live!
 }
 
 input SearchQuery {
@@ -84,9 +102,15 @@ input SearchQuery {
   limit: Float
 }
 
+input SearchLive {
+  page: Float
+  limit: Float
+}
+
 type Mutation {
   createUser(data: CreateUserDto!): User!
   deleteUser(password: PasswordUser!): User!
+  createMessage(image: Upload, data: CreateLiveDto!): Live!
 }
 
 input CreateUserDto {
@@ -98,4 +122,12 @@ input CreateUserDto {
 
 input PasswordUser {
   password: String!
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+input CreateLiveDto {
+  content: String!
+  image: String
 }

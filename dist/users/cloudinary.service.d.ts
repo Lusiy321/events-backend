@@ -5,6 +5,7 @@ export declare class CloudinaryService {
     private readonly cloudinaryConfig;
     constructor(userModel: User);
     uploadImages(user: User, images: Express.Multer.File[]): Promise<void>;
+    uploadImageLive(user: User, image: Express.Multer.File): Promise<void>;
     private uploadImage;
     deleteAllImages(user: User): Promise<void>;
     deleteImage(user: User, photoId: string): Promise<void>;

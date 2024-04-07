@@ -14,6 +14,7 @@ const live_model_1 = require("./live.model");
 const users_model_1 = require("../users/users.model");
 const live_controller_1 = require("./live.controller");
 const live_resolver_1 = require("./live.resolver");
+const cloudinary_service_1 = require("../users/cloudinary.service");
 let LiveModule = class LiveModule {
 };
 exports.LiveModule = LiveModule;
@@ -26,7 +27,7 @@ exports.LiveModule = LiveModule = __decorate([
             ]),
         ],
         controllers: [live_controller_1.LiveController],
-        providers: [live_service_1.LiveService, live_resolver_1.LiveResolver],
+        providers: [live_service_1.LiveService, live_resolver_1.LiveResolver, cloudinary_service_1.CloudinaryService],
     })
 ], LiveModule);
 //# sourceMappingURL=live.module.js.map
