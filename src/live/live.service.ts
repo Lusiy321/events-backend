@@ -100,4 +100,74 @@ export class LiveService {
       }
     }
   }
+
+  async addLike(req: any, postId: string) {
+    try {
+      const user = await this.findToken(req);
+      if (!user) {
+        throw new Unauthorized('jwt expired');
+      }
+      const post = await this.liveModel.findById(postId);
+      if (!post) {
+        throw new NotFound('Post not found');
+      }
+      const userIndex = post.like.indexOf(user._id);
+      if (userIndex !== -1) {
+        post.like.splice(userIndex, 1);
+        post.save();
+        return post;
+      } else {
+        post.like.push(user._id);
+        post.save();
+        return post;
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  async addDislike(req: any, postId: string) {
+    try {
+      const user = await this.findToken(req);
+      if (!user) {
+        throw new Unauthorized('jwt expired');
+      }
+      const post = await this.liveModel.findById(postId);
+      if (!post) {
+        throw new NotFound('Post not found');
+      }
+      const userIndex = post.dislikes.indexOf(user._id);
+      if (userIndex !== -1) {
+        post.dislikes.splice(userIndex, 1);
+        post.save();
+        return post;
+      } else {
+        post.dislikes.push(user._id);
+        post.save();
+        return post;
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  async deletePost(req: any, postId: string) {
+    try {
+      const user = await this.findToken(req);
+      if (!user) {
+        throw new Unauthorized('jwt expired');
+      }
+      const post = await this.liveModel.findById(postId);
+      if (!post) {
+        throw new NotFound('Post not found');
+      }
+      if (post.author === user._id) {
+        return await this.liveModel.findByIdAndRemove(postId);
+      } else {
+        throw new NotAcceptable('You are not the author of this post');
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
 }

@@ -6,7 +6,6 @@ import { MesengersService } from './orders/mesengers.service';
 import * as session from 'express-session';
 import * as cookieParser from 'cookie-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as cors from 'cors';
 import * as graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
 
 async function start() {

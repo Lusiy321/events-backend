@@ -10,4 +10,7 @@ export declare class LiveService {
     findAllUsersMessage(query: SearchLive): Promise<search_live>;
     createMessage(req: any, content: CreateLiveDto, file: any): Promise<Live>;
     findToken(req: any): Promise<User>;
+    addLike(req: any, postId: string): Promise<any>;
+    addDislike(req: any, postId: string): Promise<any>;
+    deletePost(req: any, postId: string): Promise<any>;
 }
