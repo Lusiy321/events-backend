@@ -120,6 +120,7 @@ let UsersController = class UsersController {
         return { message: 'Email send' };
     }
     async deleteProfile(request, password) {
+        console.log(password);
         return await this.usersService.deleteUserProfile(request, password);
     }
     async setEmailPsw(email) {

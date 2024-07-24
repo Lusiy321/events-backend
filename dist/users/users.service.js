@@ -314,9 +314,11 @@ let UsersService = class UsersService {
                 throw new http_errors_1.Unauthorized('jwt expired');
             }
             const { password } = userPassword;
+            console.log(password);
             if (user.comparePassword(password) === true) {
+                console.log('tyt');
                 await this.cloudinaryService.deleteAllImages(user);
-                await this.userModel.findByIdAndRemove({ _id: user._id });
+                await this.userModel.findByIdAndRemove({ _id: user.id });
                 const body = email_delete_1.delUserMsg;
                 const msg = {
                     to: user.email,

@@ -287,6 +287,7 @@ export class UsersController {
   @ApiBearerAuth('BearerAuthMethod')
   @Delete('delete-profile')
   async deleteProfile(@Req() request: any, @Body() password: PasswordUserDto) {
+    console.log(password);
     return await this.usersService.deleteUserProfile(request, password);
   }
 
