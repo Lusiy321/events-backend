@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const users_model_1 = require("./users.model");
 const users_service_1 = require("./users.service");
 const create_user_dto_1 = require("./dto/create.user.dto");
+const http_errors_1 = require("http-errors");
 const swagger_1 = require("@nestjs/swagger");
 const update_user_dto_1 = require("./dto/update.user.dto");
 const google_user_dto_1 = require("./dto/google.user.dto");
@@ -121,7 +122,12 @@ let UsersController = class UsersController {
     }
     async deleteProfile(request, password) {
         console.log(password);
-        return await this.usersService.deleteUserProfile(request, password);
+        if (password.password === undefined) {
+            throw new http_errors_1.BadRequest('Password is not avaible');
+        }
+        else {
+            return await this.usersService.deleteUserProfile(request, password);
+        }
     }
     async setEmailPsw(email) {
         return this.usersService.sendVerificationEmail(email);

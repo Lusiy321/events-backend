@@ -19,6 +19,7 @@ import {
 import { User } from './users.model';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create.user.dto';
+import { BadRequest } from 'http-errors';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -288,7 +289,11 @@ export class UsersController {
   @Delete('delete-profile')
   async deleteProfile(@Req() request: any, @Body() password: PasswordUserDto) {
     console.log(password);
-    return await this.usersService.deleteUserProfile(request, password);
+    if (password.password === undefined) {
+      throw new BadRequest('Password is not avaible');
+    } else {
+      return await this.usersService.deleteUserProfile(request, password);
+    }
   }
 
   @ApiOperation({
