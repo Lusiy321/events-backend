@@ -121,7 +121,6 @@ let UsersController = class UsersController {
         return { message: 'Email send' };
     }
     async deleteProfile(request, password) {
-        console.log(password);
         if (password.password === undefined) {
             throw new http_errors_1.BadRequest('Password is not avaible');
         }
@@ -383,6 +382,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Delete user profile' }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
+    (0, common_1.HttpCode)(200),
     (0, common_1.Post)('delete-profile'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),

@@ -286,9 +286,9 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Delete user profile' })
   @ApiBearerAuth('BearerAuthMethod')
+  @HttpCode(200)
   @Post('delete-profile')
   async deleteProfile(@Req() request: any, @Body() password: PasswordUserDto) {
-    console.log(password);
     if (password.password === undefined) {
       throw new BadRequest('Password is not avaible');
     } else {
