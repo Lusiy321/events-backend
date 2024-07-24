@@ -6,5 +6,5 @@ import { ApiProperty } from '@nestjs/swagger';
 export class PasswordUserDto {
   @ApiProperty({ example: 'Vovan-123545', description: 'User password' })
   @Field()
-  readonly password: string;
+  password: string;
 }

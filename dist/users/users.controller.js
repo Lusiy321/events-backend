@@ -383,7 +383,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Delete user profile' }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
-    (0, common_1.Delete)('delete-profile'),
+    (0, common_1.Post)('delete-profile'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
