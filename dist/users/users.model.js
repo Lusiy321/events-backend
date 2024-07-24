@@ -19,7 +19,7 @@ let User = class User extends mongoose_2.Model {
 };
 exports.User = User;
 __decorate([
-    (0, graphql_1.Field)(() => graphql_1.ID),
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], User.prototype, "_id", void 0);
 __decorate([

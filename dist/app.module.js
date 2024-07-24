@@ -38,6 +38,8 @@ const live_controller_1 = require("./live/live.controller");
 const banners_service_1 = require("./banners/banners.service");
 const path_1 = require("path");
 const graphql_2 = require("graphql");
+const places_module_1 = require("./places/places.module");
+const places_model_1 = require("./places/places.model");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer.apply(validation_orders_1.ValidationOrders).forRoutes('./orders/orders.controller');
@@ -83,6 +85,7 @@ exports.AppModule = AppModule = __decorate([
                 { name: banners_model_1.Banner.name, schema: banners_model_1.BannerSchema, collection: 'banners' },
                 { name: posts_model_1.Posts.name, schema: posts_model_1.PostSchema, collection: 'posts' },
                 { name: live_model_1.Live.name, schema: live_model_1.LiveSchema, collection: 'live' },
+                { name: places_model_1.Place.name, schema: places_model_1.PlaceSchema, collection: 'places' },
                 {
                     name: order_archive_model_1.OrdersArchive.name,
                     schema: order_archive_model_1.OrdersArchiveSchema,
@@ -95,6 +98,7 @@ exports.AppModule = AppModule = __decorate([
             posts_module_1.PostsModule,
             banners_module_1.BannersModule,
             live_module_1.LiveModule,
+            places_module_1.PlacesModule,
         ],
     })
 ], AppModule);

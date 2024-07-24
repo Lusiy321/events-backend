@@ -2,14 +2,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Model } from 'mongoose';
-import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 import { Photo, Social, Categories } from './utils/user.types';
 
 export type UserDocument = User & Document;
 @ObjectType('User')
 @Schema({ versionKey: false, timestamps: true })
 export class User extends Model<User> {
-  @Field(() => ID)
+  @Field()
   _id: string;
   @ApiProperty({ example: 'Volodymyr', description: 'User first name' })
   @Prop({

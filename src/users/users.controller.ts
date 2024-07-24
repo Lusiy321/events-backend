@@ -40,6 +40,7 @@ import { FacebookAuthGuard } from './utils/GuardFacebook';
 import { SearchService } from './search.service';
 import { PasswordUserDto } from './dto/password.user.dto';
 import { Categories } from './utils/user.types';
+import { LoginUserDto } from './dto/login.user.dto';
 
 @ApiTags('User')
 @Controller('users')
@@ -93,7 +94,7 @@ export class UsersController {
   @ApiResponse({ status: 200, type: User })
   @HttpCode(200)
   @Post('login')
-  async login(@Body() user: CreateUserDto): Promise<User> {
+  async login(@Body() user: LoginUserDto): Promise<User> {
     return await this.usersService.login(user);
   }
 
@@ -285,11 +286,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Delete user profile' })
   @ApiBearerAuth('BearerAuthMethod')
   @Delete('delete-profile')
-  async deleteProfile(
-    @Res() res: any,
-    @Req() request: any,
-    @Body() password: PasswordUserDto,
-  ) {
+  async deleteProfile(@Req() request: any, @Body() password: PasswordUserDto) {
     return await this.usersService.deleteUserProfile(request, password);
   }
 

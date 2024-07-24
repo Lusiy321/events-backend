@@ -37,6 +37,8 @@ import { LiveController } from './live/live.controller';
 import { BannersService } from './banners/banners.service';
 import { join } from 'path';
 import { DirectiveLocation, GraphQLDirective } from 'graphql';
+import { PlacesModule } from './places/places.module';
+import { Place, PlaceSchema } from './places/places.model';
 
 @Module({
   controllers: [UsersController, AdminController, LiveController],
@@ -72,6 +74,7 @@ import { DirectiveLocation, GraphQLDirective } from 'graphql';
       { name: Banner.name, schema: BannerSchema, collection: 'banners' },
       { name: Posts.name, schema: PostSchema, collection: 'posts' },
       { name: Live.name, schema: LiveSchema, collection: 'live' },
+      { name: Place.name, schema: PlaceSchema, collection: 'places' },
       {
         name: OrdersArchive.name,
         schema: OrdersArchiveSchema,
@@ -84,6 +87,7 @@ import { DirectiveLocation, GraphQLDirective } from 'graphql';
     PostsModule,
     BannersModule,
     LiveModule,
+    PlacesModule,
   ],
 })
 export class AppModule implements NestModule {

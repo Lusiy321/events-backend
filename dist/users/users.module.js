@@ -28,6 +28,7 @@ const apollo_1 = require("@nestjs/apollo");
 const users_resolver_1 = require("./users.resolver");
 const graphql_2 = require("graphql");
 const path_1 = require("path");
+const places_model_1 = require("../places/places.model");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;
@@ -59,6 +60,7 @@ exports.UsersModule = UsersModule = __decorate([
                 { name: users_model_1.User.name, schema: users_model_1.UserSchema, collection: 'users' },
                 { name: order_model_1.Orders.name, schema: order_model_1.OrderSchema, collection: 'orders' },
                 { name: category_model_1.Category.name, schema: category_model_1.CategorySchema, collection: 'categories' },
+                { name: places_model_1.Place.name, schema: places_model_1.PlaceSchema, collection: 'places' },
             ]),
             platform_express_1.MulterModule.register({
                 dest: './uploads',

@@ -5,6 +5,7 @@ import { User } from './users.model';
 import { InjectModel } from '@nestjs/mongoose';
 import * as fs from 'fs';
 import * as path from 'path';
+import { Place } from 'src/places/places.model';
 
 @Injectable()
 export class CloudinaryService {
@@ -13,6 +14,8 @@ export class CloudinaryService {
   constructor(
     @InjectModel(User.name)
     private userModel: User,
+    @InjectModel(Place.name)
+    private placeModel: Place,
   ) {
     this.cloudinaryConfig = {
       cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -127,6 +130,20 @@ export class CloudinaryService {
     }
   }
 
+  async deleteAllPlaceImages(place: Place): Promise<void> {
+    try {
+      const publicIds = place.photo.map((photo) => photo.publicId);
+
+      const deletePromises = publicIds.map((publicId) =>
+        this.deletePlaceImage(place, publicId),
+      );
+
+      await Promise.all(deletePromises);
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async deleteImage(user: User, photoId: string): Promise<void> {
     return new Promise(async (resolve, reject) => {
       try {
@@ -156,6 +173,54 @@ export class CloudinaryService {
               } else {
                 await this.userModel.findByIdAndUpdate(
                   { _id: user.id },
+                  {
+                    $set: {
+                      photo: updatedPhotos,
+                      master_photo: updatedPhotos[0],
+                      metaUrl: updatedPhotos[0].url,
+                    },
+                  },
+                );
+              }
+              resolve();
+            }
+          },
+        );
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  async deletePlaceImage(place: Place, photoId: string): Promise<void> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        cloudinary.uploader.destroy(
+          photoId,
+          { ...this.cloudinaryConfig },
+          async (error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              const updatedPhotos = place.photo.filter(
+                (item) => item.publicId !== photoId,
+              );
+              if (updatedPhotos.length === 0) {
+                await this.placeModel.findByIdAndUpdate(
+                  { _id: place.id },
+                  {
+                    $set: {
+                      master_photo: {
+                        publicId: '1',
+                        url: process.env.PLACE,
+                      },
+                      metaUrl: process.env.PLACE,
+                    },
+                  },
+                );
+              } else {
+                await this.placeModel.findByIdAndUpdate(
+                  { _id: place.id },
                   {
                     $set: {
                       photo: updatedPhotos,

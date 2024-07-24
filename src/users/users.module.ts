@@ -19,6 +19,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UsersResolver } from './users.resolver';
 import { DirectiveLocation, GraphQLDirective } from 'graphql';
 import { join } from 'path';
+import { Place, PlaceSchema } from 'src/places/places.model';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { join } from 'path';
       { name: User.name, schema: UserSchema, collection: 'users' },
       { name: Orders.name, schema: OrderSchema, collection: 'orders' },
       { name: Category.name, schema: CategorySchema, collection: 'categories' },
+      { name: Place.name, schema: PlaceSchema, collection: 'places' },
     ]),
     MulterModule.register({
       dest: './uploads',

@@ -1,0 +1,43 @@
+import { Categories } from '../users/utils/user.types';
+import { PlacesService } from './places.service';
+import { CloudinaryService } from 'src/users/cloudinary.service';
+import { Place } from './places.model';
+import { CreatePlaceDto } from './dto/create.place.dto';
+import { CategoryPlace } from './category.place.model';
+import { LoginUserDto } from 'src/users/dto/login.user.dto';
+import { UpdatePlaceDto } from './dto/update.place.dto';
+import { User } from 'src/users/users.model';
+import { DelUserMediaDto } from './dto/delete.user.dto';
+import { PasswordChangeDto } from 'src/users/dto/change-password.user.dto';
+import { MailUserDto } from './dto/email.user.dto';
+import { PasswordUserDto } from 'src/users/dto/password.user.dto';
+export declare class PlacesController {
+    private readonly placesService;
+    private readonly cloudinaryService;
+    constructor(placesService: PlacesService, cloudinaryService: CloudinaryService);
+    [x: string]: any;
+    create(place: CreatePlaceDto): Promise<Place>;
+    findPlaces(): Promise<Place[]>;
+    findById(id: string): Promise<Place>;
+    findCat(): Promise<CategoryPlace[]>;
+    login(place: LoginUserDto): Promise<Place>;
+    logout(request: any): Promise<Place>;
+    update(data: UpdatePlaceDto, request: any): Promise<Place>;
+    updateCat(data: Categories, request: any): Promise<Place>;
+    delCat(id: string, request: any): Promise<Place>;
+    deleteImage(id: DelUserMediaDto, req: any): Promise<User>;
+    deleteVideo(id: string, req: any): Promise<User>;
+    deleteAvatarImage(req: any): Promise<User>;
+    googleLogin(): void;
+    googleAuthRedirect(res: any, req: any): Promise<any>;
+    facebookLogin(): void;
+    facebookAuthRedirect(res: any, req: any): Promise<any>;
+    refresh(req: any): Promise<any>;
+    cangePwd(request: any, password: PasswordChangeDto): Promise<any>;
+    forgotPwd(email: MailUserDto): Promise<{
+        message: string;
+    }>;
+    deleteProfile(res: any, request: any, password: PasswordUserDto): Promise<any>;
+    setEmailPsw(email: string): Promise<any>;
+    verifyEmail(id: string): Promise<any>;
+}

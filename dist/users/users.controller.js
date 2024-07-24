@@ -33,6 +33,7 @@ const GuardFacebook_1 = require("./utils/GuardFacebook");
 const search_service_1 = require("./search.service");
 const password_user_dto_1 = require("./dto/password.user.dto");
 const user_types_1 = require("./utils/user.types");
+const login_user_dto_1 = require("./dto/login.user.dto");
 let UsersController = class UsersController {
     constructor(usersService, searchService, cloudinaryService) {
         this.usersService = usersService;
@@ -118,7 +119,7 @@ let UsersController = class UsersController {
         await this.usersService.restorePassword(email);
         return { message: 'Email send' };
     }
-    async deleteProfile(res, request, password) {
+    async deleteProfile(request, password) {
         return await this.usersService.deleteUserProfile(request, password);
     }
     async setEmailPsw(email) {
@@ -182,7 +183,7 @@ __decorate([
     (0, common_1.Post)('login'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_user_dto_1.CreateUserDto]),
+    __metadata("design:paramtypes", [login_user_dto_1.LoginUserDto]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "login", null);
 __decorate([
@@ -376,11 +377,10 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Delete user profile' }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
     (0, common_1.Delete)('delete-profile'),
-    __param(0, (0, common_1.Res)()),
-    __param(1, (0, common_1.Req)()),
-    __param(2, (0, common_1.Body)()),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object, password_user_dto_1.PasswordUserDto]),
+    __metadata("design:paramtypes", [Object, password_user_dto_1.PasswordUserDto]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "deleteProfile", null);
 __decorate([

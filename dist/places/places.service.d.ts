@@ -1,0 +1,44 @@
+import * as nodemailer from 'nodemailer';
+import { CloudinaryService } from '../users/cloudinary.service';
+import { Categories } from '../users/utils/user.types';
+import { Place } from './places.model';
+import { CreatePlaceDto } from './dto/create.place.dto';
+import { PasswordChangePlaceDto } from './dto/change-password.place.dto';
+import { GooglePlaceDto } from './dto/google.place.dto';
+import { MailUserDto } from './dto/email.user.dto';
+import { PasswordUserDto } from 'src/users/dto/password.user.dto';
+import { UpdatePlaceDto } from './dto/update.place.dto';
+import { LoginUserDto } from 'src/users/dto/login.user.dto';
+import { CategoryPlace } from './category.place.model';
+export declare const TRANSPORTER_PROVIDER = "TRANSPORTER_PROVIDER";
+export declare class PlacesService {
+    private placeModel;
+    private categoryModel;
+    private transporter;
+    private readonly cloudinaryService;
+    constructor(placeModel: Place, categoryModel: CategoryPlace, transporter: nodemailer.Transporter, cloudinaryService: CloudinaryService);
+    findAllPlaces(): Promise<Place[]>;
+    findById(id: string): Promise<Place>;
+    create(place: CreatePlaceDto): Promise<Place>;
+    checkTrialStatus(id: string): Promise<boolean>;
+    sendVerificationEmail(email: string): Promise<void>;
+    verifyPlaceEmail(id: any): Promise<any>;
+    changePassword(req: any, newPass: PasswordChangePlaceDto): Promise<Place>;
+    validatePlace(details: GooglePlaceDto): Promise<any>;
+    validateFacebook(details: any): Promise<any>;
+    restorePassword(email: MailUserDto): Promise<any>;
+    login(place: LoginUserDto): Promise<Place>;
+    logout(req: any): Promise<Place>;
+    deletePlaceProfile(req: any, placePassword: PasswordUserDto): Promise<Place>;
+    updatePlace(place: UpdatePlaceDto, req: any): Promise<Place>;
+    private addSubcategory;
+    updateCategory(data: Categories, req: any): Promise<Place>;
+    deleteCategory(id: string, req: any): Promise<any>;
+    deletePlaceVideo(id: string, req: any): Promise<any>;
+    findToken(req: any): Promise<Place>;
+    createToken(authPlace: {
+        _id: string;
+    }): Promise<any>;
+    refreshAccessToken(req: any): Promise<Place>;
+    findCategory(): Promise<CategoryPlace[]>;
+}

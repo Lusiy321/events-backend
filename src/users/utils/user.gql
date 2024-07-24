@@ -21,7 +21,7 @@ type Subcategory {
 }
 
 type User {
-  _id: ID!
+  _id: String!
   firstName: String!
   email: String!
   password: String!

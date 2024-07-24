@@ -20,9 +20,11 @@ const users_model_1 = require("./users.model");
 const mongoose_1 = require("@nestjs/mongoose");
 const fs = require("fs");
 const path = require("path");
+const places_model_1 = require("../places/places.model");
 let CloudinaryService = class CloudinaryService {
-    constructor(userModel) {
+    constructor(userModel, placeModel) {
         this.userModel = userModel;
+        this.placeModel = placeModel;
         this.cloudinaryConfig = {
             cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
             api_key: process.env.CLOUDINARY_API_KEY,
@@ -104,6 +106,16 @@ let CloudinaryService = class CloudinaryService {
             throw error;
         }
     }
+    async deleteAllPlaceImages(place) {
+        try {
+            const publicIds = place.photo.map((photo) => photo.publicId);
+            const deletePromises = publicIds.map((publicId) => this.deletePlaceImage(place, publicId));
+            await Promise.all(deletePromises);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
     async deleteImage(user, photoId) {
         return new Promise(async (resolve, reject) => {
             try {
@@ -126,6 +138,44 @@ let CloudinaryService = class CloudinaryService {
                         }
                         else {
                             await this.userModel.findByIdAndUpdate({ _id: user.id }, {
+                                $set: {
+                                    photo: updatedPhotos,
+                                    master_photo: updatedPhotos[0],
+                                    metaUrl: updatedPhotos[0].url,
+                                },
+                            });
+                        }
+                        resolve();
+                    }
+                });
+            }
+            catch (error) {
+                reject(error);
+            }
+        });
+    }
+    async deletePlaceImage(place, photoId) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                cloudinary_1.v2.uploader.destroy(photoId, Object.assign({}, this.cloudinaryConfig), async (error, result) => {
+                    if (error) {
+                        reject(error);
+                    }
+                    else {
+                        const updatedPhotos = place.photo.filter((item) => item.publicId !== photoId);
+                        if (updatedPhotos.length === 0) {
+                            await this.placeModel.findByIdAndUpdate({ _id: place.id }, {
+                                $set: {
+                                    master_photo: {
+                                        publicId: '1',
+                                        url: process.env.PLACE,
+                                    },
+                                    metaUrl: process.env.PLACE,
+                                },
+                            });
+                        }
+                        else {
+                            await this.placeModel.findByIdAndUpdate({ _id: place.id }, {
                                 $set: {
                                     photo: updatedPhotos,
                                     master_photo: updatedPhotos[0],
@@ -239,6 +289,8 @@ exports.CloudinaryService = CloudinaryService;
 exports.CloudinaryService = CloudinaryService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(users_model_1.User.name)),
-    __metadata("design:paramtypes", [users_model_1.User])
+    __param(1, (0, mongoose_1.InjectModel)(places_model_1.Place.name)),
+    __metadata("design:paramtypes", [users_model_1.User,
+        places_model_1.Place])
 ], CloudinaryService);
 //# sourceMappingURL=cloudinary.service.js.map

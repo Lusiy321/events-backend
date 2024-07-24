@@ -11,6 +11,7 @@ import { DelUserMediaDto } from './dto/delete.user.dto';
 import { SearchService } from './search.service';
 import { PasswordUserDto } from './dto/password.user.dto';
 import { Categories } from './utils/user.types';
+import { LoginUserDto } from './dto/login.user.dto';
 export declare class UsersController {
     private readonly usersService;
     private readonly searchService;
@@ -22,7 +23,7 @@ export declare class UsersController {
     findUsers(): Promise<User[]>;
     findById(id: string): Promise<User>;
     findCat(): Promise<Category[]>;
-    login(user: CreateUserDto): Promise<User>;
+    login(user: LoginUserDto): Promise<User>;
     logout(request: any): Promise<User>;
     update(data: UpdateUserDto, request: any): Promise<User>;
     updateCat(data: Categories, request: any): Promise<User>;
@@ -41,7 +42,7 @@ export declare class UsersController {
     forgotPwd(email: MailUserDto): Promise<{
         message: string;
     }>;
-    deleteProfile(res: any, request: any, password: PasswordUserDto): Promise<User>;
+    deleteProfile(request: any, password: PasswordUserDto): Promise<User>;
     setEmailPsw(email: string): Promise<any>;
     verifyEmail(id: string): Promise<any>;
 }

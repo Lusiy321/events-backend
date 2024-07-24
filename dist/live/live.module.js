@@ -15,6 +15,7 @@ const users_model_1 = require("../users/users.model");
 const live_controller_1 = require("./live.controller");
 const live_resolver_1 = require("./live.resolver");
 const cloudinary_service_1 = require("../users/cloudinary.service");
+const places_model_1 = require("../places/places.model");
 let LiveModule = class LiveModule {
 };
 exports.LiveModule = LiveModule;
@@ -24,6 +25,7 @@ exports.LiveModule = LiveModule = __decorate([
             mongoose_1.MongooseModule.forFeature([
                 { name: live_model_1.Live.name, schema: live_model_1.LiveSchema, collection: 'live' },
                 { name: users_model_1.User.name, schema: users_model_1.UserSchema, collection: 'users' },
+                { name: places_model_1.Place.name, schema: places_model_1.PlaceSchema, collection: 'places' },
             ]),
         ],
         controllers: [live_controller_1.LiveController],
