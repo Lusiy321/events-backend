@@ -396,6 +396,63 @@ let UsersService = class UsersService {
             throw e;
         }
     }
+    async firstRegisterUser(user, req) {
+        try {
+            const { firstName, social, title, description, phone, telegram, whatsapp, location, master_photo, price, viber, register, } = user;
+            const findId = await this.findToken(req);
+            if (!findId) {
+                throw new http_errors_1.Unauthorized('jwt expired');
+            }
+            if (findId) {
+                if (social) {
+                    const updatedSocial = Object.assign(Object.assign({}, findId.social), social);
+                    const sanitizedSocial = Object.entries(updatedSocial)
+                        .filter(([key, value]) => key && value)
+                        .reduce((acc, [key, value]) => (Object.assign(Object.assign({}, acc), { [key]: value })), {});
+                    await this.userModel.findByIdAndUpdate({ _id: findId.id }, { $set: { social: sanitizedSocial } });
+                    await this.userModel.findByIdAndUpdate({ _id: findId.id }, {
+                        firstName,
+                        title,
+                        description,
+                        phone,
+                        telegram,
+                        whatsapp,
+                        location,
+                        master_photo,
+                        price,
+                        viber,
+                        register,
+                    });
+                    return await this.userModel
+                        .findById({ _id: findId.id })
+                        .select(parse_user_1.rows)
+                        .exec();
+                }
+                else {
+                    await this.userModel.findByIdAndUpdate({ _id: findId.id }, {
+                        firstName,
+                        title,
+                        description,
+                        phone,
+                        telegram,
+                        whatsapp,
+                        location,
+                        master_photo,
+                        price,
+                        viber,
+                        register,
+                    });
+                    return await this.userModel
+                        .findById({ _id: findId.id })
+                        .select(parse_user_1.rows)
+                        .exec();
+                }
+            }
+        }
+        catch (e) {
+            throw e;
+        }
+    }
     async addSubcategory(categories, newCategory) {
         const updatedCategories = categories.map((category) => {
             if (category._id === newCategory._id) {

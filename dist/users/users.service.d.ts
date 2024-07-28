@@ -31,6 +31,7 @@ export declare class UsersService {
     logout(req: any): Promise<User>;
     deleteUserProfile(req: any, userPassword: PasswordUserDto): Promise<User>;
     updateUser(user: UpdateUserDto, req: any): Promise<User>;
+    firstRegisterUser(user: UpdateUserDto, req: any): Promise<User>;
     private addSubcategory;
     updateCategory(data: Categories, req: any): Promise<User>;
     deleteCategory(id: string, req: any): Promise<any>;

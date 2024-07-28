@@ -25,6 +25,7 @@ export declare class UsersController {
     findCat(): Promise<Category[]>;
     login(user: LoginUserDto): Promise<User>;
     logout(request: any): Promise<User>;
+    firstRegister(data: UpdateUserDto, request: any): Promise<User>;
     update(data: UpdateUserDto, request: any): Promise<User>;
     updateCat(data: Categories, request: any): Promise<User>;
     delCat(id: string, request: any): Promise<User>;
