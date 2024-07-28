@@ -108,6 +108,17 @@ export class UsersController {
     return this.usersService.logout(request);
   }
 
+  @ApiOperation({ summary: 'First register user' })
+  @ApiResponse({ status: 200, type: User })
+  @ApiBearerAuth('BearerAuthMethod')
+  @Put('/registration')
+  async firstRegister(
+    @Body() data: UpdateUserDto,
+    @Req() request: any,
+  ): Promise<User> {
+    return this.usersService.firstRegisterUser(data, request);
+  }
+
   @ApiOperation({ summary: 'Update user' })
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')

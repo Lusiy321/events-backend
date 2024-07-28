@@ -469,6 +469,90 @@ export class UsersService {
       throw e;
     }
   }
+
+  async firstRegisterUser(user: UpdateUserDto, req: any): Promise<User> {
+    try {
+      const {
+        firstName,
+        social,
+        title,
+        description,
+        phone,
+        telegram,
+        whatsapp,
+        location,
+        master_photo,
+        price,
+        viber,
+        register,
+      } = user;
+      const findId = await this.findToken(req);
+
+      if (!findId) {
+        throw new Unauthorized('jwt expired');
+      }
+
+      if (findId) {
+        if (social) {
+          const updatedSocial = { ...findId.social, ...social };
+
+          const sanitizedSocial = Object.entries(updatedSocial)
+            .filter(([key, value]) => key && value)
+            .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+
+          await this.userModel.findByIdAndUpdate(
+            { _id: findId.id },
+            { $set: { social: sanitizedSocial } },
+          );
+          await this.userModel.findByIdAndUpdate(
+            { _id: findId.id },
+            {
+              firstName,
+              title,
+              description,
+              phone,
+              telegram,
+              whatsapp,
+              location,
+              master_photo,
+              price,
+              viber,
+              register,
+            },
+          );
+
+          return await this.userModel
+            .findById({ _id: findId.id })
+            .select(rows)
+            .exec();
+        } else {
+          await this.userModel.findByIdAndUpdate(
+            { _id: findId.id },
+            {
+              firstName,
+              title,
+              description,
+              phone,
+              telegram,
+              whatsapp,
+              location,
+              master_photo,
+              price,
+              viber,
+              register,
+            },
+          );
+
+          return await this.userModel
+            .findById({ _id: findId.id })
+            .select(rows)
+            .exec();
+        }
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
   private async addSubcategory(
     categories: Categories[],
     newCategory: Categories,
