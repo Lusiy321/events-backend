@@ -63,6 +63,7 @@ let UsersController = class UsersController {
         return this.usersService.logout(request);
     }
     async firstRegister(data, request) {
+        console.log(data);
         return this.usersService.firstRegisterUser(data, request);
     }
     async update(data, request) {
@@ -210,7 +211,7 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'First register user' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
-    (0, common_1.Patch)('/registration'),
+    (0, common_1.Put)('/registration'),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),

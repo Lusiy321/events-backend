@@ -111,11 +111,12 @@ export class UsersController {
   @ApiOperation({ summary: 'First register user' })
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')
-  @Patch('/registration')
+  @Put('/registration')
   async firstRegister(
     @Body() data: UpdateUserDto,
     @Req() request: any,
   ): Promise<User> {
+    console.log(data);
     return this.usersService.firstRegisterUser(data, request);
   }
 
