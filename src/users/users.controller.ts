@@ -116,7 +116,6 @@ export class UsersController {
     @Body() data: UpdateUserDto,
     @Req() request: any,
   ): Promise<User> {
-    console.log(data);
     return this.usersService.firstRegisterUser(data, request);
   }
 

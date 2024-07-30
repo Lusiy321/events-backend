@@ -63,7 +63,6 @@ let UsersController = class UsersController {
         return this.usersService.logout(request);
     }
     async firstRegister(data, request) {
-        console.log(data);
         return this.usersService.firstRegisterUser(data, request);
     }
     async update(data, request) {
