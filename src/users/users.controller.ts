@@ -111,7 +111,7 @@ export class UsersController {
   @ApiOperation({ summary: 'First register user' })
   @ApiResponse({ status: 200, type: User })
   @ApiBearerAuth('BearerAuthMethod')
-  @Put('/registration')
+  @Patch('/registration')
   async firstRegister(
     @Body() data: UpdateUserDto,
     @Req() request: any,
