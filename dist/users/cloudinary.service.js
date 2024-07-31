@@ -32,8 +32,8 @@ let CloudinaryService = class CloudinaryService {
         };
     }
     async uploadImages(user, images) {
-        const validImages = images.filter((image) => image && image.path);
-        const uploadPromises = validImages.map((image) => this.uploadImage(user, image));
+        const validImages = images.filter(async (image) => image && image.path);
+        const uploadPromises = validImages.map(async (image) => await this.uploadImage(user, image));
         await Promise.all(uploadPromises);
     }
     async uploadImageLive(user, image) {

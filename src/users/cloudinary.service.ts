@@ -25,10 +25,10 @@ export class CloudinaryService {
   }
 
   async uploadImages(user: User, images: Express.Multer.File[]): Promise<void> {
-    const validImages = images.filter((image) => image && image.path);
+    const validImages = images.filter(async (image) => image && image.path);
 
-    const uploadPromises = validImages.map((image) =>
-      this.uploadImage(user, image),
+    const uploadPromises = validImages.map(
+      async (image) => await this.uploadImage(user, image),
     );
     await Promise.all(uploadPromises);
   }
@@ -37,7 +37,6 @@ export class CloudinaryService {
       console.error('Invalid image:', image);
       return;
     }
-
     const stream = createReadStream(image.path);
 
     return new Promise(async (resolve, reject) => {
