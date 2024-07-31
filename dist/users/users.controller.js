@@ -75,6 +75,7 @@ let UsersController = class UsersController {
         return this.usersService.deleteCategory(id, request);
     }
     async uploadPhoto(req, images) {
+        console.log(images, images.length);
         const user = await this.usersService.findToken(req);
         await this.cloudinaryService.uploadImages(user, images);
         return await this.usersService.findById(user.id);

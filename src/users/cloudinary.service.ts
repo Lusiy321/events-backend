@@ -25,6 +25,7 @@ export class CloudinaryService {
   }
 
   async uploadImages(user: User, images: Express.Multer.File[]): Promise<void> {
+    console.log(images);
     const validImages = images.filter(async (image) => image && image.path);
 
     const uploadPromises = validImages.map(

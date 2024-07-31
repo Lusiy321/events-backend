@@ -173,6 +173,7 @@ export class UsersController {
     @Req() req: any,
     @UploadedFiles() images: Express.Multer.File[],
   ): Promise<User> {
+    console.log(images, images.length);
     const user = await this.usersService.findToken(req);
     await this.cloudinaryService.uploadImages(user, images);
     return await this.usersService.findById(user.id);
