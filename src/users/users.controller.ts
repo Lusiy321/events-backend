@@ -173,10 +173,18 @@ export class UsersController {
     @Req() req: any,
     @UploadedFiles() images: Express.Multer.File[],
   ): Promise<User> {
-    console.log(images, images.length);
-    const user = await this.usersService.findToken(req);
-    await this.cloudinaryService.uploadImages(user, images);
-    return await this.usersService.findById(user.id);
+    try {
+      const user = await this.usersService.findToken(req);
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      await this.cloudinaryService.uploadImages(user, images);
+      return await this.usersService.findById(user.id);
+    } catch (error) {
+      console.error('Error uploading images:', error);
+      throw new Error('Failed to upload images');
+    }
   }
 
   @ApiOperation({ summary: 'Avatar image upload' })
@@ -184,7 +192,7 @@ export class UsersController {
   @ApiBearerAuth('BearerAuthMethod')
   @Post('avatar')
   @UseInterceptors(
-    FilesInterceptor('file', 5, {
+    FilesInterceptor('file', 6, {
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, cb) => {
