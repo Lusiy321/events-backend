@@ -75,10 +75,18 @@ let UsersController = class UsersController {
         return this.usersService.deleteCategory(id, request);
     }
     async uploadPhoto(req, images) {
-        console.log(images, images.length);
-        const user = await this.usersService.findToken(req);
-        await this.cloudinaryService.uploadImages(user, images);
-        return await this.usersService.findById(user.id);
+        try {
+            const user = await this.usersService.findToken(req);
+            if (!user) {
+                throw new Error('User not found');
+            }
+            await this.cloudinaryService.uploadImages(user, images);
+            return await this.usersService.findById(user.id);
+        }
+        catch (error) {
+            console.error('Error uploading images:', error);
+            throw new Error('Failed to upload images');
+        }
     }
     async uploadUserAvatar(req, images) {
         const user = await this.usersService.findToken(req);
@@ -280,7 +288,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 200, type: users_model_1.User }),
     (0, swagger_1.ApiBearerAuth)('BearerAuthMethod'),
     (0, common_1.Post)('avatar'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)('file', 5, {
+    (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)('file', 6, {
         storage: (0, multer_1.diskStorage)({
             destination: './uploads',
             filename: (req, file, cb) => {
